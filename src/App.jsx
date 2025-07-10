@@ -8,33 +8,17 @@ function App() {
   const [activeTickets, setActiveTickets] = useState();
   const [resolvedTickets, setResolvedTickets] = useState();
 
+  const getSavedData = (key) => {
+    const parsedKey = JSON.parse(localStorage.getItem(key));
+    if (parsedKey) {
+      return parsedKey;
+    } else return [];
+  };
+
   useEffect(() => {
-    const savedActiveTickets = JSON.parse(
-      localStorage.getItem("activeTickets")
-    );
-    if (savedActiveTickets) {
-      setActiveTickets(savedActiveTickets);
-    } else {
-      setActiveTickets([]);
-    }
-
-    const savedResolvedTickets = JSON.parse(
-      localStorage.getItem("resolvedTickets")
-    );
-    if (savedResolvedTickets) {
-      setResolvedTickets(savedResolvedTickets);
-    } else {
-      setResolvedTickets([]);
-    }
-
-    const savedTotalTicketCount = JSON.parse(
-      localStorage.getItem("totalTicketCount")
-    );
-    if (savedTotalTicketCount) {
-      setTotalTicketCount(savedTotalTicketCount);
-    } else {
-      setTotalTicketCount(0);
-    }
+    setActiveTickets(getSavedData("activeTickets"));
+    setResolvedTickets(getSavedData("resolvedTickets"));
+    setTotalTicketCount(getSavedData("totalTicketCount"));
 
     setLoaded(true);
   }, []);
