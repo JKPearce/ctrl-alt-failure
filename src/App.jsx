@@ -3,31 +3,32 @@ import { Ticket } from "./components/Ticket";
 import "./index.css";
 
 function App() {
-  const [hasLoaded, setLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [totalTicketCount, setTotalTicketCount] = useState();
   const [activeTickets, setActiveTickets] = useState();
   const [resolvedTickets, setResolvedTickets] = useState();
 
-  const getSavedData = (key) => {
-    const parsedKey = JSON.parse(localStorage.getItem(key));
-    if (parsedKey) {
-      return parsedKey;
-    } else return [];
+  const getSavedData = (key, fallback) => {
+    const value = localStorage.getItem(key);
+    try {
+      return value ? JSON.parse(value) : fallback;
+    } catch {
+      return fallback;
+    }
   };
 
   useEffect(() => {
-    setActiveTickets(getSavedData("activeTickets"));
-    setResolvedTickets(getSavedData("resolvedTickets"));
-    setTotalTicketCount(getSavedData("totalTicketCount"));
+    //initial load
+    setActiveTickets(getSavedData("activeTickets", []));
+    setResolvedTickets(getSavedData("resolvedTickets", []));
+    setTotalTicketCount(getSavedData("totalTicketCount", 0));
 
-    setLoaded(true);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    //Save to local storage on update of the active/resolved ticket count
-    if (!hasLoaded) {
-      return;
-    }
+    //stops the initial loading overriding the local storage
+    if (loading) return;
 
     localStorage.setItem("totalTicketCount", JSON.stringify(totalTicketCount));
     localStorage.setItem("activeTickets", JSON.stringify(activeTickets));
@@ -55,38 +56,35 @@ function App() {
     setResolvedTickets((prev) => [...prev, ticketObject]);
   };
 
+  if (loading) return <h1>Loading...</h1>;
   return (
     <>
-      {hasLoaded ? (
-        <div className="min-h-screen bg-gray-100 p-6">
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            onClick={handleAddTicket}
-          >
-            Add Ticket
-          </button>
-          <h1>Active Ticket count: {activeTickets.length}</h1>
-          <h1>Resolved Ticket count: {resolvedTickets.length}</h1>
+      <div className="min-h-screen bg-gray-100 p-6">
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          onClick={handleAddTicket}
+        >
+          Add Ticket
+        </button>
+        <h1>Active Ticket count: {activeTickets.length}</h1>
+        <h1>Resolved Ticket count: {resolvedTickets.length}</h1>
 
-          <div
-            id="ticket-section"
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4"
-          >
-            {activeTickets.map((ticket) => (
-              <Ticket
-                key={ticket.ticketNumber}
-                ticketNumber={ticket.ticketNumber}
-                raisedBy={ticket.raisedBy}
-                category={ticket.category}
-                issueDescription={ticket.issueDescription}
-                onResolve={() => handleResolveTicket(ticket)}
-              />
-            ))}
-          </div>
+        <div
+          id="ticket-section"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4"
+        >
+          {activeTickets.map((ticket) => (
+            <Ticket
+              key={ticket.ticketNumber}
+              ticketNumber={ticket.ticketNumber}
+              raisedBy={ticket.raisedBy}
+              category={ticket.category}
+              issueDescription={ticket.issueDescription}
+              onResolve={() => handleResolveTicket(ticket)}
+            />
+          ))}
         </div>
-      ) : (
-        <h1>Loading...</h1>
-      )}
+      </div>
     </>
   );
 }
