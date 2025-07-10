@@ -3,18 +3,29 @@ import { Ticket } from "./components/Ticket";
 import "./index.css";
 
 function App() {
-  const [ticketCount, setTicketCount] = useState(0);
-  const [tickets, setTickets] = useState([]);
+  const [totalTicketCount, setTotalTicketCount] = useState(0);
+  const [activeTickets, setActiveTickets] = useState([]);
+  const [resolvedTickets, setResolvedTickets] = useState([]);
 
   const handleClick = () => {
-    setTicketCount(ticketCount + 1);
+    setTotalTicketCount(totalTicketCount + 1);
+
     const newTicket = {
-      id: ticketCount,
+      ticketNumber: totalTicketCount,
       raisedBy: "Billy",
       category: "Hardware",
       issueDescription: "Keyboard not working when i type",
     };
-    setTickets([...tickets, newTicket]);
+
+    setActiveTickets([...activeTickets, newTicket]);
+  };
+
+  const resolveTicket = (ticketObject) => {
+    setActiveTickets((prev) =>
+      prev.filter((ticket) => ticket.ticketNumber !== ticketObject.ticketNumber)
+    );
+
+    setResolvedTickets([...resolvedTickets, ticketObject]);
   };
 
   return (
@@ -26,16 +37,21 @@ function App() {
         >
           Add Ticket
         </button>
+        <h1>Active Ticket count: {activeTickets.length}</h1>
+        <h1>Resolved Ticket count: {resolvedTickets.length}</h1>
+
         <div
           id="ticket-section"
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4"
         >
-          {tickets.map((ticket) => (
+          {activeTickets.map((ticket) => (
             <Ticket
-              key={ticket.id}
+              key={ticket.ticketNumber}
+              ticketNumber={ticket.ticketNumber}
               raisedBy={ticket.raisedBy}
               category={ticket.category}
               issueDescription={ticket.issueDescription}
+              onResolve={() => resolveTicket(ticket)}
             />
           ))}
         </div>
