@@ -43,19 +43,45 @@ const TicketProvider = ({ children }) => {
       raisedBy: "Billy",
       category: "Hardware",
       issueDescription: "Keyboard not working when i type",
+      state: "open",
+      assignedTo: "",
+      createdAt: Date.now(),
+      resolvedAt: null,
     };
 
     setActiveTickets([...activeTickets, newTicket]);
   };
 
-  const resolveTicket = (resolvedTicket) => {
+  const resolveTicket = (ticket, resolver) => {
     setActiveTickets((prev) =>
-      prev.filter(
-        (ticket) => ticket.ticketNumber !== resolvedTicket.ticketNumber
-      )
+      prev.filter((t) => t.ticketNumber !== ticket.ticketNumber)
     );
 
-    setResolvedTickets((prev) => [...prev, resolvedTicket]);
+    const updatedTicket = {
+      ...ticket,
+      state: "resolved",
+      resolvedAt: Date.now(),
+      resolvedBy: resolver,
+    };
+
+    setResolvedTickets((prev) => [...prev, updatedTicket]);
+  };
+
+  const updateTicketDetails = (ticketNumber, newData) => {
+    const updatedTicketArray = activeTickets.map((i) => {
+      if (i.ticketNumber === ticketNumber) {
+        return {
+          ...i,
+          ...newData,
+        };
+      } else return i;
+    });
+
+    setActiveTickets(updatedTicketArray);
+  };
+
+  const findOpenTicket = () => {
+    return activeTickets.find((t) => t.state === "open") || null;
   };
 
   return (
@@ -67,6 +93,8 @@ const TicketProvider = ({ children }) => {
         totalTicketCount,
         addTicket,
         resolveTicket,
+        updateTicketDetails,
+        findOpenTicket,
       }}
     >
       {children}

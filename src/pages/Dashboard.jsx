@@ -1,9 +1,12 @@
+import { CurrentTaskPanel } from "../components/CurrentTaskPanel";
 import { Ticket } from "../components/Ticket";
+import { useGame } from "../context/useGame";
 import { useTicket } from "../context/useTicket";
 
 const Dashboard = () => {
   const { loading, activeTickets, resolvedTickets, addTicket, resolveTicket } =
     useTicket();
+  const { playerName } = useGame();
 
   if (loading) return <h1>Loading...</h1>;
   return (
@@ -17,6 +20,7 @@ const Dashboard = () => {
         </button>
         <h1>Active Ticket count: {activeTickets.length}</h1>
         <h1>Resolved Ticket count: {resolvedTickets.length}</h1>
+        <CurrentTaskPanel />
 
         <div
           id="ticket-section"
@@ -29,7 +33,7 @@ const Dashboard = () => {
               raisedBy={ticket.raisedBy}
               category={ticket.category}
               issueDescription={ticket.issueDescription}
-              onResolve={() => resolveTicket(ticket)}
+              onResolve={() => resolveTicket(ticket, playerName)}
             />
           ))}
         </div>

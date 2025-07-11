@@ -11,8 +11,8 @@ import { Stats } from "./pages/Stats.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <GameProvider>
-      <TicketProvider>
+    <TicketProvider>
+      <GameProvider>
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<Dashboard />} />
@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="/stats" element={<Stats />} />
           </Route>
         </Routes>
-      </TicketProvider>
-    </GameProvider>
+      </GameProvider>
+    </TicketProvider>
   </BrowserRouter>
 );
