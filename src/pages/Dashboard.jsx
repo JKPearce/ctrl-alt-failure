@@ -1,67 +1,17 @@
-import { useEffect, useState } from "react";
 import { Ticket } from "../components/Ticket";
+import { useTicket } from "../context/useTicket";
 
 const Dashboard = () => {
-  const [loading, setLoading] = useState(true);
-  const [totalTicketCount, setTotalTicketCount] = useState();
-  const [activeTickets, setActiveTickets] = useState();
-  const [resolvedTickets, setResolvedTickets] = useState();
-
-  const getSavedData = (key, fallback) => {
-    const value = localStorage.getItem(key);
-    try {
-      return value ? JSON.parse(value) : fallback;
-    } catch {
-      return fallback;
-    }
-  };
-
-  useEffect(() => {
-    //initial load
-    setActiveTickets(getSavedData("activeTickets", []));
-    setResolvedTickets(getSavedData("resolvedTickets", []));
-    setTotalTicketCount(getSavedData("totalTicketCount", 0));
-
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    //stops the initial loading overriding the local storage
-    if (loading) return;
-
-    localStorage.setItem("totalTicketCount", JSON.stringify(totalTicketCount));
-    localStorage.setItem("activeTickets", JSON.stringify(activeTickets));
-    localStorage.setItem("resolvedTickets", JSON.stringify(resolvedTickets));
-  }, [activeTickets, resolvedTickets]);
-
-  const handleAddTicket = () => {
-    setTotalTicketCount(totalTicketCount + 1);
-
-    const newTicket = {
-      ticketNumber: totalTicketCount,
-      raisedBy: "Billy",
-      category: "Hardware",
-      issueDescription: "Keyboard not working when i type",
-    };
-
-    setActiveTickets([...activeTickets, newTicket]);
-  };
-
-  const handleResolveTicket = (ticketObject) => {
-    setActiveTickets((prev) =>
-      prev.filter((ticket) => ticket.ticketNumber !== ticketObject.ticketNumber)
-    );
-
-    setResolvedTickets((prev) => [...prev, ticketObject]);
-  };
+  const { loading, activeTickets, resolvedTickets, addTicket, resolveTicket } =
+    useTicket();
 
   if (loading) return <h1>Loading...</h1>;
   return (
     <>
-      <div className="min-h-screen bg-gray-100 p-6">
+      <div className="min-h-screen p-6">
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          onClick={handleAddTicket}
+          onClick={addTicket}
         >
           Add Ticket
         </button>
@@ -79,7 +29,7 @@ const Dashboard = () => {
               raisedBy={ticket.raisedBy}
               category={ticket.category}
               issueDescription={ticket.issueDescription}
-              onResolve={() => handleResolveTicket(ticket)}
+              onResolve={() => resolveTicket(ticket)}
             />
           ))}
         </div>

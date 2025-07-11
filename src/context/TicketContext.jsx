@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
-import { Ticket } from "./components/Ticket";
-import "./index.css";
+import { createContext, useEffect, useState } from "react";
 
-function App() {
+const TicketContext = createContext();
+
+const TicketProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [totalTicketCount, setTotalTicketCount] = useState();
   const [activeTickets, setActiveTickets] = useState();
   const [resolvedTickets, setResolvedTickets] = useState();
 
+  //helper function to get and parse localstorage data
   const getSavedData = (key, fallback) => {
     const value = localStorage.getItem(key);
     try {
@@ -17,12 +18,11 @@ function App() {
     }
   };
 
+  //runs on first load
   useEffect(() => {
-    //initial load
     setActiveTickets(getSavedData("activeTickets", []));
     setResolvedTickets(getSavedData("resolvedTickets", []));
     setTotalTicketCount(getSavedData("totalTicketCount", 0));
-
     setLoading(false);
   }, []);
 
@@ -35,7 +35,7 @@ function App() {
     localStorage.setItem("resolvedTickets", JSON.stringify(resolvedTickets));
   }, [activeTickets, resolvedTickets]);
 
-  const handleAddTicket = () => {
+  const addTicket = () => {
     setTotalTicketCount(totalTicketCount + 1);
 
     const newTicket = {
@@ -48,45 +48,30 @@ function App() {
     setActiveTickets([...activeTickets, newTicket]);
   };
 
-  const handleResolveTicket = (ticketObject) => {
+  const resolveTicket = (resolvedTicket) => {
     setActiveTickets((prev) =>
-      prev.filter((ticket) => ticket.ticketNumber !== ticketObject.ticketNumber)
+      prev.filter(
+        (ticket) => ticket.ticketNumber !== resolvedTicket.ticketNumber
+      )
     );
 
-    setResolvedTickets((prev) => [...prev, ticketObject]);
+    setResolvedTickets((prev) => [...prev, resolvedTicket]);
   };
 
-  if (loading) return <h1>Loading...</h1>;
   return (
-    <>
-      <div className="min-h-screen bg-gray-100 p-6">
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          onClick={handleAddTicket}
-        >
-          Add Ticket
-        </button>
-        <h1>Active Ticket count: {activeTickets.length}</h1>
-        <h1>Resolved Ticket count: {resolvedTickets.length}</h1>
-
-        <div
-          id="ticket-section"
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4"
-        >
-          {activeTickets.map((ticket) => (
-            <Ticket
-              key={ticket.ticketNumber}
-              ticketNumber={ticket.ticketNumber}
-              raisedBy={ticket.raisedBy}
-              category={ticket.category}
-              issueDescription={ticket.issueDescription}
-              onResolve={() => handleResolveTicket(ticket)}
-            />
-          ))}
-        </div>
-      </div>
-    </>
+    <TicketContext.Provider
+      value={{
+        loading,
+        activeTickets,
+        resolvedTickets,
+        totalTicketCount,
+        addTicket,
+        resolveTicket,
+      }}
+    >
+      {children}
+    </TicketContext.Provider>
   );
-}
+};
 
-export default App;
+export { TicketContext, TicketProvider };
