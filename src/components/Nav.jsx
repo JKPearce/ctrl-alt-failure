@@ -1,36 +1,36 @@
 import { NavLink } from "react-router";
 
 const Nav = () => {
-  const navLinkClasses = ({ isActive }) =>
+  const linkClasses = ({ isActive }) =>
     isActive
-      ? "text-yellow-300 font-semibold underline"
-      : "hover:text-yellow-200";
+      ? "btn btn-ghost text-secondary border-b-2 border-secondary"
+      : "btn btn-ghost hover:text-secondary";
 
   return (
-    <nav className="bg-gray-800 text-white px-4 py-2">
-      <ul className="flex space-x-4">
-        <li>
-          <NavLink to="/" end className={navLinkClasses}>
-            Dashboard
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/agents" className={navLinkClasses}>
-            Agents
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/profile" className={navLinkClasses}>
-            Profile
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/stats" className={navLinkClasses}>
-            Statistics
-          </NavLink>
-        </li>
-      </ul>
-    </nav>
+    <div className="navbar bg-base-300 text-base-content px-6 shadow-lg">
+      <div className="flex-1">
+        <NavLink
+          to="/"
+          className="btn btn-ghost normal-case text-xl text-primary"
+        >
+          IT Desk Sim
+        </NavLink>
+      </div>
+      <div className="flex-none space-x-2">
+        <NavLink to="/" end className={linkClasses}>
+          Dashboard
+        </NavLink>
+        <NavLink to="/agents" className={linkClasses}>
+          Agents
+        </NavLink>
+        <NavLink to="/profile" className={linkClasses}>
+          Profile
+        </NavLink>
+        <NavLink to="/stats" className={linkClasses}>
+          Stats
+        </NavLink>
+      </div>
+    </div>
   );
 };
 
