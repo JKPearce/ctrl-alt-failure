@@ -4,8 +4,7 @@ import { useGame } from "../context/useGame";
 import { useTicket } from "../context/useTicket";
 
 const Dashboard = () => {
-  const { loading, activeTickets, resolvedTickets, addTicket, resolveTicket } =
-    useTicket();
+  const { loading, addTicket, resolveTicket, ticketList } = useTicket();
   const { playerName } = useGame();
 
   if (loading) return <h1>Loading...</h1>;
@@ -18,24 +17,37 @@ const Dashboard = () => {
         >
           Add Ticket
         </button>
-        <h1>Active Ticket count: {activeTickets.length}</h1>
-        <h1>Resolved Ticket count: {resolvedTickets.length}</h1>
+        <h1>
+          Open Ticket count:{" "}
+          {ticketList.filter((t) => t.state === "Open").length}
+        </h1>
+        <h1>
+          Work in Progress Tickets count:{" "}
+          {ticketList.filter((t) => t.state === "Work in Progress").length}
+        </h1>
+        <h1>
+          Resolved Ticket count:{" "}
+          {ticketList.filter((t) => t.state === "Resolved").length}
+        </h1>
+
         <CurrentTaskPanel />
 
         <div
           id="ticket-section"
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4"
         >
-          {activeTickets.map((ticket) => (
-            <Ticket
-              key={ticket.ticketNumber}
-              ticketNumber={ticket.ticketNumber}
-              raisedBy={ticket.raisedBy}
-              category={ticket.category}
-              issueDescription={ticket.issueDescription}
-              onResolve={() => resolveTicket(ticket, playerName)}
-            />
-          ))}
+          {ticketList.map((ticket) =>
+            ticket.state === "Open" ? (
+              <Ticket
+                key={ticket.ticketNumber}
+                ticketNumber={ticket.ticketNumber}
+                raisedBy={ticket.raisedBy}
+                category={ticket.category}
+                issueDescription={ticket.issueDescription}
+                onResolve={() => resolveTicket(ticket, playerName)}
+              />
+            ) : null
+          )}
         </div>
       </div>
     </>

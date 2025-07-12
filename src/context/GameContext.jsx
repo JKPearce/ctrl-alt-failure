@@ -1,56 +1,85 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { useTicket } from "./useTicket";
 
 const GameContext = createContext();
 
 const GameProvider = ({ children }) => {
-  const [currentTask, setCurrentTask] = useState("Idle");
-  const [ticketInProgress, setTicketInProgress] = useState();
+  const workInterval = useRef(null);
+  const [currentAction, setCurrentTask] = useState("Idle");
+  const [ticketInProgress, setTicketInProgress] = useState(null);
   const [money, setMoney] = useState(0);
   const [playerName, setPlayerName] = useState("Player");
-  const { activeTickets, updateTicketDetails, findOpenTicket } = useTicket();
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const { updateTicketDetails, findOpenTicket } = useTicket();
+
+  useEffect(() => {
+    if (!ticketInProgress) return;
+    workInterval.current = setInterval(() => {
+      setTimeRemaining((t) => {
+        const next = t - 1;
+        if (next <= 0) {
+          clearInterval(workInterval.current);
+          workInterval.current = null;
+
+          setTimeout(() => {
+            updateTicketDetails(ticketInProgress, "Resolve", playerName);
+            setTicketInProgress(null);
+
+            setTimeout(() => {
+              startWork(); // give React time to propagate TicketContext updates
+            }, 10);
+          }, 0);
+
+          return 0;
+        }
+        return next;
+      });
+    }, 1000); //1000 is 1 second
+
+    return () => clearInterval(workInterval.current);
+  }, [ticketInProgress]);
 
   const calculateTimeToResolve = (ticket) => {
     //here is where ill eventually add some algorithm that calculates a time to complete a ticket, this will use player stats, upgrades unlocked against the ticket "difficulty" which will be calculated by a players unlocks and stats, maybe someone spent more points into hardware knowledge or software knowledge and the ticket is a hardware issue so it would be "eaiser" to resolve therefore take less time
-    const timeToResolve = 10; //going to just set this to 10 and make it be 10 seconds for now but this number will get calculated based on above comment
+    const timeToResolve = 2; //going to just set this to 10 and make it be 10 seconds for now but this number will get calculated based on above comment
     return timeToResolve;
   };
 
   const startWork = () => {
-    const ticket = findOpenTicket();
-    if (!ticket) return; //add something to notify user that theres nothing "go grab some coffee, theres no work for you here"
+    setTimeout(() => {
+      const ticket = findOpenTicket();
+      console.log("🎯 startWork ticket:", ticket);
 
-    setTicketInProgress(ticket);
-    setCurrentTask("Working on Tickets");
+      if (!ticket) {
+        setCurrentTask("Idle");
+        return;
+      }
 
-    const newTicketData = {
-      state: "Work in Progress",
-      assignedTo: playerName,
-      timeToResolve: calculateTimeToResolve(ticket),
-    };
+      setCurrentTask("Working on Tickets");
+      setTicketInProgress(ticket);
 
-    updateTicketDetails(ticket.ticketNumber, newTicketData);
+      const timeToResolve = calculateTimeToResolve(ticket);
+
+      setTimeRemaining(timeToResolve);
+      updateTicketDetails(ticket, "Work in Progress", playerName);
+    }, 50);
   };
 
   const stopWork = () => {
     setCurrentTask("Idle");
-    const newTicketData = {
-      state: "open",
-      assignedTo: "",
-      timeToResolve: null,
-    };
-
-    updateTicketDetails(ticketInProgress.ticketNumber, newTicketData);
-    setTicketInProgress({});
+    updateTicketDetails(ticketInProgress, "Stop Work");
+    setTicketInProgress(null);
+    clearInterval(workInterval.current);
   };
 
   return (
     <GameContext.Provider
       value={{
-        currentTask,
+        currentAction,
         money,
         playerName,
         ticketInProgress,
+        timeRemaining,
         startWork,
         stopWork,
       }}
