@@ -44,7 +44,12 @@ const TicketProvider = ({ children }) => {
     setTicketList([...ticketList, newTicket]);
   };
 
-  const updateTicketDetails = (ticketToUpdate, action, actorName) => {
+  const updateTicketDetails = (
+    ticketToUpdate,
+    action,
+    actorName,
+    timeToResolve
+  ) => {
     let dataToUpdate = {};
 
     switch (action) {
@@ -59,13 +64,13 @@ const TicketProvider = ({ children }) => {
         dataToUpdate = {
           state: "Work in Progress",
           assignedTo: actorName,
+          timeToResolve: timeToResolve,
         };
         break;
       case "Stop Work":
         dataToUpdate = {
           state: "Open",
           assignedTo: "",
-          timeToResolve: null,
         };
     }
 

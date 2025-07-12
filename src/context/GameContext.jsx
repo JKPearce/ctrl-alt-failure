@@ -41,7 +41,7 @@ const GameProvider = ({ children }) => {
 
   const calculateTimeToResolve = (ticket) => {
     //here is where ill eventually add some algorithm that calculates a time to complete a ticket, this will use player stats, upgrades unlocked against the ticket "difficulty" which will be calculated by a players unlocks and stats, maybe someone spent more points into hardware knowledge or software knowledge and the ticket is a hardware issue so it would be "eaiser" to resolve therefore take less time
-    const timeToResolve = 2; //going to just set this to 10 and make it be 10 seconds for now but this number will get calculated based on above comment
+    const timeToResolve = 10; //going to just set this to 10 and make it be 10 seconds for now but this number will get calculated based on above comment
     return timeToResolve;
   };
 
@@ -61,7 +61,12 @@ const GameProvider = ({ children }) => {
       const timeToResolve = calculateTimeToResolve(ticket);
 
       setTimeRemaining(timeToResolve);
-      updateTicketDetails(ticket, "Work in Progress", playerName);
+      updateTicketDetails(
+        ticket,
+        "Work in Progress",
+        playerName,
+        timeToResolve
+      );
     }, 50);
   };
 

@@ -1,10 +1,4 @@
-const Ticket = ({
-  raisedBy,
-  category,
-  issueDescription,
-  ticketNumber,
-  onResolve,
-}) => {
+const Ticket = ({ raisedBy, category, issueDescription, ticketNumber }) => {
   return (
     <div className="flex flex-col gap-4">
       <div id="ticket-body" className="bg-white shadow-md rounded-lg p-6">
@@ -20,12 +14,6 @@ const Ticket = ({
         <p className=" text-gray-800 text-sm mb-1">
           Issue Description: {issueDescription}
         </p>
-        <button
-          className="mt-4 bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition duration-150 ease-in-out text-sm"
-          onClick={onResolve}
-        >
-          Resolve
-        </button>
       </div>
     </div>
   );
