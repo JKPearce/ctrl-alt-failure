@@ -16,16 +16,13 @@ const TicketProvider = ({ children }) => {
     }
   };
 
-  //runs on first load
   useEffect(() => {
     setTicketList(getSavedData("ticketList", []));
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    //stops the initial loading overriding the local storage
     if (loading) return;
-
     localStorage.setItem("ticketList", JSON.stringify(ticketList));
   }, [ticketList]);
 
@@ -39,6 +36,7 @@ const TicketProvider = ({ children }) => {
       assignedTo: "",
       createdAt: Date.now(),
       resolvedAt: null,
+      timeToResolve: null,
     };
 
     setTicketList([...ticketList, newTicket]);

@@ -1,38 +1,55 @@
 import { createContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useTicket } from "./useTicket";
 
 const GameContext = createContext();
 
 const GameProvider = ({ children }) => {
   const workInterval = useRef(null);
-  const [currentAction, setCurrentTask] = useState("Idle");
+  const [currentAction, setCurrentAction] = useState("Idle");
   const [ticketInProgress, setTicketInProgress] = useState(null);
   const [money, setMoney] = useState(0);
   const [playerName, setPlayerName] = useState("Player");
   const [timeRemaining, setTimeRemaining] = useState(0);
   const { updateTicketDetails, findOpenTicket } = useTicket();
+  const [activityLog, setActivityLog] = useState([]);
+
+  useEffect(() => {
+    const savedLog = localStorage.getItem("activityLog");
+    if (savedLog) {
+      setActivityLog(JSON.parse(savedLog));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("activityLog", JSON.stringify(activityLog));
+  }, [activityLog]);
 
   useEffect(() => {
     if (!ticketInProgress) return;
+
     workInterval.current = setInterval(() => {
       setTimeRemaining((t) => {
-        const next = t - 1;
-        if (next <= 0) {
+        const nextNumber = t - 1;
+        if (nextNumber <= 0) {
           clearInterval(workInterval.current);
           workInterval.current = null;
 
           setTimeout(() => {
             updateTicketDetails(ticketInProgress, "Resolve", playerName);
-            setTicketInProgress(null);
+            logActivity(
+              playerName,
+              ` resolved Ticket #${ticketInProgress.ticketNumber}`,
+              "You have resolved a ticket!"
+            );
 
-            setTimeout(() => {
-              startWork(); // give React time to propagate TicketContext updates
-            }, 10);
+            setTicketInProgress(null);
+            startWork();
           }, 0);
 
           return 0;
         }
-        return next;
+        return nextNumber;
       });
     }, 1000); //1000 is 1 second
 
@@ -48,19 +65,27 @@ const GameProvider = ({ children }) => {
   const startWork = () => {
     setTimeout(() => {
       const ticket = findOpenTicket();
-      console.log("🎯 startWork ticket:", ticket);
 
       if (!ticket) {
-        setCurrentTask("Idle");
+        setCurrentAction("Idle");
+        logActivity(
+          playerName,
+          "Finished working, no more tickets in the queue. Coffee time!",
+          "The Ticket Queue is empty. Go take a break."
+        );
         return;
       }
 
-      setCurrentTask("Working on Tickets");
-      setTicketInProgress(ticket);
+      if (currentAction !== "Working on Tickets") {
+        setCurrentAction("Working on Tickets");
+        logActivity(playerName, "Started working");
+      }
 
       const timeToResolve = calculateTimeToResolve(ticket);
+      setTicketInProgress(ticket);
 
       setTimeRemaining(timeToResolve);
+
       updateTicketDetails(
         ticket,
         "Work in Progress",
@@ -71,10 +96,27 @@ const GameProvider = ({ children }) => {
   };
 
   const stopWork = () => {
-    setCurrentTask("Idle");
+    setCurrentAction("Idle");
     updateTicketDetails(ticketInProgress, "Stop Work");
     setTicketInProgress(null);
     clearInterval(workInterval.current);
+    logActivity(playerName, "Stopped working");
+  };
+
+  const logActivity = (actor, action, toastMessage = null) => {
+    setActivityLog((prev) => [
+      ...prev,
+      {
+        uID: crypto.randomUUID(),
+        logItem: activityLog.length + 1,
+        actor,
+        action,
+        time: Date.now(),
+      },
+    ]);
+    if (toastMessage) {
+      toast(toastMessage);
+    }
   };
 
   return (
@@ -85,8 +127,10 @@ const GameProvider = ({ children }) => {
         playerName,
         ticketInProgress,
         timeRemaining,
+        activityLog,
         startWork,
         stopWork,
+        logActivity,
       }}
     >
       {children}

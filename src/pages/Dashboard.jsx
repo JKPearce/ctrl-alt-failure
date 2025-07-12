@@ -1,3 +1,4 @@
+import { ActivityFeed } from "../components/dashboard/ActivityFeed";
 import { CurrentTaskPanel } from "../components/dashboard/CurrentTaskPanel";
 import { DeskOverview } from "../components/dashboard/DeskOverview";
 import { useTicket } from "../context/useTicket";
@@ -13,6 +14,7 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <CurrentTaskPanel />
+          <ActivityFeed />
         </div>
         <button
           className="btn btn-primary w-fit self-start"
