@@ -1,26 +1,43 @@
 import { useTicket } from "../../context/useTicket";
 
-const OpenTicketList = () => {
+const OpenTicketsList = () => {
   const { ticketList } = useTicket();
+  const openTickets = ticketList.filter(
+    (ticket) => ticket.state === "Open" || ticket.state === "Work in Progress"
+  );
 
   return (
-    <div
-      id="ticket-section"
-      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4"
-    >
-      {ticketList.map((ticket) =>
-        ticket.state === "Open" ? (
-          <Ticket
-            key={ticket.ticketNumber}
-            ticketNumber={ticket.ticketNumber}
-            raisedBy={ticket.raisedBy}
-            category={ticket.category}
-            issueDescription={ticket.issueDescription}
-          />
-        ) : null
-      )}
+    <div className="md:col-span-3 max-h-1/2 overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+      <table className="table table-pin-cols">
+        <thead>
+          <tr>
+            <th>Ticket Number</th>
+            <th>Category</th>
+            <th>State</th>
+            <th>Issue Description</th>
+            <th>Assigned To</th>
+          </tr>
+        </thead>
+        <tbody>
+          {openTickets.length === 0 ? (
+            <tr className="">
+              <td>No open tickets</td>
+            </tr>
+          ) : (
+            openTickets.map((ticket) => (
+              <tr key={ticket.ticketNumber}>
+                <th>{ticket.ticketNumber}</th>
+                <th>{ticket.category}</th>
+                <th>{ticket.state}</th>
+                <th>{ticket.issueDescription}</th>
+                <th>{ticket.assignedTo}</th>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-export { OpenTicketList };
+export { OpenTicketsList };
