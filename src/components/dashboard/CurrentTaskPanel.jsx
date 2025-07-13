@@ -1,4 +1,4 @@
-import { useGame } from "../../context/useGame";
+import { useGame } from "../../hooks/useGame";
 
 const CurrentTaskPanel = () => {
   const {

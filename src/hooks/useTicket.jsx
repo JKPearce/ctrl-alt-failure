@@ -1,5 +1,7 @@
+"use client";
+
+import { TicketContext } from "@/context/TicketContext";
 import { useContext } from "react";
-import { TicketContext } from "./TicketContext";
 
 const useTicket = () => {
   const ctx = useContext(TicketContext);

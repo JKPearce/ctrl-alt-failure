@@ -1,8 +1,9 @@
-import { ActivityFeed } from "../components/dashboard/ActivityFeed";
-import { CurrentTaskPanel } from "../components/dashboard/CurrentTaskPanel";
-import { DeskOverview } from "../components/dashboard/DeskOverview";
-import { OpenTicketsList } from "../components/dashboard/OpenTicketList";
-import { useTicket } from "../context/useTicket";
+"use client";
+import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { CurrentTaskPanel } from "@/components/dashboard/CurrentTaskPanel";
+import { DeskOverview } from "@/components/dashboard/DeskOverview";
+import { OpenTicketsList } from "@/components/dashboard/OpenTicketList";
+import { useTicket } from "@/hooks/useTicket";
 
 const Dashboard = () => {
   const { loading, addTicket } = useTicket();
@@ -29,4 +30,4 @@ const Dashboard = () => {
   );
 };
 
-export { Dashboard };
+export default Dashboard;

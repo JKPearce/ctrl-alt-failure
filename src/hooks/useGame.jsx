@@ -1,5 +1,6 @@
+"use client";
+import { GameContext } from "@/context/GameContext";
 import { useContext } from "react";
-import { GameContext } from "./GameContext";
 
 const useGame = () => {
   const ctx = useContext(GameContext);

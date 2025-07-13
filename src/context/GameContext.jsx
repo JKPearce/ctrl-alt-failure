@@ -1,6 +1,8 @@
+"use client";
+
 import { createContext, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { useTicket } from "./useTicket";
+import { useTicket } from "../hooks/useTicket";
 
 const GameContext = createContext();
 

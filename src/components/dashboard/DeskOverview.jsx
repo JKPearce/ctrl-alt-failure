@@ -1,4 +1,4 @@
-import { useTicket } from "../../context/useTicket";
+import { useTicket } from "../../hooks/useTicket";
 
 const DeskOverview = () => {
   const { ticketList } = useTicket();
