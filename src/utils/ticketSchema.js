@@ -1,74 +1,47 @@
 import { z } from "zod";
 
 const ticketSchema = z.object({
-  raisedBy: z
-    .string()
-    .min(3)
-    .max(15)
-    .describe("First name and Last name in the form of a pun"),
+  raisedBy: z.string().min(3).max(25).describe("Punny name (e.g. Al Beback)"),
   category: z
     .enum(["Hardware", "Software", "Network", "Security"])
-    .describe("The type of issue that the issueDescribed is referencing"),
+    .describe("The type of issue"),
   issueDescription: z
     .string()
     .min(10)
     .max(300)
-    .describe(
-      "Short, funny complaint about an IT Issue that has been written by the user in raisedBy"
-    ),
+    .describe("Users absurd complaint from their point of view"),
   issueShortDescription: z
     .string()
     .min(1)
     .max(50)
-    .describe(
-      "A 3 to 6 word funny summary of the issue (like a headline). Examples: Laptop thinks its a toaster"
-    ),
+    .describe("Funny 3 to 6 word summary"),
   suggestedResolution: z
     .string()
     .min(10)
     .max(300)
-    .describe(
-      "From the perspective of an IT Agent that resolved the ticket, with their humorous quirks"
-    ),
+    .describe("From the perspective of an IT Agent that resolved the ticket"),
   estimatedTimeToComplete: z
     .object({
-      beginner: z
-        .number()
-        .min(1)
-        .describe("Time in seconds. Skills of an beginner IT analyst"),
-      intermediate: z
-        .number()
-        .min(1)
-        .describe("Time in seconds. Skills of an intermediate IT analyst"),
-      advanced: z
-        .number()
-        .min(10)
-        .max(500)
-        .describe("Time in seconds. Skills of an advanced IT analyst"),
+      beginner: z.number().min(1).max(1000),
+      intermediate: z.number().min(1).max(700),
+      advanced: z.number().min(10).max(500),
     })
     .describe(
-      "Time in seconds for how long a ticket of this issue will take to resolve. (IT analyst with beginner level skills may take 200 seconds to resolve a ticket but someone with export skills could resolve it in 20 seconds)"
+      "Time in seconds it will take to resolve based on IT analyst skills. Beginners may take 100 seconds but advanced 20 seconds"
     ),
-
   agentRemark: z
     .array(
       z.object({
-        comment: z
-          .string()
-          .min(3)
-          .max(300)
-          .describe(
-            "Internal monologue from the agent while working on the ticket"
-          ),
+        comment: z.string().min(3).max(300).describe("Agents inner thoughts"),
         tone: z
           .enum(["helpful", "angry", "sarcastic", "neutral", "frustrated"])
-          .describe("The emotional tone or archetype of the agent's comment"),
+          .describe("Emotional Tone"),
       })
     )
     .min(3)
     .max(3)
     .describe(
-      "Absurd, humorous Remarks that could be made by an IT Agent working on this ticket"
+      "Funny remarks from the perspective of the agent resolving the issue being described"
     ),
 });
 
