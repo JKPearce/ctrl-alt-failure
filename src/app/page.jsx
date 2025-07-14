@@ -1,12 +1,15 @@
 "use client";
-import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
-import { CurrentTaskPanel } from "@/components/dashboard/CurrentTaskPanel";
-import { DeskOverview } from "@/components/dashboard/DeskOverview";
-import { OpenTicketsList } from "@/components/dashboard/OpenTicketList";
+import {
+  ActivityFeed,
+  CurrentTaskPanel,
+  DeskOverview,
+  OpenTicketsList,
+} from "@/components/dashboard";
+
 import { useTicket } from "@/hooks/useTicket";
 
 const Dashboard = () => {
-  const { loading, addTicket } = useTicket();
+  const { loading, addTicket, generateTicketFromAI } = useTicket();
 
   if (loading) return <h1>Loading...</h1>;
   return (
@@ -24,6 +27,9 @@ const Dashboard = () => {
           onClick={addTicket}
         >
           Add Ticket
+        </button>
+        <button className="btn" onClick={generateTicketFromAI}>
+          Test API
         </button>
       </section>
     </>

@@ -88,6 +88,21 @@ const TicketProvider = ({ children }) => {
     return ticketList.find((t) => t.state === "Open") || null;
   };
 
+  const generateTicketFromAI = async () => {
+    const res = await fetch("/api/ticket", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      console.error("❌ Failed to generate ticket");
+      return;
+    }
+
+    const ticket = await res.json();
+    console.log("✅ New ticket:", ticket);
+  };
+
   return (
     <TicketContext.Provider
       value={{
@@ -96,6 +111,7 @@ const TicketProvider = ({ children }) => {
         addTicket,
         updateTicketDetails,
         findOpenTicket,
+        generateTicketFromAI,
       }}
     >
       {children}
