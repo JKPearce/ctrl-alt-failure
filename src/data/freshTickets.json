@@ -1,0 +1,340 @@
+[
+  {
+    "raisedBy": "Sue Flay",
+    "category": "Software",
+    "issueDescription": "My computer keeps throwing a tantrum and refusing to open Excel. It’s like it's got a personal vendetta against spreadsheets.",
+    "issueShortDescription": "Excel Hates Me Today",
+    "suggestedResolution": "I restarted the laptop, cleared cache, and whispered sweet nothings to the failing software. Now it’s working—probably just needed a pep talk.",
+    "estimatedTimeToComplete": {
+      "beginner": 100,
+      "intermediate": 60,
+      "advanced": 40
+    },
+    "agentRemark": [
+      {
+        "comment": "Finally, something I can fix without losing my mind.",
+        "tone": "helpful"
+      },
+      {
+        "comment": "This user thinks they’re an IT expert now. Spoiler: they’re not.",
+        "tone": "neutral"
+      },
+      {
+        "comment": "Is this a new record for absurdity? Nearly. But I’ve heard worse.",
+        "tone": "sarcastic"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Wendy Byte",
+    "category": "Network",
+    "issueDescription": "My Wi-Fi is playing hide and seek, and I can't find it under the couch or behind the bookshelf.",
+    "issueShortDescription": "Wi-Fi gone rogue",
+    "suggestedResolution": "Rebooted the router and changed the channel—it's now less shy and more communicative.",
+    "estimatedTimeToComplete": {
+      "beginner": 100,
+      "intermediate": 50,
+      "advanced": 30
+    },
+    "agentRemark": [
+      {
+        "comment": "Classic Wi-Fi ghosting. Should I leave biscuits?",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "At this rate, I’ll need a séance to reach the router.",
+        "tone": "helpful"
+      },
+      {
+        "comment": "Maybe it just needed a little nap, like the users.",
+        "tone": "neutral"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Bill Board",
+    "category": "Network",
+    "issueDescription": "My Wi-Fi decided to ghost me during my important Zoom call. It’s like my internet hates my new haircut.",
+    "issueShortDescription": "Wi-Fi ghosts on my webcam",
+    "suggestedResolution": "Rebooted the router, appeased the digital spirits, and advised the user to sacrifice a snack to the wireless gods.",
+    "estimatedTimeToComplete": {
+      "beginner": 100,
+      "intermediate": 80,
+      "advanced": 60
+    },
+    "agentRemark": [
+      {
+        "comment": "Oh joy, another wireless ghost haunting.",
+        "tone": "frustrated"
+      },
+      {
+        "comment": "Maybe if I sacrifice some bandwidth, it’ll come back from the dead.",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Just a typical day battling invisible internet demons.",
+        "tone": "helpful"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Sue Flay",
+    "category": "Software",
+    "issueDescription": "My email keeps turning into a cold soup every time I try to send a message. It's like my inbox is a kitchen scandal.",
+    "issueShortDescription": "Souped-up email fiasco",
+    "suggestedResolution": "I rebooted her email client and cleared the cache, told her to keep her digital soup to herself.",
+    "estimatedTimeToComplete": {
+      "beginner": 80,
+      "intermediate": 60,
+      "advanced": 20
+    },
+    "agentRemark": [
+      {
+        "comment": "Ah, a culinary email crisis. Just what I needed.",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Rebooting should fix her 'soup' problem. Fingers crossed.",
+        "tone": "helpful"
+      },
+      {
+        "comment": "If this doesn’t work, I’ll suggest a vitamin supplement for her digital digestion.",
+        "tone": "neutral"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Ben T. Noise",
+    "category": "Network",
+    "issueDescription": "Internet vanished if I blink too much. Please restore my connection before I lose my mind.",
+    "issueShortDescription": "Blink and you'll miss it",
+    "suggestedResolution": "Rebooted the router, told the user to blink less often, and suggested they might be experiencing phantom network syndrome.",
+    "estimatedTimeToComplete": {
+      "beginner": 100,
+      "intermediate": 40,
+      "advanced": 20
+    },
+    "agentRemark": [
+      {
+        "comment": "Of course, the Wi-Fi ghost strikes again.",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Why do users think 'reset' means 'sacrifice a goat'?",
+        "tone": "helpful"
+      },
+      {
+        "comment": "One more blink, and their monitor might just evaporate.",
+        "tone": "neutral"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Phil McCracken",
+    "category": "Network",
+    "issueDescription": "I can't get my Wi-Fi to do the wave. It’s like, it’s there, then it’s not, then it’s hiding behind the printer. Classic. I think my laptop has become a ghost, haunting the Ethernet.",
+    "issueShortDescription": "Wi-Fi ghosting my laptop.",
+    "suggestedResolution": "I reset the router to make the Wi-Fi less shy and reminded the user to stay patient—it's not like the internet owes them anything.",
+    "estimatedTimeToComplete": {
+      "beginner": 100,
+      "intermediate": 60,
+      "advanced": 40
+    },
+    "agentRemark": [
+      {
+        "comment": "Another ghost in the machine. Great.",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Hopefully this fixes the Wi-Fi diva attitude.",
+        "tone": "helpful"
+      },
+      {
+        "comment": "If only ghosts paid their Internet bills.",
+        "tone": "neutral"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Bill Board",
+    "category": "Hardware",
+    "issueDescription": "My monitor decided to go on vacation right in the middle of my PowerPoint presentation. Now I look like I’m live-streaming from a cave.",
+    "issueShortDescription": "Screen vanished, magic trick?",
+    "suggestedResolution": "Rebooted the system and checked the cable connections. Turns out it was just asleep, not abducted by aliens.",
+    "estimatedTimeToComplete": {
+      "beginner": 100,
+      "intermediate": 80,
+      "advanced": 20
+    },
+    "agentRemark": [
+      {
+        "comment": "Another day, another disappearing display.",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Why don’t the monitors just come with a 'not asleep' button?",
+        "tone": "helpful"
+      },
+      {
+        "comment": "Sure, reattaching the cable worked. Because that’s what they pay me for.",
+        "tone": "frustrated"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Rick O'Shea",
+    "category": "Software",
+    "issueDescription": "My computer keeps laughing at me and opening TikTok without permission.",
+    "issueShortDescription": "Malicious Meme Machine",
+    "suggestedResolution": "I slapped some patches on the software, unplugged the offending device, and told it to behave.",
+    "estimatedTimeToComplete": {
+      "beginner": 80,
+      "intermediate": 60,
+      "advanced": 40
+    },
+    "agentRemark": [
+      {
+        "comment": "Just another day in paradise.",
+        "tone": "helpful"
+      },
+      {
+        "comment": "Honestly, I didn't realize my job involved babysitting computers.",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Hope this doesn't turn into a viral meme... or does it?",
+        "tone": "neutral"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Sue Flay",
+    "category": "Network",
+    "issueDescription": "My Wi-Fi keeps singing 'Goodbye,' while I just want to binge-watch cat videos.",
+    "issueShortDescription": "Wi-Fi says 'bye-bye' again",
+    "suggestedResolution": "Rebooted the router and convinced it to come back to work. Now it’s just sulking in the corner.",
+    "estimatedTimeToComplete": {
+      "beginner": 100,
+      "intermediate": 60,
+      "advanced": 40
+    },
+    "agentRemark": [
+      {
+        "comment": "Another day, another wifi meltdown.",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Just *sure* the router doesn’t need therapy.",
+        "tone": "neutral"
+      },
+      {
+        "comment": "This is why I don’t believe in wireless loyalty.",
+        "tone": "frustrated"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Sue Flay",
+    "category": "Network",
+    "issueDescription": "My Wi-Fi keeps magically disappearing like a bad magician's trick. One second I'm online, next I'm a network ghost. It's ruining my essential cat video binge.",
+    "issueShortDescription": "Wi-Fi Houdini act?",
+    "suggestedResolution": "Rebooted the router, performed a ritual involving a paperclip and a prayer, and suggested the user relocate the device to a more 'Wi-Fi friendly' spot. Hopefully the magic stops.",
+    "estimatedTimeToComplete": {
+      "beginner": 100,
+      "intermediate": 60,
+      "advanced": 30
+    },
+    "agentRemark": [
+      {
+        "comment": "Another disappearing act. Is this Netflix's new feature?",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Maybe the router wants a vacation too.",
+        "tone": "helpful"
+      },
+      {
+        "comment": "Time to break out the magic wand—or just a new router.",
+        "tone": "frustrated"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Sue Shinetastic",
+    "category": "Network",
+    "issueDescription": "My Wi-Fi is playing hide and seek with my laptop! It keeps disappearing right before I get to the good part of my streaming marathon.",
+    "issueShortDescription": "Wi-Fi ghosting my laptop",
+    "suggestedResolution": "I reset the router to calm its nerves and updated the network drivers on the user’s laptop, hoping to coax it back from the digital shadows.",
+    "estimatedTimeToComplete": {
+      "beginner": 120,
+      "intermediate": 90,
+      "advanced": 60
+    },
+    "agentRemark": [
+      {
+        "comment": "Another ghost story in the making.",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Apparently, the router needed a coffee break.",
+        "tone": "helpful"
+      },
+      {
+        "comment": "Just another day in the enchanted forest of office tech.",
+        "tone": "neutral"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Sue Flay",
+    "category": "Network",
+    "issueDescription": "My Wi-Fi turned into a potato and refuses to connect unless you tickle it.",
+    "issueShortDescription": "Wi-Fi now a spud",
+    "suggestedResolution": "Rebooted the router while chanting sweet nothings. Frowned at the blinking lights and hoped for the best.",
+    "estimatedTimeToComplete": {
+      "beginner": 100,
+      "intermediate": 60,
+      "advanced": 20
+    },
+    "agentRemark": [
+      {
+        "comment": "Why do users think routers are smart?",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Just another day in paradise... or digital purgatory.",
+        "tone": "helpful"
+      },
+      {
+        "comment": "If only unplugging and replugging were a universal cure.",
+        "tone": "neutral"
+      }
+    ]
+  },
+  {
+    "raisedBy": "Testy McTestface",
+    "category": "Software",
+    "issueDescription": "My computer is judging me silently, I swear it’s judging my life choices. It keeps asking for updates at the worst times.",
+    "issueShortDescription": "Judgy Computer Cracks Up",
+    "suggestedResolution": "Pretended to install updates, told users to take a deep breath and not to feed the machine after midnight.",
+    "estimatedTimeToComplete": {
+      "beginner": 120,
+      "intermediate": 80,
+      "advanced": 50
+    },
+    "agentRemark": [
+      {
+        "comment": "Another day, another cursed PC.",
+        "tone": "helpful"
+      },
+      {
+        "comment": "Should've brought popcorn for this torment.",
+        "tone": "sarcastic"
+      },
+      {
+        "comment": "Maybe I should just uninstall patience.",
+        "tone": "frustrated"
+      }
+    ]
+  }
+]

@@ -99,8 +99,10 @@ const TicketProvider = ({ children }) => {
       return;
     }
 
-    const ticket = await res.json();
-    console.log("✅ New ticket:", ticket);
+    await res.json().then((res) => {
+      console.log(res);
+      // setTicketList((prev)=>[...prev, res])
+    });
   };
 
   return (
