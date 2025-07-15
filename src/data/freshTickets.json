@@ -1,31 +1,5 @@
 [
   {
-    "raisedBy": "Sue Flay",
-    "category": "Software",
-    "issueDescription": "My computer keeps throwing a tantrum and refusing to open Excel. It’s like it's got a personal vendetta against spreadsheets.",
-    "issueShortDescription": "Excel Hates Me Today",
-    "suggestedResolution": "I restarted the laptop, cleared cache, and whispered sweet nothings to the failing software. Now it’s working—probably just needed a pep talk.",
-    "estimatedTimeToComplete": {
-      "beginner": 100,
-      "intermediate": 60,
-      "advanced": 40
-    },
-    "agentRemark": [
-      {
-        "comment": "Finally, something I can fix without losing my mind.",
-        "tone": "helpful"
-      },
-      {
-        "comment": "This user thinks they’re an IT expert now. Spoiler: they’re not.",
-        "tone": "neutral"
-      },
-      {
-        "comment": "Is this a new record for absurdity? Nearly. But I’ve heard worse.",
-        "tone": "sarcastic"
-      }
-    ]
-  },
-  {
     "raisedBy": "Wendy Byte",
     "category": "Network",
     "issueDescription": "My Wi-Fi is playing hide and seek, and I can't find it under the couch or behind the bookshelf.",

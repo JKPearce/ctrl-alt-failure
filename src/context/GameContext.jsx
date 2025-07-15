@@ -1,12 +1,41 @@
 "use client";
 
-import { createContext, useEffect, useRef, useState } from "react";
+import {
+  DEFAULT_ACTIONS,
+  DEFAULT_BUSINESS_NAME,
+  DEFAULT_INBOX_SIZE,
+  DEFAULT_MONEY,
+  DEFAULT_PLAYER_NAME,
+  DEFAULT_UPGRADES,
+} from "@/helpers/defaultGameState";
+import { useTicket } from "@/hooks/useTicket";
+import { createContext, useEffect, useReducer, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { useTicket } from "../hooks/useTicket";
 
 const GameContext = createContext();
 
 const GameProvider = ({ children }) => {
+  const [gameState, dispatch] = useReducer(reducer, {
+    businessName: DEFAULT_BUSINESS_NAME,
+    managerName: DEFAULT_PLAYER_NAME,
+    money: DEFAULT_MONEY,
+    actionsRemaining: DEFAULT_ACTIONS,
+    inboxSize: DEFAULT_INBOX_SIZE,
+    upgrades: DEFAULT_UPGRADES,
+    dayNumber: 1,
+    activityLog: [],
+    // storyChoices: [],      //Will be used to inject to API LLM prompts
+    //ticketsResolvedToday:[] //To show an end of day summary
+    //stylesTheme: "dark" // change the css theme
+    //language : "eng" //option to swap languages, or generate AI tickets in different languages
+    //ticketTheme : "Retro Video Game" // user defined theme for the types of issues e.g retro video game theme could mean a ticket gets logged by Mario who is having issues piping with his command line
+  });
+
+  function reducer(state, action) {
+    switch (action.type) {
+    }
+  }
+
   const workInterval = useRef(null);
   const [currentAction, setCurrentAction] = useState("Idle");
   const [ticketInProgress, setTicketInProgress] = useState(null);

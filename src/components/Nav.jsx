@@ -12,7 +12,7 @@ const Nav = () => {
       : "btn btn-ghost hover:text-secondary";
 
   return (
-    <div className="navbar bg-base-300 text-base-content px-6 shadow-lg">
+    <nav className="navbar bg-base-300 text-base-content px-6 shadow-lg">
       <div className="flex-1">
         <Link
           href="/"
@@ -35,7 +35,7 @@ const Nav = () => {
           Stats
         </Link>
       </div>
-    </div>
+    </nav>
   );
 };
 

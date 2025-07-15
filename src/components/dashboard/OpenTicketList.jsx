@@ -20,7 +20,7 @@ const OpenTicketsList = () => {
         </thead>
         <tbody>
           {openTickets.length === 0 ? (
-            <tr>
+            <tr colSpan={5}>
               <td>No open tickets</td>
             </tr>
           ) : (
