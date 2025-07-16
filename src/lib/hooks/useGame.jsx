@@ -18,7 +18,8 @@ const useGame = () => {
 
   const { gameState, dispatch } = ctx;
   const { createNewMessages } = useInbox();
-  const { createNewAgents } = useAgent();
+  const { createNewAgents, generateAgentComment } = useAgent();
+  const commentTimeouts = new Map();
 
   const setPlayerName = (name) => {
     dispatch({ type: GAME_ACTIONS.SET_PLAYER_NAME, payload: name });
@@ -45,12 +46,51 @@ const useGame = () => {
     dispatch({
       type: AGENT_ACTIONS.ASSIGN_TICKET,
       payload: {
-        agentID: agentID,
-        ticketID: ticketID,
+        ticketID,
+        agentID,
       },
     });
 
+    dispatch({
+      type: GAME_ACTIONS.USE_ACTION_POINT,
+      payload: {
+        actionCost: 1, //can call a function here to calc cost of action
+      },
+    });
+
+    setAgentComment(
+      agentID,
+      generateAgentComment(gameState, agentID, "assigned to ticket")
+    );
+
     //call further functions here like "makeComment() from useAgent()"
+  };
+
+  const setAgentComment = (agentID, comment, duration = 10000) => {
+    // Clear existing timeout if one exists
+    const existing = commentTimeouts.get(agentID);
+    if (existing) clearTimeout(existing);
+
+    dispatch({
+      type: AGENT_ACTIONS.SET_AGENT_COMMENT,
+      payload: {
+        agentID,
+        comment,
+        //note to self, if the Key:value is the same variable, you can short hand them in 1 call
+      },
+    });
+
+    //here we could add an item to the actionslog as well with the comment
+
+    const timeout = setTimeout(() => {
+      dispatch({
+        type: AGENT_ACTIONS.SET_AGENT_COMMENT,
+        payload: { agentID, comment: null },
+      });
+      commentTimeouts.delete(agentID);
+    }, duration);
+
+    commentTimeouts.set(agentID, timeout);
   };
 
   return {
@@ -59,6 +99,7 @@ const useGame = () => {
     setBusinessName,
     startGame,
     assignTicketToAgent,
+    setAgentComment,
   };
 };
 

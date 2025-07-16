@@ -2,7 +2,7 @@
 
 import { AGENT_ACTIONS, GAME_ACTIONS } from "@/lib/config/actionTypes";
 import {
-  DEFAULT_ACTIONS,
+  DEFAULT_ACTION_POINTS,
   DEFAULT_BUSINESS_NAME,
   DEFAULT_INBOX_SIZE,
   DEFAULT_MONEY,
@@ -18,7 +18,7 @@ const GameProvider = ({ children }) => {
     businessName: DEFAULT_BUSINESS_NAME,
     playerName: DEFAULT_PLAYER_NAME,
     money: DEFAULT_MONEY,
-    actionsRemaining: DEFAULT_ACTIONS,
+    actionsPointsRemaining: DEFAULT_ACTION_POINTS,
     inboxSize: DEFAULT_INBOX_SIZE,
     upgrades: DEFAULT_UPGRADES,
     dayNumber: 0,
@@ -64,10 +64,22 @@ const GameProvider = ({ children }) => {
           inbox: action.payload.inbox,
         };
 
+      case GAME_ACTIONS.USE_ACTION_POINT:
+        return {
+          ...state,
+          actionsPointsRemaining:
+            state.actionsPointsRemaining - action.payload.actionCost,
+        };
+
       case AGENT_ACTIONS.ASSIGN_TICKET:
         return updateEntity(state, "agents", action.payload.agentID, {
           assignedTicket: action.payload.ticketID,
           currentAction: "working",
+        });
+
+      case AGENT_ACTIONS.SET_AGENT_COMMENT:
+        return updateEntity(state, "agents", action.payload.agentID, {
+          currentComment: action.payload.comment,
         });
 
       default:

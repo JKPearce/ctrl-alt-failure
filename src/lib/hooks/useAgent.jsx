@@ -45,13 +45,20 @@ function useAgent() {
           "Told a user to 'sacrifice the router to the Wi-Fi gods' — it worked",
           "Filed a ticket against management for 'existential incompetence'",
         ],
+        currentComment: null,
       };
     }
 
     return agents;
   };
 
-  return { createNewAgents };
+  const generateAgentComment = (state, agentID, context) => {
+    //TODO: Logic here to send to do an API call based on the ticket and agent
+
+    return "What the hell did she even click? How do you break a screen, a mouse, and gravity in one email? Ugh — I’ll fix it, but if Brenda's cake comes up one more time, I’m bricking the whole network.";
+  };
+
+  return { createNewAgents, generateAgentComment };
 }
 
 export { useAgent };

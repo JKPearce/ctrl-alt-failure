@@ -1,5 +1,3 @@
-import React from "react";
-
 function AgentCard({ agent }) {
   const {
     agentName,
@@ -9,10 +7,22 @@ function AgentCard({ agent }) {
     skills,
     currentEmotion,
     personalStatement,
+    currentComment,
   } = agent;
 
   return (
     <div className="relative card card-border rounded-xl bg-base-100 shadow-xl border-primary transition-all duration-200 hover:scale-105 hover:shadow-2xl overflow-hidden">
+      {currentComment && (
+        <div className="absolute top-4 left-4 z-20 w-[90%] max-w-md bg-base-200 text-base-content p-4 rounded-xl shadow-lg text-sm italic opacity-100 transition-opacity duration-1000 ease-in-out animate-fadeout">
+          <p className="italic">{currentComment}</p>
+
+          {/* Thought bubble tail (dots) */}
+          <div className="absolute left-4 bottom-[-0.6rem] flex gap-1">
+            <div className="w-2 h-2 bg-base-200 rounded-full"></div>
+            <div className="w-1.5 h-1.5 bg-base-200 rounded-full translate-y-1"></div>
+          </div>
+        </div>
+      )}
       <div className="card-body relative z-10">
         {/* Header */}
         <h2 className="card-title">
