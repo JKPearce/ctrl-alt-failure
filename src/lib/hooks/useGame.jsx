@@ -1,7 +1,7 @@
 "use client";
 
 import { GameContext } from "@/context/GameContext";
-import { GAME_ACTIONS } from "@/lib/config/actionTypes";
+import { AGENT_ACTIONS, GAME_ACTIONS } from "@/lib/config/actionTypes";
 import { useContext } from "react";
 import {
   DEFAULT_AGENT_CAPACITY,
@@ -41,11 +41,24 @@ const useGame = () => {
     });
   };
 
+  const assignTicketToAgent = (ticketID, agentID) => {
+    dispatch({
+      type: AGENT_ACTIONS.ASSIGN_TICKET,
+      payload: {
+        agentID: agentID,
+        ticketID: ticketID,
+      },
+    });
+
+    //call further functions here like "makeComment() from useAgent()"
+  };
+
   return {
     gameState,
     setPlayerName,
     setBusinessName,
     startGame,
+    assignTicketToAgent,
   };
 };
 

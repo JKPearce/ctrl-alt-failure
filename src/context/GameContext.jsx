@@ -66,7 +66,8 @@ const GameProvider = ({ children }) => {
 
       case AGENT_ACTIONS.ASSIGN_TICKET:
         return updateEntity(state, "agents", action.payload.agentID, {
-          assignedTicket: action.payload.ticket,
+          assignedTicket: action.payload.ticketID,
+          currentAction: "working",
         });
 
       default:

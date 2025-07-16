@@ -1,11 +1,16 @@
 "use client";
 
 import { useGame } from "@/lib/hooks/useGame";
+import { useEffect } from "react";
 import AgentCard from "./AgentCard";
 import InboxMessageCard from "./InboxMessageCard";
 
 function Active() {
   const { gameState } = useGame();
+
+  useEffect(() => {
+    console.log("Updated gameState:", gameState);
+  }, [gameState]);
 
   return (
     <>
@@ -23,7 +28,11 @@ function Active() {
           <h1 className="menu-title">Inbox</h1>
 
           {Object.values(gameState.inbox).map((m) => (
-            <InboxMessageCard key={m.id} message={m} />
+            <InboxMessageCard
+              key={m.id}
+              message={m}
+              agentList={Object.values(gameState.agents)}
+            />
           ))}
         </div>
       </div>
