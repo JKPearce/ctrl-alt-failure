@@ -3,11 +3,11 @@
 function useInbox() {
   const createNewMessages = (amount) => {
     //eventually this will be an API call to get a unique ticket / message
-    const messages = [];
+    const messages = {};
 
     for (let i = 0; i < amount; i++) {
-      const message = {
-        id: 1,
+      messages[i] = {
+        id: i,
         sender: "Mary",
         subject: "computer no go",
         body: `Hi,
@@ -20,7 +20,6 @@ function useInbox() {
         Mary`,
         received: Date.now(),
       };
-      messages.push(message);
     }
 
     return messages;

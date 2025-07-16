@@ -5,7 +5,6 @@
 
 @plugin "daisyui/theme" {
   name: "interactive-dark";
-  default: true;
   color-scheme: dark;
 
   --color-base-100: #1c1a2e;
@@ -47,8 +46,6 @@
 
 @plugin "daisyui/theme" {
   name: "lightnpc";
-  default: true;
-  prefersdark: true;
   color-scheme: "dark";
   --color-base-100: oklch(14% 0.004 49.25);
   --color-base-200: oklch(21% 0.006 56.043);

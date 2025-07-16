@@ -1,6 +1,6 @@
 "use client";
 
-import { GAME_ACTIONS } from "@/lib/config/actionTypes";
+import { AGENT_ACTIONS, GAME_ACTIONS } from "@/lib/config/actionTypes";
 import {
   DEFAULT_ACTIONS,
   DEFAULT_BUSINESS_NAME,
@@ -23,8 +23,8 @@ const GameProvider = ({ children }) => {
     upgrades: DEFAULT_UPGRADES,
     dayNumber: 0,
     gamePhase: "setup", //options are"setup" | "active" | "running",
-    agents: [],
-    inbox: [],
+    agents: {},
+    inbox: {},
     activityLog: [],
     // storyChoices: [],      //Will be used to inject to API LLM prompts
     //ticketsResolvedToday:[] //To show an end of day summary
@@ -41,17 +41,20 @@ const GameProvider = ({ children }) => {
           ...state,
           playerName: action.payload,
         };
+
       case GAME_ACTIONS.SET_BUSINESS_NAME:
         return {
           ...state,
           businessName: action.payload,
         };
+
       case GAME_ACTIONS.START_NEW_DAY:
         return {
           ...state,
           dayNumber: state.dayNumber + 1,
           gamePhase: "active",
         };
+
       case GAME_ACTIONS.START_GAME:
         return {
           ...state,
@@ -60,9 +63,28 @@ const GameProvider = ({ children }) => {
           agents: action.payload.agents,
           inbox: action.payload.inbox,
         };
+
+      case AGENT_ACTIONS.ASSIGN_TICKET:
+        return updateEntity(state, "agents", action.payload.agentID, {
+          assignedTicket: action.payload.ticket,
+        });
+
       default:
         return state;
     }
+  }
+
+  function updateEntity(state, entityKey, entityID, updates) {
+    return {
+      ...state,
+      [entityKey]: {
+        ...state[entityKey],
+        [entityID]: {
+          ...state[entityKey][entityID],
+          ...updates,
+        },
+      },
+    };
   }
 
   return (
