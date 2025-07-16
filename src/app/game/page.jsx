@@ -1,6 +1,7 @@
 "use client";
 
-import Setup from "@/components/phases/active/setup/Setup";
+import Active from "@/components/phases/active/Active";
+import Setup from "@/components/phases/setup/Setup";
 import { useGame } from "@/context";
 
 function GamePage() {
@@ -9,7 +10,7 @@ function GamePage() {
   return (
     <>
       {gameState.gamePhase === "setup" && <Setup />}
-      {gameState.gamePhase === "active" && <div>{gameState.gamePhase}</div>}
+      {gameState.gamePhase === "active" && <Active />}
       {gameState.gamePhase === "summary" && <div>{gameState.gamePhase}</div>}
     </>
   );

@@ -33,12 +33,13 @@ const useGame = () => {
         skillLevel: "intermediate",
       },
     ];
+
     const inbox = [
       {
         id: 1,
         sender: "Mary",
         subject: "computer no go",
-        message: `Hi,
+        body: `Hi,
 
 i was trying to write an email but the screen went all blue and then it beeped very loud and now the mouse is gone and the letters are very big and sideways.
 
