@@ -6,7 +6,7 @@ import {
   OpenTicketsList,
 } from "@/components/dashboard";
 
-import { useTicket } from "@/hooks/useTicket";
+import { useTicket } from "@/lib/hooks/useTicket";
 
 const Dashboard = () => {
   const { loading, addTicket, generateTicketFromAI } = useTicket();

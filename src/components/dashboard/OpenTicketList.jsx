@@ -1,4 +1,4 @@
-import { useTicket } from "../../hooks/useTicket";
+import { useTicket } from "../../lib/hooks/useTicket";
 
 const OpenTicketsList = () => {
   const { ticketList } = useTicket();

@@ -1,6 +1,6 @@
 // ActivityFeed.jsx
 import { formatDistanceToNow } from "date-fns";
-import { useGame } from "../../hooks/useGame";
+import { useGame } from "../../lib/hooks/useGame";
 
 const ActivityFeed = () => {
   const { activityLog } = useGame();

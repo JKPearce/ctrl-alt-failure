@@ -7,21 +7,19 @@ import {
 } from "@/lib/config/defaultGameState";
 import { useRef } from "react";
 
-export default function Profile() {
+function Setup() {
+  const { startGame } = useGame();
   const playerName = useRef();
   const businessName = useRef();
-  const { setPlayerName, setBusinessName } = useGame();
 
-  const handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
-    //TODO:validate and sanitize input here
 
-    setPlayerName(playerName.current.value);
-    setBusinessName(businessName.current.value);
-  };
+    startGame(playerName.current.value, businessName.current.value);
+  }
 
   return (
-    <section id="profile-page" className="flex flex-col gap-2">
+    <>
       <form
         action="submit"
         className="grid grid-cols-2 gap-2"
@@ -52,10 +50,12 @@ export default function Profile() {
           />
         </div>
 
-        <button type="submit" className="btn btn-success">
-          Save
+        <button type="submit" className="btn">
+          Start Game
         </button>
       </form>
-    </section>
+    </>
   );
 }
+
+export default Setup;

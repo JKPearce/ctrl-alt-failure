@@ -1,6 +1,6 @@
 "use client";
 
-import { GAME_ACTIONS } from "@/helpers/actionTypes";
+import { GAME_ACTIONS } from "@/lib/config/actionTypes";
 import {
   DEFAULT_ACTIONS,
   DEFAULT_BUSINESS_NAME,
@@ -8,10 +8,8 @@ import {
   DEFAULT_MONEY,
   DEFAULT_PLAYER_NAME,
   DEFAULT_UPGRADES,
-} from "@/helpers/defaultGameState";
-import { useTicket } from "@/hooks/useTicket";
+} from "@/lib/config/defaultGameState";
 import { createContext, useEffect, useReducer, useRef, useState } from "react";
-import toast from "react-hot-toast";
 
 const GameContext = createContext();
 
@@ -23,7 +21,10 @@ const GameProvider = ({ children }) => {
     actionsRemaining: DEFAULT_ACTIONS,
     inboxSize: DEFAULT_INBOX_SIZE,
     upgrades: DEFAULT_UPGRADES,
-    dayNumber: 1,
+    dayNumber: 0,
+    gamePhase: "setup", //options are"setup" | "active" | "running",
+    agents: [],
+    inbox: [],
     activityLog: [],
     // storyChoices: [],      //Will be used to inject to API LLM prompts
     //ticketsResolvedToday:[] //To show an end of day summary
@@ -43,6 +44,20 @@ const GameProvider = ({ children }) => {
         return {
           ...state,
           businessName: action.payload,
+        };
+      case GAME_ACTIONS.START_NEW_DAY:
+        return {
+          ...state,
+          dayNumber: dayNumber + 1,
+          gamePhase: "active",
+        };
+      case GAME_ACTIONS.START_GAME:
+        return {
+          ...state,
+          dayNumber: 1,
+          gamePhase: "active",
+          agents: action.payload.agents,
+          inbox: action.payload.inbox,
         };
       default:
         return state;

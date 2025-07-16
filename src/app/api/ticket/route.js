@@ -1,5 +1,5 @@
-import { loadJSON, saveJSON } from "@/utils/fileManager";
-import ticketSchema from "@/utils/ticketSchema";
+import { loadJSON, saveJSON } from "@/lib/utils/fileManager";
+import ticketSchema from "@/lib/utils/ticketSchema";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 
