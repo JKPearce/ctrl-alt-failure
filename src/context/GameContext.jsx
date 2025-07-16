@@ -71,6 +71,17 @@ const GameProvider = ({ children }) => {
             state.actionsPointsRemaining - action.payload.actionCost,
         };
 
+      case GAME_ACTIONS.ADD_ACTIVITY_LOG:
+        return {
+          ...state,
+          activityLog: [
+            {
+              ...action.payload,
+            },
+            ...state.activityLog,
+          ], //reverse order so the newest log entry is the first item in the array
+        };
+
       case AGENT_ACTIONS.ASSIGN_TICKET:
         return updateEntity(state, "agents", action.payload.agentID, {
           assignedTicket: action.payload.ticketID,

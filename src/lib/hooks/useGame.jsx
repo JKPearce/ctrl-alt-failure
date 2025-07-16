@@ -43,6 +43,10 @@ const useGame = () => {
   };
 
   const assignTicketToAgent = (ticketID, agentID) => {
+    // Always validate agent exists before proceeding
+    const agent = getAgentByID(agentID);
+    if (!agent) return;
+
     dispatch({
       type: AGENT_ACTIONS.ASSIGN_TICKET,
       payload: {
@@ -58,18 +62,26 @@ const useGame = () => {
       },
     });
 
-    setAgentComment(
+    addEntryToLog(
+      "assign_ticket",
+      agent.agentName,
+      `Ticket #${ticketID} assigned to ${gameState.agents[agentID].agentName}.`
+    );
+
+    triggerAgentComment(
       agentID,
       generateAgentComment(gameState, agentID, "assigned to ticket")
     );
-
-    //call further functions here like "makeComment() from useAgent()"
   };
 
-  const setAgentComment = (agentID, comment, duration = 10000) => {
+  const triggerAgentComment = (agentID, comment, duration = 10000) => {
     // Clear existing timeout if one exists
     const existing = commentTimeouts.get(agentID);
     if (existing) clearTimeout(existing);
+
+    // Always validate agent exists before proceeding
+    const agent = getAgentByID(agentID);
+    if (!agent) return;
 
     dispatch({
       type: AGENT_ACTIONS.SET_AGENT_COMMENT,
@@ -80,7 +92,7 @@ const useGame = () => {
       },
     });
 
-    //here we could add an item to the actionslog as well with the comment
+    addEntryToLog("agent_comment", agent.agentName, comment);
 
     const timeout = setTimeout(() => {
       dispatch({
@@ -93,13 +105,32 @@ const useGame = () => {
     commentTimeouts.set(agentID, timeout);
   };
 
+  const addEntryToLog = (type, actor, message) => {
+    dispatch({
+      type: GAME_ACTIONS.ADD_ACTIVITY_LOG,
+      payload: {
+        type,
+        actor,
+        message,
+        timestamp: Date.now(),
+      },
+    });
+  };
+
+  const getAgentByID = (agentID) => {
+    if (agentID == null) return null;
+    return gameState.agents.find((a) => a.id === agentID) || null;
+  };
+
   return {
     gameState,
     setPlayerName,
     setBusinessName,
     startGame,
     assignTicketToAgent,
-    setAgentComment,
+    triggerAgentComment,
+    addEntryToLog,
+    getAgentByID,
   };
 };
 
