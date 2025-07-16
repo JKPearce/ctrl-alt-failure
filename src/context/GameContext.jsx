@@ -49,7 +49,7 @@ const GameProvider = ({ children }) => {
       case GAME_ACTIONS.START_NEW_DAY:
         return {
           ...state,
-          dayNumber: dayNumber + 1,
+          dayNumber: state.dayNumber + 1,
           gamePhase: "active",
         };
       case GAME_ACTIONS.START_GAME:

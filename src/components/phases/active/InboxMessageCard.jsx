@@ -1,5 +1,4 @@
 function InboxMessageCard({ message }) {
-  console.log(message);
   return (
     <div className="card bg-base-100 shadow-md border border-base-300 w-full max-w-xl">
       <div className="card-body">

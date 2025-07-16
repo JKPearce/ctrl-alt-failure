@@ -2,16 +2,17 @@
 
 import Active from "@/components/phases/active/Active";
 import Setup from "@/components/phases/setup/Setup";
+import Summary from "@/components/phases/summary/Summary";
 import { useGame } from "@/lib/hooks/useGame";
 
 function GamePage() {
-  const { gameState, startGame } = useGame();
+  const { gameState } = useGame();
 
   return (
     <>
       {gameState.gamePhase === "setup" && <Setup />}
       {gameState.gamePhase === "active" && <Active />}
-      {gameState.gamePhase === "summary" && <div>{gameState.gamePhase}</div>}
+      {gameState.gamePhase === "summary" && <Summary />}
     </>
   );
 }

@@ -4,6 +4,7 @@ export const DEFAULT_PLAYER_NAME = "Bob Nullman";
 export const DEFAULT_MONEY = 1000;
 export const DEFAULT_ACTIONS = 10;
 export const DEFAULT_INBOX_SIZE = 10;
+export const DEFAULT_AGENT_CAPACITY = 1;
 export const DEFAULT_UPGRADES = {
   coffeeMachine: false,
   biggerInbox: false,

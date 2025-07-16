@@ -3,6 +3,12 @@
 import { GameContext } from "@/context/GameContext";
 import { GAME_ACTIONS } from "@/lib/config/actionTypes";
 import { useContext } from "react";
+import {
+  DEFAULT_AGENT_CAPACITY,
+  DEFAULT_INBOX_SIZE,
+} from "../config/defaultGameState";
+import { useAgent } from "./useAgent";
+import { useInbox } from "./useInbox";
 
 const useGame = () => {
   const ctx = useContext(GameContext);
@@ -11,6 +17,8 @@ const useGame = () => {
   }
 
   const { gameState, dispatch } = ctx;
+  const { createNewMessages } = useInbox();
+  const { createNewAgents } = useAgent();
 
   const setPlayerName = (name) => {
     dispatch({ type: GAME_ACTIONS.SET_PLAYER_NAME, payload: name });
@@ -24,38 +32,11 @@ const useGame = () => {
     setPlayerName(playerName);
     setBusinessName(businessName);
 
-    const agents = [
-      {
-        id: 1,
-        agentName: "Bobby",
-        personality: "sarcastic",
-        age: "45",
-        skillLevel: "intermediate",
-      },
-    ];
-
-    const inbox = [
-      {
-        id: 1,
-        sender: "Mary",
-        subject: "computer no go",
-        body: `Hi,
-
-i was trying to write an email but the screen went all blue and then it beeped very loud and now the mouse is gone and the letters are very big and sideways.
-
-pls fix it asap I need to tell brenda about the birthday cake thing and this is very urgent
-
-thx
-Mary`,
-        received: Date.now(),
-      },
-    ];
-
     dispatch({
       type: GAME_ACTIONS.START_GAME,
       payload: {
-        agents: agents,
-        inbox: inbox,
+        agents: createNewAgents(DEFAULT_AGENT_CAPACITY),
+        inbox: createNewMessages(DEFAULT_INBOX_SIZE),
       },
     });
   };
