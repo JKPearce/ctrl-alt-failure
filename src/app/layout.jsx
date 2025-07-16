@@ -1,7 +1,7 @@
 // src/app/layout.jsx or layout.js
 import { Nav } from "@/components/Nav";
 import { GameProvider, TicketProvider } from "@/context";
-import "@/styles/globals.css";
+import "@/globals.css";
 
 export const metadata = {
   title: "IT Desk Sim",

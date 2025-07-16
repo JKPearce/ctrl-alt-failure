@@ -1,5 +1,7 @@
 "use client";
+
 import { GameContext } from "@/context/GameContext";
+import { GAME_ACTIONS } from "@/helpers/actionTypes";
 import { useContext } from "react";
 
 const useGame = () => {
@@ -7,7 +9,21 @@ const useGame = () => {
   if (!ctx) {
     throw new Error("useGame must be used within a GameProvider");
   }
-  return ctx;
+
+  const { gameState, dispatch } = ctx;
+
+  const setPlayerName = (name) => {
+    dispatch({ type: GAME_ACTIONS.SET_PLAYER_NAME, payload: name });
+  };
+  const setBusinessName = (name) => {
+    dispatch({ type: GAME_ACTIONS.SET_BUSINESS_NAME, payload: name });
+  };
+
+  return {
+    gameState,
+    setPlayerName,
+    setBusinessName,
+  };
 };
 
 export { useGame };

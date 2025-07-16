@@ -1,10 +1,12 @@
 "use client";
 
+import { useGame } from "@/context";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const Nav = () => {
   const pathname = usePathname();
+  const { gameState } = useGame();
 
   const getLinkClass = (path) =>
     pathname === path
@@ -20,6 +22,10 @@ const Nav = () => {
         >
           IT Desk Sim
         </Link>
+      </div>
+      <div>
+        <p>{gameState.playerName}</p>
+        <p>{gameState.businessName}</p>
       </div>
       <div className="flex-none space-x-2">
         <Link href="/" className={getLinkClass("/")}>
