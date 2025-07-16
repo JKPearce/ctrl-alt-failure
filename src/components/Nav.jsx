@@ -1,6 +1,6 @@
 "use client";
 
-import { useGame } from "@/context";
+import { useGame } from "@/lib/hooks/useGame";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -20,26 +20,11 @@ const Nav = () => {
           href="/"
           className="btn btn-ghost normal-case text-xl text-primary"
         >
-          IT Desk Sim
+          {gameState.businessName}
         </Link>
       </div>
       <div>
         <p>{gameState.playerName}</p>
-        <p>{gameState.businessName}</p>
-      </div>
-      <div className="flex-none space-x-2">
-        <Link href="/" className={getLinkClass("/")}>
-          Dashboard
-        </Link>
-        <Link href="/agents" className={getLinkClass("/agents")}>
-          Agents
-        </Link>
-        <Link href="/profile" className={getLinkClass("/profile")}>
-          Profile
-        </Link>
-        <Link href="/stats" className={getLinkClass("/stats")}>
-          Stats
-        </Link>
       </div>
     </nav>
   );

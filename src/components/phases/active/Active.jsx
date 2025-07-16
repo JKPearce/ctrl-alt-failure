@@ -1,6 +1,6 @@
 "use client";
 
-import { useGame } from "@/context";
+import { useGame } from "@/lib/hooks/useGame";
 import AgentCard from "./AgentCard";
 import InboxMessageCard from "./InboxMessageCard";
 
