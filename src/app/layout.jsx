@@ -13,10 +13,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" data-theme="dark">
       <body>
-        <GameProvider>
-          <Nav />
-          {children}
-        </GameProvider>
+        <GameProvider>{children}</GameProvider>
       </body>
     </html>
   );
