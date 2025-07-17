@@ -1,3 +1,4 @@
+import { useGame } from "@/lib/hooks/useGame";
 import { useState } from "react";
 import InboxMessages from "./InboxMessages";
 import MessageModal from "./MessageModal";
@@ -5,6 +6,7 @@ import MessageModal from "./MessageModal";
 function InboxPanel({ inbox, agents }) {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const { assignTicketToAgent } = useGame();
 
   const handleMessageClick = (message) => {
     console.log(message);
@@ -12,29 +14,29 @@ function InboxPanel({ inbox, agents }) {
     setModalOpen(true);
   };
 
-  const assignAndClose = (agentID) => {
+  const assignAndClose = (agentID, messageID) => {
     setModalOpen(false);
-    console.log(agentID);
+    console.log(agentID, messageID);
+    assignTicketToAgent(messageID, agentID);
   };
 
   return (
-    <section id="inbox-panel">
+    <section id="inbox-panel" className="h-full w-full overflow-y-auto pr-1">
       {modalOpen && (
         <MessageModal
           message={selectedMessage}
-          modalOpen={modalOpen}
           assignAndClose={assignAndClose}
           onClose={() => setModalOpen(false)}
         />
       )}
-      <ul className="list bg-base-100 shadow-md border border-base-300 w-full max-w-xl">
-        <li class="p-4 pb-2  tracking-wide font-bold text-accent">
+      <ul className="list gap-2 bg-base-100 shadow-md border border-base-300 w-full max-w-xl space-y-2">
+        <li class=" list-row sticky top-0 z-10 bg-base-100 p-4 pb-2 tracking-wide font-bold text-accent">
           Incoming Messages
         </li>
         {inbox.map((m) => (
           <li
             key={m.id}
-            className="list-row"
+            className="list-row px-4 py-3 border-b border-base-300 hover:bg-base-300/40 transition rounded cursor-pointer"
             onClick={() => handleMessageClick(m)}
           >
             <InboxMessages key={m.id} message={m} />

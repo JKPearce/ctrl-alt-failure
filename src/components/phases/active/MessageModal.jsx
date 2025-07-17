@@ -3,7 +3,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
 
 function MessageModal({ message, assignAndClose, onClose }) {
-  const [selectedAgentID, setSelectedAgentID] = useState();
+  const [selectedAgentID, setSelectedAgentID] = useState("");
   const { gameState } = useGame();
   const agentList = Object.values(gameState.agents);
 
@@ -22,9 +22,9 @@ function MessageModal({ message, assignAndClose, onClose }) {
   }, [onClose]);
 
   return (
-    <div id="message_modal" className="modal modal-open" onClick={onClose}>
+    <div id="message_modal" className="modal modal-open " onClick={onClose}>
       <div
-        className="modal-box relative animate-in fade-in zoom-in duration-200"
+        className="modal-box animate-modal-zoom relative animate-in fade-in zoom-in duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -73,7 +73,7 @@ function MessageModal({ message, assignAndClose, onClose }) {
 
           <button
             className="btn btn-sm btn-primary mt-2"
-            onClick={() => assignAndClose(selectedAgentID)}
+            onClick={() => assignAndClose(selectedAgentID, message.id)}
           >
             Assign
           </button>

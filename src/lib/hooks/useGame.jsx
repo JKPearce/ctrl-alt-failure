@@ -45,6 +45,7 @@ const useGame = () => {
   const assignTicketToAgent = (ticketID, agentID) => {
     // Always validate agent exists before proceeding
     const agent = getAgentByID(agentID);
+    console.log(agent);
     if (!agent) return;
 
     dispatch({
@@ -119,7 +120,7 @@ const useGame = () => {
 
   const getAgentByID = (agentID) => {
     if (agentID == null) return null;
-    return gameState.agents.find((a) => a.id === agentID) || null;
+    return gameState.agents[agentID] || null;
   };
 
   return {

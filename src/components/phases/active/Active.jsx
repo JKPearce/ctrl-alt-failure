@@ -15,25 +15,30 @@ function Active() {
   }, [gameState]);
 
   return (
-    <>
-      <div className="h-screen w-full grid grid-rows-[auto_1fr] grid-cols-[250px_1fr] gap-2 p-2 bg-base-200">
-        <div className="col-span-2">
-          <Nav />
-        </div>
+    <div className="h-screen w-full grid grid-rows-[auto_1fr] grid-cols-[250px_1fr] gap-2 p-2 bg-base-200 overflow-hidden">
+      {/* Top nav */}
+      <div className="col-span-2">
+        <Nav />
+      </div>
 
-        <div className="row-span-1">
-          <InboxPanel
-            inbox={Object.values(gameState.inbox)}
-            agents={Object.values(gameState.agents)}
-          />
-        </div>
+      {/* Left column — inbox (scrollable) */}
+      <div className="h-full overflow-y-auto">
+        <InboxPanel
+          inbox={Object.values(gameState.inbox)}
+          agents={Object.values(gameState.agents)}
+        />
+      </div>
 
-        <div className="flex flex-col gap-2">
-          <ActivityLog log={gameState.activityLog} />
-          <AgentGrid agents={gameState.agents} />
+      {/* Right column — log + agents */}
+      <div className="flex flex-col gap-2 overflow-hidden">
+        <div className="max-h-[40%] overflow-y-auto">
+          <ActivityLog log={Object.values(gameState.activityLog)} />
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          <AgentGrid agents={Object.values(gameState.agents)} />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

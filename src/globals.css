@@ -77,6 +77,35 @@
   --noise: 0;
 }
 
-html {
-  /* font-family: "Poppins", sans-serif; */
+@keyframes agent-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modal-zoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer utilities {
+  .animate-agent-pop {
+    animation: agent-pop 0.2s ease-out forwards;
+  }
+
+  .animate-modal-zoom {
+    animation: modal-zoom 0.25s ease-out forwards;
+    transform-origin: center;
+  }
 }
