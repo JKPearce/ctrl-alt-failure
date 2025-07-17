@@ -3,26 +3,24 @@ import { useState } from "react";
 import InboxMessages from "./InboxMessages";
 import MessageModal from "./MessageModal";
 
-function InboxPanel({ inbox, agents }) {
+function InboxPanel({ inbox }) {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const { assignTicketToAgent } = useGame();
 
   const handleMessageClick = (message) => {
-    console.log(message);
     setSelectedMessage(message);
     setModalOpen(true);
   };
 
   const assignAndClose = (agentID, messageID) => {
     setModalOpen(false);
-    console.log(agentID, messageID);
     assignTicketToAgent(messageID, agentID);
   };
 
   return (
     <section id="inbox-panel" className="h-full w-full overflow-y-auto pr-1">
-      {modalOpen && (
+      {modalOpen && selectedMessage && (
         <MessageModal
           message={selectedMessage}
           assignAndClose={assignAndClose}
@@ -30,7 +28,7 @@ function InboxPanel({ inbox, agents }) {
         />
       )}
       <ul className="list gap-2 bg-base-100 shadow-md border border-base-300 w-full max-w-xl space-y-2">
-        <li class=" list-row sticky top-0 z-10 bg-base-100 p-4 pb-2 tracking-wide font-bold text-accent">
+        <li className="list-row sticky top-0 z-10 bg-base-100 p-4 pb-2 tracking-wide font-bold text-accent">
           Incoming Messages
         </li>
         {inbox.map((m) => (

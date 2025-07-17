@@ -12,7 +12,7 @@ function AgentProfileMini({ agent, onClick }) {
       className="relative cursor-pointer bg-base-100 border border-base-300 rounded-xl p-4 shadow-sm hover:shadow-lg hover:scale-[1.03] transition-all duration-200 ease-out w-full flex flex-col gap-2 items-center text-center"
     >
       {agent.currentComment && (
-        <div className="absolute -top-5 right-0 bg-base-100 text-xs px-3 py-2 rounded-lg shadow-xl border border-base-300 max-w-[200px] z-50 animate-agent-pop">
+        <div className="absolute -top-5 right-0  text-xs px-3 py-2 shadow border border-base-300 max-w-[200px] z-50 animate-agent-pop bg-base-100 rounded-lg p-4 hover:shadow-xl transition duration-200 cursor-pointer">
           “{agent.currentComment}”
         </div>
       )}

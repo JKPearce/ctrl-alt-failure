@@ -31,7 +31,7 @@ function Active() {
 
       {/* Right column — log + agents */}
       <div className="flex flex-col gap-2 overflow-hidden">
-        <div className="max-h-[40%] overflow-y-auto">
+        <div className="max-h-[25%] overflow-y-auto mb-2">
           <ActivityLog log={Object.values(gameState.activityLog)} />
         </div>
         <div className="flex-1 overflow-y-auto">

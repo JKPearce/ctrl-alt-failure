@@ -1,8 +1,14 @@
+import { useState } from "react";
+import AgentProfileFull from "./AgentProfileFull";
 import AgentProfileMini from "./AgentProfileMini";
 
 function AgentGrid({ agents }) {
-  const openAgentModal = () => {
-    console.log("modal click");
+  const [selectedAgent, setSelectedAgent] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const openAgentModal = (agent) => {
+    setSelectedAgent(agent);
+    setModalOpen(true);
   };
 
   return (
@@ -14,6 +20,13 @@ function AgentGrid({ agents }) {
           onClick={() => openAgentModal(agent)}
         />
       ))}
+
+      {modalOpen && selectedAgent && (
+        <AgentProfileFull
+          agent={selectedAgent}
+          onClose={() => setModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
