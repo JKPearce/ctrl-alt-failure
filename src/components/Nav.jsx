@@ -1,20 +1,17 @@
 "use client";
 
-import { useGame } from "@/lib/hooks/useGame";
+import { useGame } from "@/context/useGame";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 const Nav = () => {
-  const pathname = usePathname();
   const { gameState } = useGame();
 
-  const getLinkClass = (path) =>
-    pathname === path
-      ? "btn btn-ghost text-secondary border-b-2 border-secondary"
-      : "btn btn-ghost hover:text-secondary";
+  const handleDevAction = () => {
+    console.log("Dev Action triggered");
+  };
 
   return (
-    <nav className="navbar bg-base-300 text-base-content px-6 shadow-lg">
+    <nav className="navbar bg-base-300 text-base-content px-6 shadow-md">
       <div className="flex-1">
         <Link
           href="/"
@@ -23,8 +20,34 @@ const Nav = () => {
           {gameState.businessName}
         </Link>
       </div>
-      <div>
-        <p>{gameState.playerName}</p>
+
+      <div className="flex items-center gap-4 text-sm">
+        <div className="flex gap-4">
+          <div className="opacity-70">
+            Day{" "}
+            <span className="font-bold text-base-content">
+              {gameState.dayNumber}
+            </span>
+          </div>
+          <div className="opacity-70">
+            AP{" "}
+            <span className="font-bold text-base-content">
+              {gameState.actionsPointsRemaining}
+            </span>
+          </div>
+          <div className="opacity-70">
+            💰{" "}
+            <span className="font-bold text-base-content">
+              ${gameState.money}
+            </span>
+          </div>
+        </div>
+
+        <button className="btn btn-xs btn-warning" onClick={handleDevAction}>
+          Dev Action
+        </button>
+
+        <span className="text-xs opacity-70">{gameState.playerName}</span>
       </div>
     </nav>
   );

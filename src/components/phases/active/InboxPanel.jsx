@@ -1,4 +1,4 @@
-import { useGame } from "@/lib/hooks/useGame";
+import { useGame } from "@/context/useGame";
 import { useState } from "react";
 import InboxMessages from "./InboxMessages";
 import MessageModal from "./MessageModal";

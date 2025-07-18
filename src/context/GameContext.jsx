@@ -1,6 +1,10 @@
 "use client";
 
-import { AGENT_ACTIONS, GAME_ACTIONS } from "@/lib/config/actionTypes";
+import {
+  AGENT_ACTIONS,
+  GAME_ACTIONS,
+  INBOX_ACTIONS,
+} from "@/lib/config/actionTypes";
 import {
   DEFAULT_ACTION_POINTS,
   DEFAULT_BUSINESS_NAME,
@@ -82,15 +86,19 @@ const GameProvider = ({ children }) => {
           ], //reverse order so the newest log entry is the first item in the array
         };
 
-      case AGENT_ACTIONS.ASSIGN_TICKET:
-        return updateEntity(state, "agents", action.payload.agentID, {
-          assignedTicket: action.payload.ticketID,
-          currentAction: "working",
-        });
-
       case AGENT_ACTIONS.SET_AGENT_COMMENT:
         return updateEntity(state, "agents", action.payload.agentID, {
           currentComment: action.payload.comment,
+        });
+
+      case AGENT_ACTIONS.SET_AGENT_ACTION:
+        return updateEntity(state, "agents", action.payload.agentID, {
+          currentAction: action.payload.action,
+        });
+
+      case INBOX_ACTIONS.ASSIGN_TICKET:
+        return updateEntity(state, "inbox", action.payload.ticketID, {
+          assignedAgent: action.payload.agentID,
         });
 
       default:

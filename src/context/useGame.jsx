@@ -1,14 +1,22 @@
 "use client";
 
 import { GameContext } from "@/context/GameContext";
-import { AGENT_ACTIONS, GAME_ACTIONS } from "@/lib/config/actionTypes";
+import {
+  AGENT_ACTIONS,
+  GAME_ACTIONS,
+  INBOX_ACTIONS,
+  LOG_TYPES,
+} from "@/lib/config/actionTypes";
+import {
+  createNewAgents,
+  generateAgentComment,
+} from "@/lib/helpers/agentHelpers";
+import { createNewMessages } from "@/lib/helpers/inboxHelpers";
 import { useContext } from "react";
 import {
   DEFAULT_AGENT_CAPACITY,
   DEFAULT_INBOX_SIZE,
-} from "../config/defaultGameState";
-import { useAgent } from "./useAgent";
-import { useInbox } from "./useInbox";
+} from "../lib/config/defaultGameState";
 
 const useGame = () => {
   const ctx = useContext(GameContext);
@@ -17,8 +25,6 @@ const useGame = () => {
   }
 
   const { gameState, dispatch } = ctx;
-  const { createNewMessages } = useInbox();
-  const { createNewAgents, generateAgentComment } = useAgent();
   const commentTimeouts = new Map();
 
   const setPlayerName = (name) => {
@@ -32,6 +38,7 @@ const useGame = () => {
   const startGame = (playerName, businessName) => {
     setPlayerName(playerName);
     setBusinessName(businessName);
+    //generate inbox, agents and any other stuff here? well call the functions
 
     dispatch({
       type: GAME_ACTIONS.START_GAME,
@@ -49,22 +56,18 @@ const useGame = () => {
     if (!agent) return;
 
     dispatch({
-      type: AGENT_ACTIONS.ASSIGN_TICKET,
+      type: INBOX_ACTIONS.ASSIGN_TICKET,
       payload: {
         ticketID,
         agentID,
       },
     });
 
-    dispatch({
-      type: GAME_ACTIONS.USE_ACTION_POINT,
-      payload: {
-        actionCost: 1, //can call a function here to calc cost of action
-      },
-    });
+    spendActionPoint(1);
+    setAgentAction(agentID, "Working");
 
     addEntryToLog(
-      "assign_ticket",
+      LOG_TYPES.ASSIGN_TICKET,
       agent.agentName,
       `Ticket #${ticketID} assigned to ${gameState.agents[agentID].agentName}.`
     );
@@ -80,7 +83,7 @@ const useGame = () => {
     const existing = commentTimeouts.get(agentID);
     if (existing) clearTimeout(existing);
 
-    // Always validate agent exists before proceeding
+    // Always validate agent exists in current state before proceeding
     const agent = getAgentByID(agentID);
     if (!agent) return;
 
@@ -89,12 +92,12 @@ const useGame = () => {
       payload: {
         agentID,
         comment,
-        //note to self, if the Key:value is the same variable, you can short hand them in 1 call
       },
     });
 
-    addEntryToLog("agent_comment", agent.agentName, comment);
+    addEntryToLog(LOG_TYPES.AGENT_COMMENT, agent.agentName, comment);
 
+    //this removes the comment after the specified duration so i can call render the comment dynamicly without needing a useEffect and timeout initilised on call change of the "currentComment"
     const timeout = setTimeout(() => {
       dispatch({
         type: AGENT_ACTIONS.SET_AGENT_COMMENT,
@@ -106,11 +109,22 @@ const useGame = () => {
     commentTimeouts.set(agentID, timeout);
   };
 
-  const addEntryToLog = (type, actor, message) => {
+  const setAgentAction = (agentID, action) => {
+    dispatch({
+      type: AGENT_ACTIONS.SET_AGENT_ACTION,
+      payload: {
+        agentID,
+        action,
+      },
+    });
+  };
+
+  const addEntryToLog = (eventType, actor, message) => {
+    //type is defined as "assign_ticket", "agent_comment" see actionTypes.js for the ENUM define
     dispatch({
       type: GAME_ACTIONS.ADD_ACTIVITY_LOG,
       payload: {
-        type,
+        eventType,
         actor,
         message,
         timestamp: Date.now(),
@@ -118,9 +132,23 @@ const useGame = () => {
     });
   };
 
+  const spendActionPoint = (amount = 1) => {
+    dispatch({
+      type: GAME_ACTIONS.USE_ACTION_POINT,
+      payload: {
+        actionCost: amount,
+      },
+    });
+  };
+
   const getAgentByID = (agentID) => {
     if (agentID == null) return null;
     return gameState.agents[agentID] || null;
+  };
+
+  const nextGameTick = () => {
+    if (gameState.actionsPointsRemaining <= 0) return;
+    spendActionPoint();
   };
 
   return {
@@ -132,6 +160,9 @@ const useGame = () => {
     triggerAgentComment,
     addEntryToLog,
     getAgentByID,
+    spendActionPoint,
+    setAgentAction,
+    nextGameTick,
   };
 };
 

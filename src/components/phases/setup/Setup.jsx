@@ -1,10 +1,10 @@
 "use client";
 
+import { useGame } from "@/context/useGame";
 import {
   DEFAULT_BUSINESS_NAME,
   DEFAULT_PLAYER_NAME,
 } from "@/lib/config/defaultGameState";
-import { useGame } from "@/lib/hooks/useGame";
 import { useRef } from "react";
 
 function Setup() {

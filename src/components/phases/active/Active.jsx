@@ -1,7 +1,7 @@
 "use client";
 
 import { Nav } from "@/components/Nav";
-import { useGame } from "@/lib/hooks/useGame";
+import { useGame } from "@/context/useGame";
 import { useEffect } from "react";
 import ActivityLog from "./ActivityLog";
 import AgentGrid from "./AgentGrid";
@@ -31,7 +31,7 @@ function Active() {
 
       {/* Right column — log + agents */}
       <div className="flex flex-col gap-2 overflow-hidden">
-        <div className="max-h-[25%] overflow-y-auto mb-2">
+        <div className="max-h-[33%] overflow-y-auto mb-2">
           <ActivityLog log={Object.values(gameState.activityLog)} />
         </div>
         <div className="flex-1 overflow-y-auto">

@@ -1,4 +1,4 @@
-import { useGame } from "@/lib/hooks/useGame";
+import { useGame } from "@/context/useGame";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
 
@@ -64,7 +64,7 @@ function MessageModal({ message, assignAndClose, onClose }) {
               <option
                 key={agent.id}
                 value={agent.id}
-                disabled={agent.assignedTicket !== null}
+                disabled={agent.currentAction === "Working"}
               >
                 {agent.agentName} ({agent.currentAction})
               </option>

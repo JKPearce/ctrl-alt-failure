@@ -3,7 +3,7 @@
 import Active from "@/components/phases/active/Active";
 import Setup from "@/components/phases/setup/Setup";
 import Summary from "@/components/phases/summary/Summary";
-import { useGame } from "@/lib/hooks/useGame";
+import { useGame } from "@/context/useGame";
 
 function GamePage() {
   const { gameState } = useGame();

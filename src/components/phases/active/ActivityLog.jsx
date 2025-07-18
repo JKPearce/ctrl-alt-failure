@@ -15,7 +15,7 @@ function ActivityLog({ log }) {
           <li
             key={i}
             className={`rounded-md px-3 py-2 text-sm border-l-4 ${
-              entry.type === "agent_comment"
+              entry.eventType === "agent_comment"
                 ? "bg-base-200 border-warning"
                 : "bg-base-300 border-info"
             }`}
