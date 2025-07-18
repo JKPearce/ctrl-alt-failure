@@ -40,7 +40,7 @@ function AgentProfileFull({ agent, onClose }) {
           {/* Profile Picture */}
           <div className="flex flex-col items-center">
             <Image
-              src={`/images/agents/${agent.agentName}.png`}
+              src={`/images/agents/${agent.gender}_${agent.ageBracket} (${agent.id}).png`}
               alt={agent.agentName}
               width={128}
               height={128}

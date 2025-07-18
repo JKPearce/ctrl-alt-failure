@@ -11,6 +11,8 @@ function useAgent() {
         agentName: "Terry Blazer",
         nickName: "Blaze",
         age: "39",
+        gender: "male",
+        ageBracket: "middleage",
         personality: {
           traits: ["angry", "impatient", "abrasive"],
           quirks: [

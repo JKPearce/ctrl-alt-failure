@@ -20,10 +20,11 @@ function AgentProfileMini({ agent, onClick }) {
       {/* Avatar */}
       <div className="avatar">
         <div className="w-20 mask mask-squircle">
+          {console.log(
+            `/images/agents/${agent.gender}_${agent.ageBracket} (${agent.agentID}).png`
+          )}
           <img
-            src={`/images/agents/${agent.agentName}_${
-              agent.currentEmotion || "neutral"
-            }.png`}
+            src={`/images/agents/${agent.gender}_${agent.ageBracket} (${agent.id}).png`}
             alt={agent.agentName}
           />
         </div>
