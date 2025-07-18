@@ -55,7 +55,7 @@ const GameProvider = ({ children }) => {
       case GAME_ACTIONS.START_NEW_DAY:
         return {
           ...state,
-          dayNumber: state.dayNumber + 1,
+          dayNumber: Number(state.dayNumber + 1),
           gamePhase: "active",
         };
 
@@ -71,8 +71,9 @@ const GameProvider = ({ children }) => {
       case GAME_ACTIONS.USE_ACTION_POINT:
         return {
           ...state,
-          actionsPointsRemaining:
-            state.actionsPointsRemaining - action.payload.actionCost,
+          actionsPointsRemaining: Number(
+            state.actionsPointsRemaining - action.payload.actionCost
+          ),
         };
 
       case GAME_ACTIONS.ADD_ACTIVITY_LOG:
@@ -98,7 +99,19 @@ const GameProvider = ({ children }) => {
 
       case INBOX_ACTIONS.ASSIGN_TICKET:
         return updateEntity(state, "inbox", action.payload.ticketID, {
-          assignedAgent: action.payload.agentID,
+          agentAssigned: Number(action.payload.agentID),
+        });
+
+      case INBOX_ACTIONS.UPDATE_TICKET_PROGRESS:
+        return updateEntity(state, "inbox", action.payload.ticketID, {
+          stepsRemaining: Number(action.payload.stepsRemaining),
+        });
+
+      case INBOX_ACTIONS.RESOLVE_TICKET:
+        return updateEntity(state, "inbox", action.payload.ticketID, {
+          stepsRemaining: 0,
+          resolved: true,
+          agentAssigned: null,
         });
 
       default:

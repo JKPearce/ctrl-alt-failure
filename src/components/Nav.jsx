@@ -4,10 +4,11 @@ import { useGame } from "@/context/useGame";
 import Link from "next/link";
 
 const Nav = () => {
-  const { gameState } = useGame();
+  const { gameState, progressTickets } = useGame();
 
   const handleDevAction = () => {
     console.log("Dev Action triggered");
+    progressTickets();
   };
 
   return (

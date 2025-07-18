@@ -74,7 +74,7 @@ const useGame = () => {
 
     triggerAgentComment(
       agentID,
-      generateAgentComment(gameState, agentID, "assigned to ticket")
+      generateAgentComment(gameState, agentID, "assign_ticket")
     );
   };
 
@@ -151,6 +151,57 @@ const useGame = () => {
     spendActionPoint();
   };
 
+  const progressTickets = () => {
+    Object.values(gameState.inbox).forEach((ticket) => {
+      console.log("Progress tickets foreach ticket: ", ticket);
+      if (ticket.messageType !== "ticket") return;
+      if (ticket.agentAssigned === null) return;
+      if (ticket.resolved) return;
+
+      //later create a helper function to calculate how many steps will be removed from modifiers like upgrades etc
+      const nextStepsRemaining = ticket.stepsRemaining - 1;
+
+      if (nextStepsRemaining <= 0) {
+        console.log("Resolving: ", ticket);
+
+        dispatch({
+          type: INBOX_ACTIONS.RESOLVE_TICKET,
+          payload: {
+            ticketID: ticket.id,
+          },
+        });
+
+        setAgentAction(ticket.agentAssigned, "idle");
+
+        triggerAgentComment(
+          ticket.agentAssigned,
+          generateAgentComment(
+            gameState,
+            ticket.agentAssigned,
+            "resolved_ticket"
+          )
+        );
+
+        const agent = getAgentByID(ticket.agentAssigned);
+        addEntryToLog(
+          LOG_TYPES.RESOLVE_TICKET,
+          agent.agentName,
+          `${agent.agentName} has assigned Ticket #${ticket.id}.`
+        );
+      } else {
+        console.log("Updating: ", ticket);
+
+        dispatch({
+          type: INBOX_ACTIONS.UPDATE_TICKET_PROGRESS,
+          payload: {
+            ticketID: ticket.id,
+            stepsRemaining: nextStepsRemaining,
+          },
+        });
+      }
+    });
+  };
+
   return {
     gameState,
     setPlayerName,
@@ -163,6 +214,7 @@ const useGame = () => {
     spendActionPoint,
     setAgentAction,
     nextGameTick,
+    progressTickets,
   };
 };
 

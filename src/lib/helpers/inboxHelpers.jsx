@@ -1,13 +1,14 @@
-const createNewMessages = (amount) => {
+export const createNewMessages = (amount) => {
   //eventually this will be an API call to get a unique ticket / message
   const messages = {};
 
   for (let i = 0; i < amount; i++) {
     messages[i] = {
       id: i,
-      type: "ticket", //multiple types of messages "ticket" for something that can be assigned "spam" for a funny flavour spam email "feedback" comments on a resolved ticket etc
+      messageType: "ticket", //multiple types of messages "ticket" for something that can be assigned "spam" for a funny flavour spam email "feedback" comments on a resolved ticket etc
       stepsRemaining: 4,
       agentAssigned: null,
+      resolved: false,
       sender: "Mary",
       subject: "computer no go",
       body: `Hi,
@@ -24,5 +25,3 @@ const createNewMessages = (amount) => {
 
   return messages;
 };
-
-export { createNewMessages };

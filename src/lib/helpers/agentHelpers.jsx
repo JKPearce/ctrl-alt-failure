@@ -1,4 +1,4 @@
-const createNewAgents = (amount) => {
+export const createNewAgents = (amount) => {
   //eventually this will be an API call to get a unique agent personalities and traits    const agents = [];
   const agents = {};
 
@@ -49,10 +49,13 @@ const createNewAgents = (amount) => {
   return agents;
 };
 
-const generateAgentComment = (state, agentID, context) => {
+export const generateAgentComment = (state, agentID, context) => {
   //TODO: Logic here to send to do an API call based on the ticket and agent
   //switch case based on the context that gets sent "assgined to ticket" "resolved ticket"etc
-  return "What the hell did she even click? How do you break a screen, a mouse, and gravity in one email? Ugh — I’ll fix it, but if Brenda's cake comes up one more time, I’m bricking the whole network.";
-};
 
-export { createNewAgents, generateAgentComment };
+  if (context === "assigned_ticket")
+    return "What the hell did she even click? How do you break a screen, a mouse, and gravity in one email? Ugh — I’ll fix it, but if Brenda's cake comes up one more time, I’m bricking the whole network.";
+
+  if (context === "resolved_ticket") return "Done and dusted, piece of cake";
+  else return "Agent is making a generic comment";
+};
