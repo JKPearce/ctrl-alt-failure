@@ -12,14 +12,16 @@ function AgentGrid({ agents }) {
   };
 
   return (
-    <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
-      {agents.map((agent) => (
-        <AgentProfileMini
-          key={agent.id}
-          agent={agent}
-          onClick={() => openAgentModal(agent)}
-        />
-      ))}
+    <div className="w-full">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
+        {agents.map((agent) => (
+          <AgentProfileMini
+            key={agent.id}
+            agent={agent}
+            onClick={() => openAgentModal(agent)}
+          />
+        ))}
+      </div>
 
       {modalOpen && selectedAgent && (
         <AgentProfileFull

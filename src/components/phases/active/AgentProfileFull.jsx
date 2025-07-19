@@ -1,27 +1,20 @@
+// AgentProfileFull.jsx — refactored for visual hierarchy and theme
+
 import Image from "next/image";
 import { useEffect } from "react";
 
 function AgentProfileFull({ agent, onClose }) {
-  // 🔐 Handle ESC key to close
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
+      if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handleEsc);
-
-    return () => {
-      document.removeEventListener("keydown", handleEsc);
-    };
+    return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
-
-  console.log("AgentProfileFull received agent:", agent);
-  console.log("agent.skills:", agent.skills);
 
   return (
     <div className="modal modal-open z-50">
-      <div className="modal-box animate-modal-zoom max-w-4xl h-[90vh] overflow-hidden flex flex-col bg-base-200 shadow-xl">
+      <div className="modal-box animate-modal-zoom max-w-4xl h-[90vh] overflow-hidden flex flex-col bg-base-100 text-base-content border border-base-300 shadow-xl">
         {/* Header */}
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -35,9 +28,9 @@ function AgentProfileFull({ agent, onClose }) {
           </button>
         </div>
 
-        {/* Main content grid */}
+        {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 flex-grow overflow-hidden">
-          {/* Profile Picture */}
+          {/* Left panel */}
           <div className="flex flex-col items-center">
             <Image
               src={agent.profileImage}
@@ -52,9 +45,8 @@ function AgentProfileFull({ agent, onClose }) {
             <div className="text-xs text-error">Mood: {agent.moodScore}</div>
           </div>
 
-          {/* Info Panel */}
+          {/* Info panel */}
           <div className="flex flex-col gap-4 overflow-y-auto pr-2">
-            {/* Personal Statement */}
             <div>
               <h3 className="text-lg font-semibold mb-1">Personal Statement</h3>
               <p className="text-sm text-base-content/80">
@@ -62,7 +54,6 @@ function AgentProfileFull({ agent, onClose }) {
               </p>
             </div>
 
-            {/* Skills */}
             <div>
               <h3 className="text-lg font-semibold mb-1">Skills</h3>
               <ul className="text-sm grid grid-cols-3 gap-2">
@@ -75,60 +66,40 @@ function AgentProfileFull({ agent, onClose }) {
               </ul>
             </div>
 
-            {/* Personality */}
             <div>
               <h3 className="text-lg font-semibold mb-1">Personality</h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <p className="font-medium">Traits:</p>
-                  <ul className="list-disc list-inside text-base-content/70">
-                    {agent.personality.traits.map((trait, i) => (
-                      <li key={i}>{trait}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-medium">Quirks:</p>
-                  <ul className="list-disc list-inside text-base-content/70">
-                    {agent.personality.quirks.map((q, i) => (
-                      <li key={i}>{q}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-medium">Likes:</p>
-                  <ul className="list-disc list-inside text-base-content/70">
-                    {agent.personality.likes.map((l, i) => (
-                      <li key={i}>{l}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-medium">Dislikes:</p>
-                  <ul className="list-disc list-inside text-base-content/70">
-                    {agent.personality.dislikes.map((d, i) => (
-                      <li key={i}>{d}</li>
-                    ))}
-                  </ul>
-                </div>
+                {[
+                  ["Traits", agent.personality.traits],
+                  ["Quirks", agent.personality.quirks],
+                  ["Likes", agent.personality.likes],
+                  ["Dislikes", agent.personality.dislikes],
+                ].map(([label, list]) => (
+                  <div key={label}>
+                    <p className="font-medium">{label}:</p>
+                    <ul className="list-disc list-inside text-base-content/70">
+                      {list.map((item, i) => (
+                        <li key={i}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Memory Log */}
             <div>
               <h3 className="text-lg font-semibold mb-1">Memory Log</h3>
-              <div className="h-28 overflow-y-auto bg-base-100 rounded p-2 border border-base-300 text-sm space-y-1">
+              <div className="h-28 overflow-y-auto bg-base-200 rounded p-2 border border-base-300 text-sm space-y-1">
                 {agent.memoryLog.map((entry, i) => (
                   <p key={i}>- {entry}</p>
                 ))}
               </div>
             </div>
 
-            {/* Current Comment */}
             {agent.currentComment && (
               <div>
                 <h3 className="text-lg font-semibold mb-1">Current Comment</h3>
-                <div className="bg-base-100 border border-base-300 rounded p-2 text-sm">
+                <div className="bg-base-200 border border-base-300 rounded p-2 text-sm">
                   "{agent.currentComment}"
                 </div>
               </div>
