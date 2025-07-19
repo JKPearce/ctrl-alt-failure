@@ -1,6 +1,6 @@
-# 🖥️ IT Desk Simulator
+# 🧨 CTRL ALT Failure
 
-**IT Desk Simulator** is a turn-based, roguelike resource management game where you play as the frazzled CEO of a chaotic Managed Service Provider (MSP). Hire agents, complete bizarre client contracts, and survive the relentless flood of help desk tickets, spam, and complaints.
+**CTRL ALT Failure** is a turn-based, roguelike resource management game where you play as the frazzled CEO of a chaotic Managed Service Provider (MSP). Hire agents, complete bizarre client contracts, and survive the relentless flood of help desk tickets, spam, and complaints.
 
 > 🏢 Build your company.  
 > 🤬 Manage stressed-out agents.  
@@ -18,7 +18,9 @@ No traditional win-state. Your goal: survive as long as possible and complete as
 ## 🧩 Game Systems
 
 ### 📋 Contracts
+
 Contracts change:
+
 - Ticket tone (e.g. Cyberpunk startup, Fantasy RPG company)
 - Game modifiers (+1 spam/complaint per turn, dangerous tickets)
 - Win conditions (e.g. resolve X tickets)
@@ -26,16 +28,19 @@ Contracts change:
 Each completed contract grants rewards and escalates difficulty.
 
 ### 🔋 Energy Points (EP)
+
 - Actions cost EP (assigning tickets, deleting spam, etc.)
 - Max EP starts at 3 but can be upgraded
 - Smart EP usage = efficient company survival
 
 ### 🧠 Agents
+
 - Come with random traits, moods, and skills (Hardware, Software, People)
 - Progress through tickets passively
 - Can be advised (LLM-prompted interactions planned)
 
 ### 📬 Inbox Pressure
+
 - Your inbox is the fail state
 - Message types include:
   - **Tickets** (assign to agent)
@@ -45,7 +50,9 @@ Each completed contract grants rewards and escalates difficulty.
   - **Events** (multi-choice encounters)
 
 ### 🔄 Progression
+
 After each contract:
+
 - Choose from powerful upgrades
 - Hire quirky new agents (Common → Rare → Legendary)
 - Face a harder contract
@@ -55,7 +62,7 @@ Eventually, the global inbox pressure overwhelms you. That's the run.
 ## 🧪 Status
 
 > 🚧 Early Development (Pre-MVP)  
-The core game loop, inbox handling, and agent assignment are in progress. LLM ticket generation and progression systems coming next.
+> The core game loop, inbox handling, and agent assignment are in progress. LLM ticket generation and progression systems coming next.
 
 ## 🧠 Tech Stack
 
@@ -75,13 +82,13 @@ The core game loop, inbox handling, and agent assignment are in progress. LLM ti
 ## 🔥 Inspirations
 
 Think:  
-*Slay the Spire* meets *Two Point Hospital*, but you're running a doomed IT startup with weird coworkers and catastrophic deadlines.
+_Slay the Spire_ meets _Two Point Hospital_, but you're running a doomed IT startup with weird coworkers and catastrophic deadlines.
 
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/JKPearce/it-desk-simulator
-cd it-desk-simulator
+git clone git@github.com:JKPearce/ctrl-alt-failure.git
+cd ctrl-alt-failure
 npm install
 npm run dev
 ```
