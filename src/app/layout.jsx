@@ -10,7 +10,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" data-theme="dark">
+    <html lang="en" data-theme="coffee">
       <body>
         <GameProvider>{children}</GameProvider>
       </body>

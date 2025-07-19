@@ -73,12 +73,12 @@ const GameProvider = ({ children }) => {
 
       case INBOX_ACTIONS.ASSIGN_TICKET:
         return updateEntity(state, "inbox", action.payload.ticketID, {
-          agentAssigned: Number(action.payload.agentID),
+          agentAssigned: action.payload.agentID,
         });
 
       case INBOX_ACTIONS.UPDATE_TICKET_PROGRESS:
         return updateEntity(state, "inbox", action.payload.ticketID, {
-          stepsRemaining: Number(action.payload.stepsRemaining),
+          stepsRemaining: action.payload.stepsRemaining,
         });
 
       case INBOX_ACTIONS.RESOLVE_TICKET:

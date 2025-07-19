@@ -1,5 +1,3 @@
-// InboxPanel.jsx — Refactored for theme, layout, modal toggle
-
 import { useGame } from "@/context/useGame";
 import { useState } from "react";
 import InboxMessages from "./InboxMessages";

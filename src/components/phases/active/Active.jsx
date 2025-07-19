@@ -1,5 +1,3 @@
-// Active.jsx — Refactored layout using design guide
-
 "use client";
 
 import AgentGrid from "@/components/phases/active/AgentGrid";
@@ -13,6 +11,7 @@ function Active() {
 
   useEffect(() => {
     console.log("state currently: ", gameState);
+
     if (gameState.gamePhase !== "active") return;
     if (Object.values(gameState.inbox).length >= gameState.inboxSize) {
       endGame();
@@ -47,8 +46,6 @@ function Active() {
               <AgentGrid agents={Object.values(gameState.agents)} />
             </div>
           </div>
-
-          {/* Future: Add activity log toggle drawer here if open */}
         </div>
       </div>
     </div>
