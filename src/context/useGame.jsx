@@ -30,11 +30,20 @@ const useGame = () => {
     //generate initial inbox messages here based on contract etc
     const inbox = generateNewMessages(3);
 
+    // Convert selectedAgents from an array into an object keyed by agent.id.
+    // This ensures agents are stored in gameState.agents as a lookup object (e.g. { [id]: agent }),
+    // which is required for reducers and ticket assignment logic to work correctly.
+    // UUID strings can't be accessed via numeric indexing, so object lookup is required.
+    const agentMap = {};
+    selectedAgents.forEach((agent) => {
+      agentMap[agent.id] = agent;
+    });
+
     dispatch({
       type: GAME_ACTIONS.START_GAME,
       payload: {
         businessName,
-        selectedAgents,
+        selectedAgents: agentMap,
         inbox,
         selectedFounder,
         selectedContract,
