@@ -7,10 +7,7 @@ import {
   INBOX_ACTIONS,
   LOG_TYPES,
 } from "@/lib/config/actionTypes";
-import {
-  generateAgentComment,
-  generateNewAgents,
-} from "@/lib/helpers/agentHelpers";
+import { generateAgentComment } from "@/lib/helpers/agentHelpers";
 import { generateNewMessages } from "@/lib/helpers/inboxHelpers";
 import { useContext } from "react";
 import { DEFAULT_STARTING_ENERGY } from "../lib/config/defaultGameState";
@@ -26,7 +23,7 @@ const useGame = () => {
 
   const startGame = (
     businessName,
-    selectedCEO,
+    selectedFounder,
     selectedContract,
     selectedAgents
   ) => {
@@ -36,12 +33,11 @@ const useGame = () => {
     dispatch({
       type: GAME_ACTIONS.START_GAME,
       payload: {
-        playerName: selectedCEO.name,
         businessName,
-        agents: selectedAgents,
+        selectedAgents,
         inbox,
-        CEO: selectedCEO,
-        currentContract: selectedContract,
+        selectedFounder,
+        selectedContract,
       },
     });
   };
@@ -49,14 +45,6 @@ const useGame = () => {
   const restartGame = () => {
     dispatch({
       type: GAME_ACTIONS.RESTART_GAME,
-      payload: {
-        playerName: selectedCEO.name,
-        businessName,
-        agents: selectedAgents,
-        inbox,
-        CEO: selectedCEO,
-        currentContract: selectedContract,
-      },
     });
   };
 

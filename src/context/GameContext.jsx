@@ -21,10 +21,10 @@ const GameProvider = ({ children }) => {
           ...state,
           gamePhase: "active",
           businessName: action.payload.businessName,
-          agents: action.payload.agents,
+          agents: action.payload.selectedAgents,
           inbox: action.payload.inbox,
           founder: action.payload.selectedFounder,
-          currentContract: action.payload.currentContract,
+          currentContract: action.payload.selectedContract,
         };
 
       case GAME_ACTIONS.END_GAME:
@@ -34,7 +34,7 @@ const GameProvider = ({ children }) => {
         };
 
       case GAME_ACTIONS.RESTART_GAME:
-        return { ...DEFAULT_GAME_STATE };
+        return DEFAULT_GAME_STATE;
 
       case GAME_ACTIONS.USE_ENERGY:
         return {
