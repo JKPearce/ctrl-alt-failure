@@ -1,11 +1,14 @@
-const { formatDistanceToNow } = require("date-fns");
+import { formatDistanceToNow } from "date-fns";
 
 function InboxMessages({ message }) {
   return (
-    <div className="flex flex-col w-full overflow-hidden">
-      <div className="flex justify-between w-full">
-        <h2 className="font-semibold text-sm truncate">{message.sender}</h2>
-        <span className="text-xs text-base-content/50 pl-2 shrink-0 whitespace-nowrap">
+    <div className="flex flex-col gap-1 text-sm">
+      {/* Header row */}
+      <div className="flex justify-between items-center w-full">
+        <h3 className="font-semibold text-base-content truncate">
+          {message.sender}
+        </h3>
+        <span className="text-xs text-base-content/50 whitespace-nowrap">
           {formatDistanceToNow(message.received, {
             includeSeconds: true,
             addSuffix: true,
@@ -13,9 +16,16 @@ function InboxMessages({ message }) {
         </span>
       </div>
 
-      <p className="text-sm text-base-content/70 truncate">{message.subject}</p>
-      <p className="text-xs text-base-content/40 truncate">
-        {message.body.slice(0, 80)}...
+      {/* Subject */}
+      <p className="text-base-content/80 font-medium truncate">
+        {message.subject || (
+          <em className="text-base-content/40">(no subject)</em>
+        )}
+      </p>
+
+      {/* Preview */}
+      <p className="text-xs text-base-content/60 truncate">
+        {message.body?.slice(0, 100) || "(no preview)"}
       </p>
     </div>
   );

@@ -1,3 +1,5 @@
+// InboxPanel.jsx — Refactored for theme, layout, modal toggle
+
 import { useGame } from "@/context/useGame";
 import { useState } from "react";
 import InboxMessages from "./InboxMessages";
@@ -19,7 +21,7 @@ function InboxPanel({ inbox }) {
   };
 
   return (
-    <section id="inbox-panel" className="h-full w-full overflow-y-auto pr-1">
+    <section id="inbox-panel" className="h-full w-full overflow-y-auto">
       {modalOpen && selectedMessage && (
         <MessageModal
           message={selectedMessage}
@@ -27,20 +29,26 @@ function InboxPanel({ inbox }) {
           onClose={() => setModalOpen(false)}
         />
       )}
-      <ul className="list gap-2 bg-base-100 shadow-md border border-base-300 w-full max-w-xl space-y-2">
-        <li className="list-row sticky top-0 z-10 bg-base-100 p-4 pb-2 tracking-wide font-bold text-accent">
-          Inbox - Capacity: {`${inbox.length} / ${gameState.inboxSize}`}
-        </li>
-        {inbox.map((m) => (
-          <li
-            key={m.id}
-            className="list-row px-4 py-3 border-b border-base-300 hover:bg-base-300/40 transition rounded cursor-pointer"
-            onClick={() => handleMessageClick(m)}
-          >
-            <InboxMessages key={m.id} message={m} />
-          </li>
-        ))}
-      </ul>
+
+      <div className="bg-base-100 border border-base-300 shadow-md rounded-xl overflow-hidden">
+        <div className="sticky top-0 z-10 bg-base-100 px-4 py-3 border-b border-base-300">
+          <h2 className="font-bold text-accent tracking-wide">
+            Inbox — {inbox.length} / {gameState.inboxSize}
+          </h2>
+        </div>
+
+        <ul className="divide-y divide-base-300">
+          {inbox.map((message) => (
+            <li
+              key={message.id}
+              className="px-4 py-3 hover:bg-base-300/30 transition cursor-pointer"
+              onClick={() => handleMessageClick(message)}
+            >
+              <InboxMessages message={message} />
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

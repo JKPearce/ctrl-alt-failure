@@ -7,50 +7,50 @@ function MessageModal({ message, assignAndClose, onClose }) {
   const { gameState } = useGame();
   const agentList = Object.values(gameState.agents);
 
-  // 🔐 Handle ESC key to close
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
+      if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handleEsc);
-
-    return () => {
-      document.removeEventListener("keydown", handleEsc);
-    };
+    return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
   return (
-    <div id="message_modal" className="modal modal-open " onClick={onClose}>
+    <div
+      id="message_modal"
+      className="modal modal-open bg-black/40 backdrop-blur-sm z-50"
+      onClick={onClose}
+    >
       <div
-        className="modal-box animate-modal-zoom relative animate-in fade-in zoom-in duration-200"
+        className="modal-box animate-modal-zoom max-w-xl bg-base-100 text-base-content border border-base-300 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          className="btn btn-sm btn-circle absolute right-2 top-2"
-          onClick={onClose}
-        >
-          ✕
-        </button>
-
-        <h2>{message.from}</h2>
-        <h2 className="font-bold text-lg">From: {message.sender}</h2>
-        <h2 className="font-bold text-lg">
-          Received:{" "}
-          {formatDistanceToNow(message.received, {
-            includeSeconds: true,
-            addSuffix: true,
-          })}
-        </h2>
-
-        <p className="py-4">{message.body}</p>
-
-        <div className="modal-action">
-          <button className="btn btn-sm btn-error" onClick={onClose}>
-            Cancel
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-xl font-bold">{message.subject}</h2>
+            <p className="text-sm text-base-content/60">
+              From: <strong>{message.sender}</strong>
+            </p>
+            <p className="text-xs text-base-content/50 italic">
+              {formatDistanceToNow(message.received, {
+                includeSeconds: true,
+                addSuffix: true,
+              })}
+            </p>
+          </div>
+          <button className="btn btn-sm btn-circle" onClick={onClose}>
+            ✕
           </button>
-          <label htmlFor="agent-list">Assign to:</label>
+        </div>
+
+        <div className="prose max-w-none text-sm mb-4">
+          <p>{message.body}</p>
+        </div>
+
+        <div className="flex flex-col gap-3 border-t border-base-300 pt-4">
+          <label htmlFor="agent-list" className="text-sm font-semibold">
+            Assign to:
+          </label>
           <select
             name="agent-list"
             className="select select-sm select-bordered"
@@ -71,12 +71,18 @@ function MessageModal({ message, assignAndClose, onClose }) {
             ))}
           </select>
 
-          <button
-            className="btn btn-sm btn-primary mt-2"
-            onClick={() => assignAndClose(selectedAgentID, message.id)}
-          >
-            Assign
-          </button>
+          <div className="flex justify-end gap-2">
+            <button className="btn btn-error btn-sm" onClick={onClose}>
+              Cancel
+            </button>
+            <button
+              className="btn btn-primary btn-sm"
+              disabled={!selectedAgentID}
+              onClick={() => assignAndClose(selectedAgentID, message.id)}
+            >
+              Assign
+            </button>
+          </div>
         </div>
       </div>
     </div>
