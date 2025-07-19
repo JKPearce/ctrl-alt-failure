@@ -6,7 +6,7 @@ import MessageModal from "./MessageModal";
 function InboxPanel({ inbox }) {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const { assignTicketToAgent } = useGame();
+  const { assignTicketToAgent, gameState } = useGame();
 
   const handleMessageClick = (message) => {
     setSelectedMessage(message);
@@ -29,7 +29,7 @@ function InboxPanel({ inbox }) {
       )}
       <ul className="list gap-2 bg-base-100 shadow-md border border-base-300 w-full max-w-xl space-y-2">
         <li className="list-row sticky top-0 z-10 bg-base-100 p-4 pb-2 tracking-wide font-bold text-accent">
-          Incoming Messages
+          Inbox - Capacity: {`${inbox.length} / ${gameState.inboxSize}`}
         </li>
         {inbox.map((m) => (
           <li

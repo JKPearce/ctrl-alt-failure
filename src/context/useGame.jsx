@@ -8,13 +8,14 @@ import {
   LOG_TYPES,
 } from "@/lib/config/actionTypes";
 import {
-  createNewAgents,
   generateAgentComment,
+  generateNewAgents,
 } from "@/lib/helpers/agentHelpers";
-import { createNewMessages } from "@/lib/helpers/inboxHelpers";
+import { generateNewMessages } from "@/lib/helpers/inboxHelpers";
 import { useContext } from "react";
 import {
   DEFAULT_AGENT_CAPACITY,
+  DEFAULT_ENERGY,
   DEFAULT_INBOX_SIZE,
 } from "../lib/config/defaultGameState";
 
@@ -38,13 +39,16 @@ const useGame = () => {
   const startGame = (playerName, businessName) => {
     setPlayerName(playerName);
     setBusinessName(businessName);
+
     //generate inbox, agents and any other stuff here? well call the functions
+    const agents = generateNewAgents(3);
+    const inbox = generateNewMessages(3);
 
     dispatch({
       type: GAME_ACTIONS.START_GAME,
       payload: {
-        agents: createNewAgents(DEFAULT_AGENT_CAPACITY),
-        inbox: createNewMessages(DEFAULT_INBOX_SIZE),
+        agents,
+        inbox,
       },
     });
   };
@@ -63,7 +67,7 @@ const useGame = () => {
       },
     });
 
-    spendActionPoint(1);
+    spendEnergy(1);
     setAgentAction(agentID, "Working");
 
     addEntryToLog(
@@ -78,7 +82,7 @@ const useGame = () => {
     );
   };
 
-  const triggerAgentComment = (agentID, comment, duration = 10000) => {
+  const triggerAgentComment = (agentID, comment, duration = 3000) => {
     // Clear existing timeout if one exists
     const existing = commentTimeouts.get(agentID);
     if (existing) clearTimeout(existing);
@@ -132,9 +136,9 @@ const useGame = () => {
     });
   };
 
-  const spendActionPoint = (amount = 1) => {
+  const spendEnergy = (amount = 1) => {
     dispatch({
-      type: GAME_ACTIONS.USE_ACTION_POINT,
+      type: GAME_ACTIONS.USE_ENERGY,
       payload: {
         actionCost: amount,
       },
@@ -148,12 +152,11 @@ const useGame = () => {
 
   const nextGameTick = () => {
     if (gameState.actionsPointsRemaining <= 0) return;
-    spendActionPoint();
+    spendEnergy();
   };
 
   const progressTickets = () => {
     Object.values(gameState.inbox).forEach((ticket) => {
-      console.log("Progress tickets foreach ticket: ", ticket);
       if (ticket.messageType !== "ticket") return;
       if (ticket.agentAssigned === null) return;
       if (ticket.resolved) return;
@@ -202,6 +205,34 @@ const useGame = () => {
     });
   };
 
+  const replenishEnergy = (energy = DEFAULT_ENERGY) => {
+    dispatch({
+      type: GAME_ACTIONS.REPLENISH_ENERGY,
+      payload: {
+        energy,
+      },
+    });
+  };
+
+  const addNewInboxItems = () => {
+    const amountToGenerate = 2; //logic here /call helper function to calculate amount of items and the type of inbox item
+    const items = generateNewMessages(amountToGenerate);
+
+    //update inbox state
+    dispatch({
+      type: INBOX_ACTIONS.ADD_INBOX_ITEM,
+      payload: {
+        items,
+      },
+    });
+  };
+
+  const endGame = () => {
+    dispatch({
+      type: GAME_ACTIONS.END_GAME,
+    });
+  };
+
   return {
     gameState,
     setPlayerName,
@@ -211,10 +242,13 @@ const useGame = () => {
     triggerAgentComment,
     addEntryToLog,
     getAgentByID,
-    spendActionPoint,
+    spendActionPoint: spendEnergy,
     setAgentAction,
     nextGameTick,
     progressTickets,
+    replenishEnergy,
+    addNewInboxItems,
+    endGame,
   };
 };
 

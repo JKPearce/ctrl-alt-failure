@@ -6,8 +6,8 @@ import {
   INBOX_ACTIONS,
 } from "@/lib/config/actionTypes";
 import {
-  DEFAULT_ACTION_POINTS,
   DEFAULT_BUSINESS_NAME,
+  DEFAULT_ENERGY,
   DEFAULT_INBOX_SIZE,
   DEFAULT_MONEY,
   DEFAULT_PLAYER_NAME,
@@ -22,7 +22,7 @@ const GameProvider = ({ children }) => {
     businessName: DEFAULT_BUSINESS_NAME,
     playerName: DEFAULT_PLAYER_NAME,
     money: DEFAULT_MONEY,
-    actionsPointsRemaining: DEFAULT_ACTION_POINTS,
+    energyRemaining: DEFAULT_ENERGY,
     inboxSize: DEFAULT_INBOX_SIZE,
     upgrades: DEFAULT_UPGRADES,
     dayNumber: 0,
@@ -30,11 +30,6 @@ const GameProvider = ({ children }) => {
     agents: {},
     inbox: {},
     activityLog: [],
-    // storyChoices: [],      //Will be used to inject to API LLM prompts
-    //ticketsResolvedToday:[] //To show an end of day summary
-    //stylesTheme: "dark" // change the css theme
-    //language : "eng" //option to swap languages, or generate AI tickets in different languages
-    //ticketTheme : "Retro Video Game" // user defined theme for the types of issues e.g retro video game theme could mean a ticket gets logged by Mario who is having issues piping with his command line
   });
 
   //this is the brains of the whole game
@@ -52,13 +47,6 @@ const GameProvider = ({ children }) => {
           businessName: action.payload,
         };
 
-      case GAME_ACTIONS.START_NEW_DAY:
-        return {
-          ...state,
-          dayNumber: Number(state.dayNumber + 1),
-          gamePhase: "active",
-        };
-
       case GAME_ACTIONS.START_GAME:
         return {
           ...state,
@@ -68,12 +56,24 @@ const GameProvider = ({ children }) => {
           inbox: action.payload.inbox,
         };
 
-      case GAME_ACTIONS.USE_ACTION_POINT:
+      case GAME_ACTIONS.END_GAME:
         return {
           ...state,
-          actionsPointsRemaining: Number(
-            state.actionsPointsRemaining - action.payload.actionCost
+          gamePhase: "game_over",
+        };
+
+      case GAME_ACTIONS.USE_ENERGY:
+        return {
+          ...state,
+          energyRemaining: Number(
+            state.energyRemaining - action.payload.actionCost
           ),
+        };
+
+      case GAME_ACTIONS.REPLENISH_ENERGY:
+        return {
+          ...state,
+          energyRemaining: Number(action.payload.energy),
         };
 
       case GAME_ACTIONS.ADD_ACTIVITY_LOG:
@@ -114,7 +114,17 @@ const GameProvider = ({ children }) => {
           agentAssigned: null,
         });
 
+      case INBOX_ACTIONS.ADD_INBOX_ITEM:
+        return {
+          ...state,
+          inbox: {
+            ...state.inbox,
+            ...action.payload.items,
+          },
+        };
+
       default:
+        console.warn("Unhandled action type:", action.type);
         return state;
     }
   }

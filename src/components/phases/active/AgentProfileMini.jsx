@@ -9,7 +9,6 @@ function AgentProfileMini({ agent, onClick }) {
       msg.agentAssigned === agent.id &&
       !msg.resolved
   );
-  console.log("current ticket: ", currentTicket);
 
   const moodColor =
     agent.moodScore <= -5

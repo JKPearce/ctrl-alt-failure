@@ -1,10 +1,11 @@
-export const createNewMessages = (amount) => {
+export const generateNewMessages = (amount) => {
   //eventually this will be an API call to get a unique ticket / message
   const messages = {};
 
   for (let i = 0; i < amount; i++) {
-    messages[i] = {
-      id: i,
+    const uuid = crypto.randomUUID();
+    messages[uuid] = {
+      id: uuid,
       messageType: "ticket", //multiple types of messages "ticket" for something that can be assigned "spam" for a funny flavour spam email "feedback" comments on a resolved ticket etc
       stepsRemaining: 4,
       agentAssigned: null,

@@ -1,4 +1,4 @@
-export const createNewAgents = (amount) => {
+export const generateNewAgents = (amount) => {
   //eventually this will be an API call to get a unique agent personalities and traits    const agents = [];
   const agents = {};
 

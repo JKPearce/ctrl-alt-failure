@@ -1,5 +1,5 @@
 // src/app/layout.jsx or layout.js
-import { Nav } from "@/components/Nav";
+import { Nav } from "@/components/phases/active/ControlPanel";
 import { GameProvider } from "@/context/GameContext";
 
 import "@/globals.css";
