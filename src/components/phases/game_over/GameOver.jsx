@@ -3,7 +3,7 @@
 import { useGame } from "@/context/useGame";
 
 const GameOver = () => {
-  const { gameState, startGame } = useGame();
+  const { gameState, restartGame } = useGame();
   const {
     playerName,
     businessName,
@@ -39,11 +39,8 @@ const GameOver = () => {
         </div>
       </div>
 
-      <button
-        className="btn btn-primary"
-        onClick={() => startGame(playerName, businessName)}
-      >
-        🔁 Restart Company
+      <button className="btn btn-primary" onClick={() => restartGame()}>
+        🔁 Restart Game
       </button>
     </div>
   );

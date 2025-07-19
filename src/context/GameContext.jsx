@@ -5,55 +5,26 @@ import {
   GAME_ACTIONS,
   INBOX_ACTIONS,
 } from "@/lib/config/actionTypes";
-import {
-  DEFAULT_BUSINESS_NAME,
-  DEFAULT_ENERGY,
-  DEFAULT_INBOX_SIZE,
-  DEFAULT_MONEY,
-  DEFAULT_PLAYER_NAME,
-  DEFAULT_UPGRADES,
-} from "@/lib/config/defaultGameState";
+import { DEFAULT_GAME_STATE } from "@/lib/config/defaultGameState";
 import { createContext, useReducer } from "react";
 
 const GameContext = createContext();
 
 const GameProvider = ({ children }) => {
-  const [gameState, dispatch] = useReducer(reducer, {
-    businessName: DEFAULT_BUSINESS_NAME,
-    playerName: DEFAULT_PLAYER_NAME,
-    money: DEFAULT_MONEY,
-    energyRemaining: DEFAULT_ENERGY,
-    inboxSize: DEFAULT_INBOX_SIZE,
-    upgrades: DEFAULT_UPGRADES,
-    dayNumber: 0,
-    gamePhase: "setup", //options are"setup" | "active" | "running",
-    agents: {},
-    inbox: {},
-    activityLog: [],
-  });
+  const [gameState, dispatch] = useReducer(reducer, DEFAULT_GAME_STATE);
 
   //this is the brains of the whole game
   function reducer(state, action) {
     switch (action.type) {
-      case GAME_ACTIONS.SET_PLAYER_NAME:
-        return {
-          ...state,
-          playerName: action.payload,
-        };
-
-      case GAME_ACTIONS.SET_BUSINESS_NAME:
-        return {
-          ...state,
-          businessName: action.payload,
-        };
-
       case GAME_ACTIONS.START_GAME:
         return {
           ...state,
-          dayNumber: 1,
           gamePhase: "active",
+          businessName: action.payload.businessName,
           agents: action.payload.agents,
           inbox: action.payload.inbox,
+          founder: action.payload.selectedFounder,
+          currentContract: action.payload.currentContract,
         };
 
       case GAME_ACTIONS.END_GAME:
@@ -61,6 +32,9 @@ const GameProvider = ({ children }) => {
           ...state,
           gamePhase: "game_over",
         };
+
+      case GAME_ACTIONS.RESTART_GAME:
+        return { ...DEFAULT_GAME_STATE };
 
       case GAME_ACTIONS.USE_ENERGY:
         return {

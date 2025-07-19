@@ -1,4 +1,5 @@
 import { useGame } from "@/context/useGame"; // adjust path if needed
+import Image from "next/image";
 
 function AgentProfileMini({ agent, onClick }) {
   const { gameState } = useGame();
@@ -17,9 +18,6 @@ function AgentProfileMini({ agent, onClick }) {
       ? "text-warning"
       : "text-success";
 
-  const ageBracket =
-    agent.age <= 30 ? "young" : agent.age <= 50 ? "middleage" : "old";
-
   return (
     <div
       onClick={onClick}
@@ -33,9 +31,12 @@ function AgentProfileMini({ agent, onClick }) {
 
       <div className="avatar">
         <div className="w-20 mask mask-squircle">
-          <img
-            src={`/images/agents/${agent.gender}_${ageBracket} (${agent.id}).png`}
-            alt={agent.agentName}
+          <Image
+            src={agent.profileImage}
+            alt={`${agent.agentName} profile`}
+            width={80}
+            height={80}
+            className="object-cover"
           />
         </div>
       </div>

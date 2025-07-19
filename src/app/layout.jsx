@@ -1,12 +1,11 @@
 // src/app/layout.jsx or layout.js
-import { Nav } from "@/components/phases/active/ControlPanel";
 import { GameProvider } from "@/context/GameContext";
 
 import "@/globals.css";
 
 export const metadata = {
-  title: "IT Desk Sim",
-  description: "Manage an IT helpdesk with flair",
+  title: "CTRL-ALT-FAIL",
+  description: "Manage an IT support company with flair",
 };
 
 export default function RootLayout({ children }) {

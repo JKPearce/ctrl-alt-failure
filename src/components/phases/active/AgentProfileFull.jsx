@@ -2,9 +2,6 @@ import Image from "next/image";
 import { useEffect } from "react";
 
 function AgentProfileFull({ agent, onClose }) {
-  const ageBracket =
-    agent.age <= 30 ? "young" : agent.age <= 50 ? "middleage" : "old";
-
   // 🔐 Handle ESC key to close
   useEffect(() => {
     const handleEsc = (e) => {
@@ -43,8 +40,8 @@ function AgentProfileFull({ agent, onClose }) {
           {/* Profile Picture */}
           <div className="flex flex-col items-center">
             <Image
-              src={`/images/agents/${agent.gender}_${ageBracket} (${agent.id}).png`}
-              alt={agent.agentName}
+              src={agent.profileImage}
+              alt={`${agent.agentName} profile`}
               width={128}
               height={128}
               className="rounded-xl border border-base-300"

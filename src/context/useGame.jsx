@@ -13,11 +13,7 @@ import {
 } from "@/lib/helpers/agentHelpers";
 import { generateNewMessages } from "@/lib/helpers/inboxHelpers";
 import { useContext } from "react";
-import {
-  DEFAULT_AGENT_CAPACITY,
-  DEFAULT_ENERGY,
-  DEFAULT_INBOX_SIZE,
-} from "../lib/config/defaultGameState";
+import { DEFAULT_STARTING_ENERGY } from "../lib/config/defaultGameState";
 
 const useGame = () => {
   const ctx = useContext(GameContext);
@@ -28,27 +24,38 @@ const useGame = () => {
   const { gameState, dispatch } = ctx;
   const commentTimeouts = new Map();
 
-  const setPlayerName = (name) => {
-    dispatch({ type: GAME_ACTIONS.SET_PLAYER_NAME, payload: name });
-  };
-
-  const setBusinessName = (name) => {
-    dispatch({ type: GAME_ACTIONS.SET_BUSINESS_NAME, payload: name });
-  };
-
-  const startGame = (playerName, businessName) => {
-    setPlayerName(playerName);
-    setBusinessName(businessName);
-
-    //generate inbox, agents and any other stuff here? well call the functions
-    const agents = generateNewAgents(3);
+  const startGame = (
+    businessName,
+    selectedCEO,
+    selectedContract,
+    selectedAgents
+  ) => {
+    //generate initial inbox messages here based on contract etc
     const inbox = generateNewMessages(3);
 
     dispatch({
       type: GAME_ACTIONS.START_GAME,
       payload: {
-        agents,
+        playerName: selectedCEO.name,
+        businessName,
+        agents: selectedAgents,
         inbox,
+        CEO: selectedCEO,
+        currentContract: selectedContract,
+      },
+    });
+  };
+
+  const restartGame = () => {
+    dispatch({
+      type: GAME_ACTIONS.RESTART_GAME,
+      payload: {
+        playerName: selectedCEO.name,
+        businessName,
+        agents: selectedAgents,
+        inbox,
+        CEO: selectedCEO,
+        currentContract: selectedContract,
       },
     });
   };
@@ -205,7 +212,7 @@ const useGame = () => {
     });
   };
 
-  const replenishEnergy = (energy = DEFAULT_ENERGY) => {
+  const replenishEnergy = (energy = DEFAULT_STARTING_ENERGY) => {
     dispatch({
       type: GAME_ACTIONS.REPLENISH_ENERGY,
       payload: {
@@ -235,9 +242,8 @@ const useGame = () => {
 
   return {
     gameState,
-    setPlayerName,
-    setBusinessName,
     startGame,
+    restartGame,
     assignTicketToAgent,
     triggerAgentComment,
     addEntryToLog,

@@ -1,13 +1,20 @@
 //initial game state values (new players will start with these )
 export const DEFAULT_BUSINESS_NAME = "UserError Inc.";
-export const DEFAULT_PLAYER_NAME = "Bob Nullman";
-export const DEFAULT_MONEY = 1000;
-export const DEFAULT_ENERGY = 3;
+export const DEFAULT_STARTING_MONEY = 1000;
+export const DEFAULT_STARTING_ENERGY = 3;
 export const DEFAULT_INBOX_SIZE = 10;
-export const DEFAULT_AGENT_CAPACITY = 5;
-export const DEFAULT_UPGRADES = {
-  coffeeMachine: false,
-  biggerInbox: false,
+
+export const DEFAULT_GAME_STATE = {
+  businessName: DEFAULT_BUSINESS_NAME,
+  founder: {},
+  money: DEFAULT_STARTING_MONEY,
+  energyRemaining: DEFAULT_STARTING_ENERGY,
+  inboxSize: DEFAULT_INBOX_SIZE,
+  gamePhase: "setup", //options are "setup" | "active" | "summary" | "game_over",
+  agents: {},
+  inbox: {},
+  activityLog: [],
+  currentContract: {},
 };
 
 export const UPGRADE_DEFINITIONS = {

@@ -13,10 +13,27 @@ export const generateNewAgents = (amount) => {
       id: uuid,
       currentAction: "idle",
       currentComment: null,
+      profileImage: getRandomPortrait(
+        baseAgent.gender,
+        getAgeBracket(baseAgent.age)
+      ),
     };
+
+    console.log(agents[uuid]);
   }
 
   return agents;
+};
+
+const getRandomPortrait = (gender, ageBracket) => {
+  const index = Math.floor(Math.random() * 7); // 0–6
+  return `/images/agents/${gender.toLowerCase()}_${ageBracket.toLowerCase()} (${index}).png`;
+};
+
+const getAgeBracket = (age) => {
+  if (age < 30) return "young";
+  if (age < 50) return "middleage";
+  return "old";
 };
 
 export const generateAgentComment = (state, agentID, context) => {
