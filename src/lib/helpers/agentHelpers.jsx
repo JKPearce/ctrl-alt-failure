@@ -1,47 +1,17 @@
+import { PRE_GENERATED_AGENTS } from "../config/preGeneratedAgents";
+
 export const generateNewAgents = (amount) => {
-  //eventually this will be an API call to get a unique agent personalities and traits    const agents = [];
   const agents = {};
+  const shuffled = [...PRE_GENERATED_AGENTS].sort(() => 0.5 - Math.random());
 
   for (let i = 0; i < amount; i++) {
-    agents[i] = {
-      id: i,
-      agentName: "Terry Blazer",
-      nickName: "Blaze",
-      age: "39",
-      gender: "male",
-      personality: {
-        traits: ["angry", "impatient", "abrasive"],
-        quirks: [
-          "swears at error messages",
-          "has broken 3 keyboards this quarter",
-          "keeps a stress ball collection with names",
-        ],
-        likes: [
-          "solving things fast",
-          "screaming into the void",
-          "flipping off the server rack",
-        ],
-        dislikes: [
-          "slow Wi-Fi",
-          "printers",
-          "people who ask 'have you tried turning it off and on again?'",
-        ],
-        favFood: "double-shot espresso with chili flakes",
-      },
-      skills: {
-        hardware: 8,
-        software: 5,
-        people: -2,
-      },
+    const uuid = crypto.randomUUID();
+    const baseAgent = { ...shuffled[i % PRE_GENERATED_AGENTS.length] };
+
+    agents[uuid] = {
+      ...baseAgent,
+      id: uuid,
       currentAction: "idle",
-      currentEmotion: "furious",
-      moodScore: -7,
-      memoryLog: [
-        "Threw a monitor across the room after a driver update loop",
-        "Told a user to 'sacrifice the router to the Wi-Fi gods' — it worked",
-        "Filed a ticket against management for 'existential incompetence'",
-      ],
-      personalStatement: `I'm not here to coddle end-users or listen to Brenda cry about her Outlook not syncing. You give me the problem, I swear at it until it works, and then I get back to drinking liquid rage. If you want soft skills, hire a therapy dog. You want results? You call Blaze.`,
       currentComment: null,
     };
   }
