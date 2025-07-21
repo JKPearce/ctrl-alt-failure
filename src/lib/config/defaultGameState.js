@@ -15,6 +15,7 @@ export const DEFAULT_GAME_STATE = {
   inbox: {},
   activityLog: [],
   currentContract: {},
+  dayNumber: 1,
 };
 
 export const UPGRADE_DEFINITIONS = {

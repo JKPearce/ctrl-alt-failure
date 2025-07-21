@@ -7,7 +7,10 @@ import {
   INBOX_ACTIONS,
   LOG_TYPES,
 } from "@/lib/config/actionTypes";
-import { generateAgentComment } from "@/lib/helpers/agentHelpers";
+import {
+  calcSuccessChance,
+  generateAgentComment,
+} from "@/lib/helpers/agentHelpers";
 import { generateNewMessages } from "@/lib/helpers/inboxHelpers";
 import { useContext } from "react";
 import { DEFAULT_STARTING_ENERGY } from "../lib/config/defaultGameState";
@@ -159,22 +162,30 @@ const useGame = () => {
     spendEnergy();
   };
 
-  const progressTickets = () => {
+  const resolveTickets = () => {
     Object.values(gameState.inbox).forEach((ticket) => {
       if (ticket.messageType !== "ticket") return;
       if (ticket.agentAssigned === null) return;
       if (ticket.resolved) return;
 
-      //later create a helper function to calculate how many steps will be removed from modifiers like upgrades etc
-      const nextStepsRemaining = ticket.stepsRemaining - 1;
+      const agent = getAgentByID(ticket.agentAssigned);
 
-      if (nextStepsRemaining <= 0) {
+      const chance = calcSuccessChance(
+        agent.skills[ticket.ticketType],
+        ticket.ticketDifficulty
+      );
+      const success = Math.random() < chance;
+      console.log("success change ", chance, " - Successful roll = ", success);
+
+      if (success) {
         console.log("Resolving: ", ticket);
 
         dispatch({
           type: INBOX_ACTIONS.RESOLVE_TICKET,
           payload: {
             ticketID: ticket.id,
+            resolvedBy: agent.id,
+            successChance: chance,
           },
         });
 
@@ -189,20 +200,26 @@ const useGame = () => {
           )
         );
 
-        const agent = getAgentByID(ticket.agentAssigned);
         addEntryToLog(
-          LOG_TYPES.RESOLVE_TICKET,
+          LOG_TYPES.RESOLVE_SUCCESS,
           agent.agentName,
           `${agent.agentName} has assigned Ticket #${ticket.id}.`
         );
       } else {
         console.log("Updating: ", ticket);
+        addEntryToLog(
+          LOG_TYPES.RESOLVE_FAIL,
+          agent.agentName,
+          `${agent.agentName} has failed to resolve Ticket #${
+            ticket.id
+          }. Success Chance: ${chance * 100}%`
+        );
 
         dispatch({
           type: INBOX_ACTIONS.UPDATE_TICKET_PROGRESS,
           payload: {
             ticketID: ticket.id,
-            stepsRemaining: nextStepsRemaining,
+            failCount: ticket.failCount + 1,
           },
         });
       }
@@ -218,8 +235,7 @@ const useGame = () => {
     });
   };
 
-  const addNewInboxItems = () => {
-    const amountToGenerate = 2; //logic here /call helper function to calculate amount of items and the type of inbox item
+  const addNewInboxItems = (amountToGenerate = 2) => {
     const items = generateNewMessages(amountToGenerate);
 
     //update inbox state
@@ -228,6 +244,22 @@ const useGame = () => {
       payload: {
         items,
       },
+    });
+  };
+
+  const endCurrentDay = () => {
+    resolveTickets();
+
+    replenishEnergy();
+
+    //run function to generate more inbox items depending on contract modifiers
+    addNewInboxItems();
+
+    const endDaySummary = ["Tom resolved X", "bob fucked up Y"];
+
+    dispatch({
+      type: GAME_ACTIONS.END_DAY,
+      payload: { endDaySummary },
     });
   };
 
@@ -248,10 +280,11 @@ const useGame = () => {
     spendActionPoint: spendEnergy,
     setAgentAction,
     nextGameTick,
-    progressTickets,
+    progressTickets: resolveTickets,
     replenishEnergy,
     addNewInboxItems,
     endGame,
+    endCurrentDay,
   };
 };
 

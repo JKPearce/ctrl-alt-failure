@@ -8,21 +8,13 @@ import Link from "next/link";
 import { useState } from "react";
 
 const ControlPanel = () => {
-  const {
-    gameState,
-    progressTickets,
-    replenishEnergy,
-    addNewInboxItems,
-    endGame,
-  } = useGame();
+  const { gameState, endCurrentDay, endGame } = useGame();
 
   const [logOpen, setLogOpen] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
   const handleDevAction = () => {
-    progressTickets();
-    replenishEnergy();
-    addNewInboxItems();
+    endCurrentDay();
   };
 
   const handleResetGame = () => {
@@ -56,7 +48,7 @@ const ControlPanel = () => {
           <div className="opacity-70">💰 ${gameState.money}</div>
 
           <button className="btn btn-sm btn-outline" onClick={handleDevAction}>
-            ☕ Break
+            End Day
           </button>
 
           <button

@@ -46,3 +46,13 @@ export const generateAgentComment = (state, agentID, context) => {
   if (context === "resolved_ticket") return "Done and dusted, piece of cake";
   else return "Agent is making a generic comment";
 };
+
+/**
+ * @param {number} skill      – agent.skills[ticket.type] (1–10)
+ * @param {number} difficulty – ticket.difficulty    (1–10)
+ * @returns {number}          – success chance, 0–0.95
+ */
+export const calcSuccessChance = (skill, difficulty) => {
+  const raw = (skill / difficulty) * 0.95;
+  return Math.min(raw, 0.95);
+};

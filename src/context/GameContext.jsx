@@ -61,6 +61,14 @@ const GameProvider = ({ children }) => {
           ], //reverse order so the newest log entry is the first item in the array
         };
 
+      case GAME_ACTIONS.END_DAY:
+        return {
+          ...state,
+          gamePhase: "summary",
+          dayNumber: state.dayNumber + 1,
+          endDaySummary: action.payload.endDaySummary,
+        };
+
       case AGENT_ACTIONS.SET_AGENT_COMMENT:
         return updateEntity(state, "agents", action.payload.agentID, {
           currentComment: action.payload.comment,
@@ -86,6 +94,8 @@ const GameProvider = ({ children }) => {
           stepsRemaining: 0,
           resolved: true,
           agentAssigned: null,
+          successChance: action.payload.successChance,
+          resolvedBy: action.payload.resolvedBy,
         });
 
       case INBOX_ACTIONS.ADD_INBOX_ITEM:
