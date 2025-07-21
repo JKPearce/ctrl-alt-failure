@@ -1,4 +1,4 @@
-export const generateNewMessages = (amount) => {
+export const generateNewMessages = (amount, dayNumber) => {
   //eventually this will be an API call to get a unique ticket / message
   const messages = {};
 
@@ -11,6 +11,7 @@ export const generateNewMessages = (amount) => {
       agentAssigned: null,
       resolved: false,
       failCount: 0,
+      activeItem: true,
       ticketType: "hardware",
       ticketDifficulty: 5,
       sender: "Mary",
@@ -23,7 +24,7 @@ export const generateNewMessages = (amount) => {
         
         thx
         Mary`,
-      received: Date.now(),
+      received: dayNumber,
     };
   }
 

@@ -61,12 +61,17 @@ const GameProvider = ({ children }) => {
           ], //reverse order so the newest log entry is the first item in the array
         };
 
+      case GAME_ACTIONS.START_NEW_DAY:
+        return {
+          ...state,
+          gamePhase: "active",
+          dayNumber: Number(state.dayNumber + 1),
+        };
+
       case GAME_ACTIONS.END_DAY:
         return {
           ...state,
           gamePhase: "summary",
-          dayNumber: state.dayNumber + 1,
-          endDaySummary: action.payload.endDaySummary,
         };
 
       case AGENT_ACTIONS.SET_AGENT_COMMENT:
@@ -86,16 +91,18 @@ const GameProvider = ({ children }) => {
 
       case INBOX_ACTIONS.UPDATE_TICKET_PROGRESS:
         return updateEntity(state, "inbox", action.payload.ticketID, {
-          stepsRemaining: action.payload.stepsRemaining,
+          failCount: action.payload.failCount,
         });
 
       case INBOX_ACTIONS.RESOLVE_TICKET:
         return updateEntity(state, "inbox", action.payload.ticketID, {
-          stepsRemaining: 0,
           resolved: true,
           agentAssigned: null,
           successChance: action.payload.successChance,
           resolvedBy: action.payload.resolvedBy,
+          resolvedOnDay: Number(state.dayNumber),
+          resolutionNotes: action.payload.resolutionNotes,
+          activeItem: false,
         });
 
       case INBOX_ACTIONS.ADD_INBOX_ITEM:

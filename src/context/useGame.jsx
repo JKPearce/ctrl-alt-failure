@@ -158,11 +158,13 @@ const useGame = () => {
   };
 
   const nextGameTick = () => {
-    if (gameState.actionsPointsRemaining <= 0) return;
+    if (gameState.energyRemaining <= 0) return;
     spendEnergy();
   };
 
   const resolveTickets = () => {
+    let resolvedTicketsCount = 0;
+
     Object.values(gameState.inbox).forEach((ticket) => {
       if (ticket.messageType !== "ticket") return;
       if (ticket.agentAssigned === null) return;
@@ -180,17 +182,19 @@ const useGame = () => {
       if (success) {
         console.log("Resolving: ", ticket);
 
+        resolvedTicketsCount++;
+
         dispatch({
           type: INBOX_ACTIONS.RESOLVE_TICKET,
           payload: {
             ticketID: ticket.id,
             resolvedBy: agent.id,
             successChance: chance,
+            resolutionNotes: "Piece of cake.", //TODO: Create a function that calls LLM for fun "resolution notes"
           },
         });
 
         setAgentAction(ticket.agentAssigned, "idle");
-
         triggerAgentComment(
           ticket.agentAssigned,
           generateAgentComment(
@@ -206,7 +210,6 @@ const useGame = () => {
           `${agent.agentName} has assigned Ticket #${ticket.id}.`
         );
       } else {
-        console.log("Updating: ", ticket);
         addEntryToLog(
           LOG_TYPES.RESOLVE_FAIL,
           agent.agentName,
@@ -224,6 +227,8 @@ const useGame = () => {
         });
       }
     });
+
+    return resolvedTicketsCount;
   };
 
   const replenishEnergy = (energy = DEFAULT_STARTING_ENERGY) => {
@@ -236,7 +241,7 @@ const useGame = () => {
   };
 
   const addNewInboxItems = (amountToGenerate = 2) => {
-    const items = generateNewMessages(amountToGenerate);
+    const items = generateNewMessages(amountToGenerate, gameState.dayNumber);
 
     //update inbox state
     dispatch({
@@ -248,18 +253,24 @@ const useGame = () => {
   };
 
   const endCurrentDay = () => {
-    resolveTickets();
+    const ticketsResolvedToday = resolveTickets();
 
-    replenishEnergy();
-
-    //run function to generate more inbox items depending on contract modifiers
-    addNewInboxItems();
-
-    const endDaySummary = ["Tom resolved X", "bob fucked up Y"];
+    //calculate contract satisfaction score
+    //updateContract
 
     dispatch({
       type: GAME_ACTIONS.END_DAY,
-      payload: { endDaySummary },
+      payload: {},
+    });
+  };
+
+  const startNewDay = () => {
+    addNewInboxItems(2); //eventually ill have more functions here to check other modifiers like type of emails, complains, spam, tickets etc
+    //fire off functions to make new tweets or other actions that will happen on a new day
+
+    dispatch({
+      type: GAME_ACTIONS.START_NEW_DAY,
+      payload: {},
     });
   };
 
@@ -285,6 +296,7 @@ const useGame = () => {
     addNewInboxItems,
     endGame,
     endCurrentDay,
+    startNewDay,
   };
 };
 

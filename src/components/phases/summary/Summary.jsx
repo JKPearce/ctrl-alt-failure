@@ -14,18 +14,11 @@ import React from "react";
  * - onStartNextDay: () => void
  */
 export default function Summary() {
-  const { gameState } = useGame();
-  const {
-    dayNumber,
-    currentContract,
-
-    dailySatisfactionDelta,
-    satisfaction,
-    activityLog,
-  } = gameState;
+  const { gameState, startNewDay } = useGame();
+  const { dayNumber, currentContract, activityLog } = gameState;
 
   function onStartNextDay() {
-    //call game function
+    startNewDay();
   }
 
   return (
