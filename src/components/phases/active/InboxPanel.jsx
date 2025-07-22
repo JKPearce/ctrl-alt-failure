@@ -36,15 +36,17 @@ function InboxPanel({ inbox }) {
         </div>
 
         <ul className="divide-y divide-base-300">
-          {inbox.map((message) => (
-            <li
-              key={message.id}
-              className="px-4 py-3 hover:bg-base-300/30 transition cursor-pointer"
-              onClick={() => handleMessageClick(message)}
-            >
-              <InboxMessages message={message} />
-            </li>
-          ))}
+          {inbox.map((message) =>
+            message.activeItem ? (
+              <li
+                key={message.id}
+                className="px-4 py-3 hover:bg-base-300/30 transition cursor-pointer"
+                onClick={() => handleMessageClick(message)}
+              >
+                <InboxMessages message={message} />
+              </li>
+            ) : null
+          )}
         </ul>
       </div>
     </section>

@@ -31,7 +31,7 @@ const useGame = () => {
     selectedAgents
   ) => {
     //generate initial inbox messages here based on contract etc
-    const inbox = generateNewMessages(3);
+    const inbox = generateNewMessages(3, gameState.dayNumber);
 
     // Convert selectedAgents from an array into an object keyed by agent.id.
     // This ensures agents are stored in gameState.agents as a lookup object (e.g. { [id]: agent }),
@@ -49,7 +49,7 @@ const useGame = () => {
         selectedAgents: agentMap,
         inbox,
         selectedFounder,
-        selectedContract,
+        contractId: selectedContract.id,
       },
     });
   };
@@ -65,6 +65,8 @@ const useGame = () => {
     const agent = getAgentByID(agentID);
     console.log(agent);
     if (!agent) return;
+
+    spendEnergy();
 
     dispatch({
       type: INBOX_ACTIONS.ASSIGN_TICKET,
@@ -155,11 +157,6 @@ const useGame = () => {
   const getAgentByID = (agentID) => {
     if (agentID == null) return null;
     return gameState.agents[agentID] || null;
-  };
-
-  const nextGameTick = () => {
-    if (gameState.energyRemaining <= 0) return;
-    spendEnergy();
   };
 
   const resolveTickets = () => {
@@ -253,10 +250,9 @@ const useGame = () => {
   };
 
   const endCurrentDay = () => {
-    const ticketsResolvedToday = resolveTickets();
-
     //calculate contract satisfaction score
-    //updateContract
+    resolveTickets();
+    replenishEnergy();
 
     dispatch({
       type: GAME_ACTIONS.END_DAY,
@@ -290,7 +286,6 @@ const useGame = () => {
     getAgentByID,
     spendActionPoint: spendEnergy,
     setAgentAction,
-    nextGameTick,
     progressTickets: resolveTickets,
     replenishEnergy,
     addNewInboxItems,

@@ -1,5 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
-
 function InboxMessages({ message }) {
   return (
     <div className="flex flex-col gap-1 text-sm">
@@ -9,10 +7,7 @@ function InboxMessages({ message }) {
           {message.sender}
         </h3>
         <span className="text-xs text-base-content/50 whitespace-nowrap">
-          {formatDistanceToNow(message.received, {
-            includeSeconds: true,
-            addSuffix: true,
-          })}
+          {`Received day: ${message.received}`}
         </span>
       </div>
 

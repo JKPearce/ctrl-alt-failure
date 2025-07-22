@@ -5,6 +5,7 @@ import { ControlPanel } from "@/components/phases/active/ControlPanel";
 import InboxPanel from "@/components/phases/active/InboxPanel";
 import { useGame } from "@/context/useGame";
 import { useEffect } from "react";
+import ContractProgressHUD from "./ContractProgressHUD";
 
 function Active() {
   const { gameState, endGame } = useGame();
@@ -13,15 +14,16 @@ function Active() {
     console.log("state currently: ", gameState);
 
     if (gameState.gamePhase !== "active") return;
-    if (Object.values(gameState.inbox).length >= gameState.inboxSize) {
-      endGame();
-    }
+    // if (Object.values(gameState.inbox.active).length >= gameState.inboxSize) {
+    //   endGame();
+    // }
   }, [gameState]);
 
   return (
     <div className="h-screen w-full bg-base-100 p-4 space-y-4">
       {/* Top nav */}
       <ControlPanel />
+      <ContractProgressHUD />
 
       {/* Main grid */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-[calc(100%-5rem)]">

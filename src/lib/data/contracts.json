@@ -1,0 +1,30 @@
+[
+  {
+    "id": "onboarding_blitz",
+    "name": "Onboarding Blitz",
+    "description": "Get 12 new employees fully set up before Monday hits.",
+    "ticketsRequired": 12,
+    "baseInboxSize": 6,
+    "reward": { "cash": 1500 },
+    "spawnTable": {
+      "password_reset": 0.3,
+      "printer_setup": 0.2,
+      "vpn_request": 0.2,
+      "account_provision": 0.3
+    }
+  },
+  {
+    "id": "midnight_patch",
+    "name": "Midnight Patch Panic",
+    "description": "Roll out an emergency security patch during the graveyard shift.",
+    "ticketsRequired": 15,
+    "baseInboxSize": 8,
+    "reward": { "cash": 2500 },
+    "spawnTable": {
+      "server_reboot": 0.25,
+      "login_issue": 0.25,
+      "patch_failure": 0.3,
+      "coffee_spill": 0.2
+    }
+  }
+]

@@ -1,5 +1,6 @@
 "use client";
 
+import ContractComplete from "@/components/contract_complete/ContractComplete";
 import Active from "@/components/phases/active/Active";
 import GameOver from "@/components/phases/game_over/GameOver";
 import SetupScreen from "@/components/phases/setup/SetupScreen";
@@ -15,6 +16,7 @@ function GamePage() {
       {gameState.gamePhase === "active" && <Active />}
       {gameState.gamePhase === "summary" && <Summary />}
       {gameState.gamePhase === "game_over" && <GameOver />}
+      {gameState.gamePhase === "contract_complete" && <ContractComplete />}
     </>
   );
 }
