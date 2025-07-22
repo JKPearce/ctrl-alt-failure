@@ -140,7 +140,7 @@ const useGame = () => {
         eventType,
         actor,
         message,
-        timestamp: Date.now(),
+        day: gameState.dayNumber,
       },
     });
   };

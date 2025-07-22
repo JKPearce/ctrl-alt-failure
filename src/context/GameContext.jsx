@@ -7,6 +7,7 @@ import {
 } from "@/lib/config/actionTypes";
 import { DEFAULT_GAME_STATE } from "@/lib/config/defaultGameState";
 import { getContract } from "@/lib/helpers/contractHelpers";
+import { summariseDay } from "@/lib/helpers/summariseDay";
 import { createContext, useReducer } from "react";
 
 const GameContext = createContext();
@@ -79,9 +80,12 @@ const GameProvider = ({ children }) => {
         // If the contract is already complete, do **not** override the phase
         if (state.gamePhase === "contract_complete") return state;
 
+        const summary = summariseDay(state, state.dayNumber);
+
         return {
           ...state,
           gamePhase: "summary",
+          dailySummaries: [summary, ...state.dailySummaries],
         };
 
       case AGENT_ACTIONS.SET_AGENT_COMMENT:

@@ -14,6 +14,7 @@ export const DEFAULT_GAME_STATE = {
   agents: {},
   inbox: {},
   activityLog: [],
+  dailySummaries: [],
   currentContract: {},
   dayNumber: 1,
 };
