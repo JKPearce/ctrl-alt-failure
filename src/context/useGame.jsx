@@ -11,7 +11,10 @@ import {
   calcSuccessChance,
   generateAgentComment,
 } from "@/lib/helpers/agentHelpers";
-import { generateNewMessages } from "@/lib/helpers/inboxHelpers";
+import {
+  generateNewMessages,
+  spawnInboxItems,
+} from "@/lib/helpers/inboxHelpers";
 import { useContext } from "react";
 import { DEFAULT_STARTING_ENERGY } from "../lib/config/defaultGameState";
 
@@ -30,8 +33,13 @@ const useGame = () => {
     selectedContract,
     selectedAgents
   ) => {
-    //generate initial inbox messages here based on contract etc
-    const inbox = generateNewMessages(3, gameState.dayNumber);
+    const numOfItems = selectedContract.baseInboxSize; // simple
+    const inbox = spawnInboxItems(
+      gameState.chaos,
+      selectedContract,
+      numOfItems,
+      gameState.dayNumber
+    );
 
     // Convert selectedAgents from an array into an object keyed by agent.id.
     // This ensures agents are stored in gameState.agents as a lookup object (e.g. { [id]: agent }),

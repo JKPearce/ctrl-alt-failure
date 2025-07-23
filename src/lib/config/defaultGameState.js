@@ -17,6 +17,7 @@ export const DEFAULT_GAME_STATE = {
   dailySummaries: [],
   currentContract: {},
   dayNumber: 1,
+  chaos: 5,
 };
 
 export const UPGRADE_DEFINITIONS = {
