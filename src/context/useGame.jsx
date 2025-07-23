@@ -215,11 +215,16 @@ const useGame = () => {
           }. Success Chance: ${chance * 100}%`
         );
 
+        addEntryToLog(
+          LOG_TYPES.COMPLAINT_CREATED,
+          agent.agentName,
+          `A NEW COMPLAINT HAS BEEN CREATED`
+        );
+
         dispatch({
-          type: INBOX_ACTIONS.UPDATE_TICKET_PROGRESS,
+          type: INBOX_ACTIONS.TICKET_FAIL,
           payload: {
             ticketID: ticket.id,
-            failCount: ticket.failCount + 1,
           },
         });
       }

@@ -6,6 +6,8 @@
     "ticketsRequired": 12,
     "baseInboxSize": 6,
     "reward": { "cash": 1500 },
+    "baseChaos": 5,
+    "complaintLimit": 2,
     "spawnTable": {
       "password_reset": 0.3,
       "printer_setup": 0.2,
@@ -20,6 +22,8 @@
     "ticketsRequired": 15,
     "baseInboxSize": 8,
     "reward": { "cash": 2500 },
+    "baseChaos": 15,
+    "complaintLimit": 3,
     "spawnTable": {
       "server_reboot": 0.25,
       "login_issue": 0.25,

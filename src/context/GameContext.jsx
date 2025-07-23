@@ -21,6 +21,7 @@ const GameProvider = ({ children }) => {
       case GAME_ACTIONS.START_GAME:
         const { contractId } = action.payload;
         const contractDef = getContract(contractId);
+
         return {
           ...state,
           gamePhase: "active",
@@ -28,6 +29,8 @@ const GameProvider = ({ children }) => {
           agents: action.payload.selectedAgents,
           inbox: action.payload.inbox,
           founder: action.payload.selectedFounder,
+          chaos: Math.max(5, contractDef.baseChaos), // enforce floor
+          openComplaints: 0,
           currentContract: {
             id: contractId,
             ticketsRequired: contractDef.ticketsRequired,
@@ -72,6 +75,7 @@ const GameProvider = ({ children }) => {
       case GAME_ACTIONS.START_NEW_DAY:
         return {
           ...state,
+          chaos: Math.max(5, state.chaos - 1), // natural decay
           gamePhase: "active",
           dayNumber: Number(state.dayNumber + 1),
         };
@@ -87,6 +91,12 @@ const GameProvider = ({ children }) => {
           gamePhase: "summary",
           dailySummaries: [summary, ...state.dailySummaries],
         };
+
+      case GAME_ACTIONS.CONTRACT_COMPLETE: {
+        const contract = getContract(state.currentContract.id);
+        const penalty = state.openComplaints > contract.complaintLimit ? 10 : 0;
+        return { ...state, baseChaos: contract.baseChaos + penalty };
+      }
 
       case AGENT_ACTIONS.SET_AGENT_COMMENT:
         return updateEntity(state, "agents", action.payload.agentID, {
@@ -104,10 +114,16 @@ const GameProvider = ({ children }) => {
           activeItem: false,
         });
 
-      case INBOX_ACTIONS.UPDATE_TICKET_PROGRESS:
-        return updateEntity(state, "inbox", action.payload.ticketID, {
-          failCount: action.payload.failCount,
-        });
+      case INBOX_ACTIONS.TICKET_FAIL:
+        const updatedState = updateEntity(
+          state,
+          "inbox",
+          action.payload.ticketID,
+          {
+            failCount: state.inbox[action.payload.ticketID].failCount + 1,
+          }
+        );
+        return { ...updatedState, openComplaints: state.openComplaints + 1 };
 
       case INBOX_ACTIONS.RESOLVE_TICKET: {
         const updatedState = updateEntity(
@@ -126,14 +142,14 @@ const GameProvider = ({ children }) => {
         );
 
         //check for game win (contract goal reached)
-        const resolved = state.currentContract.ticketsResolved + 1;
-        const won = resolved >= state.currentContract.ticketsRequired;
+        const newTotal = state.currentContract.ticketsResolved + 1;
+        const won = newTotal >= state.currentContract.ticketsRequired;
 
         return {
           ...updatedState,
           currentContract: {
             ...state.currentContract,
-            ticketsResolved: state.currentContract.ticketsResolved + 1,
+            ticketsResolved: newTotal,
           },
           gamePhase: won ? "contract_complete" : state.gamePhase,
         };

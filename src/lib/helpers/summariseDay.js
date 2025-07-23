@@ -1,3 +1,5 @@
+import { LOG_TYPES } from "../config/actionTypes";
+
 export const summariseDay = ({ activityLog, inbox, agents }, dayNumber) => {
   // limit to events that happened *today*
   const todayEvents = activityLog.filter((e) => e.day === dayNumber);
@@ -12,15 +14,15 @@ export const summariseDay = ({ activityLog, inbox, agents }, dayNumber) => {
 
   todayEvents.forEach((e) => {
     switch (e.eventType) {
-      case "RESOLVE_SUCCESS":
+      case LOG_TYPES.RESOLVE_SUCCESS:
         summary.resolved++;
         inc(summary.agentStats, e.actor, "resolves");
         break;
-      case "RESOLVE_FAIL":
+      case LOG_TYPES.RESOLVE_FAIL:
         summary.failed++;
         inc(summary.agentStats, e.actor, "fails");
         break;
-      case "COMPLAINT": // add when you have that event
+      case LOG_TYPES.COMPLAINT_CREATED: // add when you have that event
         summary.complaints++;
         break;
       default:
