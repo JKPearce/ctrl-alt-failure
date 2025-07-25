@@ -52,7 +52,6 @@ export function spawnInboxItems(chaos, contract, num, dayNumber) {
       activeItem: true,
       resolved: false,
       failCount: 0,
-      stepsRemaining: 4,
       agentAssigned: null,
     };
   }

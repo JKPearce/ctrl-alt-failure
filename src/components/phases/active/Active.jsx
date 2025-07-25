@@ -8,6 +8,7 @@ import {
   TwitterIcon,
 } from "lucide-react";
 import React, { useState } from "react";
+import InboxScreen from "./InboxScreen";
 
 const navItems = [
   { label: "inbox", icon: Inbox },
@@ -32,7 +33,7 @@ function getStatusColor(action) {
 }
 
 const Active = () => {
-  const { gameState } = useGame();
+  const { gameState, endCurrentDay } = useGame();
   const [selectedNav, setSelectedNav] = useState("inbox");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedAgentId, setSelectedAgentId] = useState(null);
@@ -54,7 +55,12 @@ const Active = () => {
           </span>
         </div>
         <div className="flex-1 justify-end flex gap-4 items-center">
-          <button className="btn btn-outline btn-sm">End Day</button>
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => endCurrentDay()}
+          >
+            End Day
+          </button>
           <span>💰 {gameState.money}</span>
           <span>⚡ {gameState.energyRemaining}</span>
           <span>Day {gameState.dayNumber}</span>
@@ -163,8 +169,8 @@ const Active = () => {
           </div>
         </aside>
         {/* Dynamic Main Area */}
-        <main className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-2xl mx-auto">
+        <main className="flex-1">
+          <div className="w-full max-w-2xl mx-auto h-full flex flex-col">
             {selectedAgent ? (
               <div className="p-6 rounded-lg bg-base-100 shadow border flex flex-col gap-4">
                 <div className="flex items-center gap-4">
@@ -230,12 +236,23 @@ const Active = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-center text-lg text-base-content/70">
-                {selectedNav === "inbox" && "Inbox view coming soon..."}
-                {selectedNav === "shop" && "Shop view coming soon..."}
-                {selectedNav === "stats" && "Stats view coming soon..."}
-                {selectedNav === "ctrl-alt-tweet" &&
-                  "Ctrl-Alt-Tweet view coming soon..."}
+              <div className="flex-1 flex flex-col">
+                {selectedNav === "inbox" && <InboxScreen />}
+                {selectedNav === "shop" && (
+                  <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
+                    Shop view coming soon...
+                  </div>
+                )}
+                {selectedNav === "stats" && (
+                  <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
+                    Stats view coming soon...
+                  </div>
+                )}
+                {selectedNav === "ctrl-alt-tweet" && (
+                  <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
+                    Ctrl-Alt-Tweet view coming soon...
+                  </div>
+                )}
               </div>
             )}
           </div>
