@@ -178,11 +178,11 @@ const useGame = () => {
       const agent = getAgentByID(ticket.agentAssigned);
 
       const chance = calcSuccessChance(
-        agent.skills[ticket.ticketType],
-        ticket.ticketDifficulty
+        Number(agent.skills[ticket.ticketType]),
+        Number(ticket.difficulty)
       );
       const success = Math.random() < chance;
-      console.log("success change ", chance, " - Successful roll = ", success);
+      console.log("success chance  ", chance, " - Successful roll = ", success);
 
       if (success) {
         console.log("Resolving: ", ticket);

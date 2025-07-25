@@ -85,10 +85,6 @@ const AgentPicker = ({
                     <strong>People:</strong> {agent.skills.people}
                   </div>
                 </div>
-
-                <div className="mt-2 text-xs opacity-70">
-                  {agent.personality.quirks[0]}
-                </div>
               </div>
             </div>
           );

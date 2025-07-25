@@ -54,5 +54,6 @@ export const generateAgentComment = (state, agentID, context) => {
  */
 export const calcSuccessChance = (skill, difficulty) => {
   const raw = (skill / difficulty) * 0.95;
+  console.log("skill: ", skill, " difficulty: ", difficulty, " Raw: ", raw);
   return Math.min(raw, 0.95);
 };

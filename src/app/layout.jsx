@@ -1,4 +1,3 @@
-// src/app/layout.jsx or layout.js
 import { GameProvider } from "@/context/GameContext";
 
 import "@/globals.css";
