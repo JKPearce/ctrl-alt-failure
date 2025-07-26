@@ -1,7 +1,7 @@
 //initial game state values (new players will start with these )
 export const DEFAULT_BUSINESS_NAME = "UserError Inc.";
 export const DEFAULT_STARTING_MONEY = 1000;
-export const DEFAULT_STARTING_ENERGY = 3;
+export const DEFAULT_STARTING_ENERGY = 4;
 export const DEFAULT_INBOX_SIZE = 10;
 
 export const DEFAULT_GAME_STATE = {

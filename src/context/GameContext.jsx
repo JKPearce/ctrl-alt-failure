@@ -79,7 +79,6 @@ const GameProvider = ({ children }) => {
             ...state.inbox,
             ...action.payload.newItems,
           },
-          chaos: Math.max(5, state.chaos - 1), // natural decay
           gamePhase: "active",
           dayNumber: Number(state.dayNumber + 1),
         };
@@ -112,11 +111,32 @@ const GameProvider = ({ children }) => {
           currentAction: action.payload.action,
         });
 
-      case INBOX_ACTIONS.ASSIGN_TICKET:
-        return updateEntity(state, "inbox", action.payload.ticketID, {
-          agentAssigned: action.payload.agentID,
-          activeItem: false,
-        });
+      case INBOX_ACTIONS.ASSIGN_TICKET: {
+        // Assign the agent to the ticket and mark it inactive
+        const updatedInboxState = updateEntity(
+          state,
+          "inbox",
+          action.payload.ticketID,
+          {
+            agentAssigned: action.payload.agentID,
+            activeItem: false,
+          }
+        );
+
+        // Increment the agent's assigned ticket count
+        const agentId = action.payload.agentID;
+        const updatedAgents = updateEntity(
+          updatedInboxState,
+          "agents",
+          agentId,
+          {
+            currentAssignedTickets:
+              updatedInboxState.agents[agentId].currentAssignedTickets + 1,
+          }
+        );
+
+        return updatedAgents;
+      }
 
       case INBOX_ACTIONS.TICKET_FAIL:
         const updatedState = updateEntity(
@@ -130,7 +150,9 @@ const GameProvider = ({ children }) => {
         return { ...updatedState, openComplaints: state.openComplaints + 1 };
 
       case INBOX_ACTIONS.RESOLVE_TICKET: {
-        const updatedState = updateEntity(
+        const agentId = action.payload.resolvedBy;
+
+        const updatedInboxState = updateEntity(
           state,
           "inbox",
           action.payload.ticketID,
@@ -138,16 +160,27 @@ const GameProvider = ({ children }) => {
             resolved: true,
             agentAssigned: null,
             successChance: action.payload.successChance,
-            resolvedBy: action.payload.resolvedBy,
+            resolvedBy: agentId,
             resolvedOnDay: state.dayNumber,
             resolutionNotes: action.payload.resolutionNotes,
             activeItem: false,
           }
         );
 
-        //check for game win (contract goal reached)
+        // check for game win (contract goal reached)
         const newTotal = state.currentContract.ticketsResolved + 1;
         const won = newTotal >= state.currentContract.ticketsRequired;
+
+        // update agent's currentAssignedTickets
+        const updatedState = updateEntity(
+          updatedInboxState,
+          "agents",
+          agentId,
+          {
+            currentAssignedTickets:
+              updatedInboxState.agents[agentId].currentAssignedTickets - 1,
+          }
+        );
 
         return {
           ...updatedState,

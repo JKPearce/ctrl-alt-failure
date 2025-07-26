@@ -11,6 +11,8 @@ export const generateNewAgents = (amount) => {
     agents[uuid] = {
       ...baseAgent,
       id: uuid,
+      maxAssignedTickets: 1, //TODO: make this dynamic based on agent skill or special unlocks
+      currentAssignedTickets: 0,
       currentAction: "idle",
       currentComment: null,
       profileImage: getRandomPortrait(

@@ -158,9 +158,18 @@ const InboxScreen = () => {
                                 b.skills[item.ticketType] -
                                 a.skills[item.ticketType]
                             )
+                            .filter((agent) => {
+                              // Hide agents who are already working or at max capacity
+                              return (
+                                agent.currentAssignedTickets <
+                                agent.maxAssignedTickets
+                              );
+                            })
                             .map((agent) => {
                               const agentSkill = agent.skills[item.ticketType];
                               const isGood = agentSkill >= item.difficulty;
+                              const hasEnergy = gameState.energyRemaining > 0;
+
                               return (
                                 <div
                                   key={agent.id}
@@ -201,13 +210,18 @@ const InboxScreen = () => {
                                   </div>
                                   <button
                                     className={`btn btn-xs ${
-                                      isGood ? "btn-success" : "btn-outline"
+                                      !hasEnergy
+                                        ? "btn-outline btn-error"
+                                        : isGood
+                                        ? "btn-success"
+                                        : "btn-outline"
                                     }`}
+                                    disabled={!hasEnergy}
                                     onClick={() =>
                                       assignTicketToAgent(item.id, agent.id)
                                     }
                                   >
-                                    Assign
+                                    {!hasEnergy ? "No Energy" : "Assign"}
                                   </button>
                                 </div>
                               );

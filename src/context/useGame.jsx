@@ -7,14 +7,8 @@ import {
   INBOX_ACTIONS,
   LOG_TYPES,
 } from "@/lib/config/actionTypes";
-import {
-  calcSuccessChance,
-  generateAgentComment,
-} from "@/lib/helpers/agentHelpers";
-import {
-  generateNewMessages,
-  spawnInboxItems,
-} from "@/lib/helpers/inboxHelpers";
+import { calcSuccessChance } from "@/lib/helpers/agentHelpers";
+import { spawnInboxItems } from "@/lib/helpers/inboxHelpers";
 import { useContext } from "react";
 import { DEFAULT_STARTING_ENERGY } from "../lib/config/defaultGameState";
 
@@ -25,7 +19,6 @@ const useGame = () => {
   }
 
   const { gameState, dispatch } = ctx;
-  const commentTimeouts = new Map();
 
   const startGame = (
     businessName,
