@@ -246,6 +246,19 @@ const useGame = () => {
     });
   };
 
+  const startNewContract = (selectedContract) => {
+    //TODO add calculation for new chaos based on complaints left in inbox?
+
+    dispatch({
+      type: GAME_ACTIONS.START_NEW_CONTRACT,
+      payload: {
+        contract: selectedContract,
+      },
+    });
+
+    startNewDay();
+  };
+
   return {
     gameState,
     startGame,
@@ -253,14 +266,15 @@ const useGame = () => {
     assignTicketToAgent,
     addEntryToLog,
     getAgentByID,
-    spendActionPoint: spendEnergy,
+    spendEnergy,
     setAgentAction,
-    progressTickets: resolveTickets,
+    resolveTickets,
     replenishEnergy,
     endGame,
     endCurrentDay,
     startNewDay,
     deleteSpam,
+    startNewContract,
   };
 };
 

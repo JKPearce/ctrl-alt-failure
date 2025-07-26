@@ -101,6 +101,13 @@ const GameProvider = ({ children }) => {
         return { ...state, baseChaos: contract.baseChaos + penalty };
       }
 
+      case GAME_ACTIONS.START_NEW_CONTRACT:
+        return {
+          ...state,
+          currentContract: action.payload.contract,
+          chaos: action.payload.contract.baseChaos,
+        };
+
       case AGENT_ACTIONS.SET_AGENT_COMMENT:
         return updateEntity(state, "agents", action.payload.agentID, {
           currentComment: action.payload.comment,
