@@ -5,6 +5,26 @@ import {
 } from "@/lib/data/inboxTemplates";
 import { nanoid } from "nanoid";
 
+// Calculate how many items to spawn based on day number and chaos
+export function calculateItemsToSpawn(dayNumber, chaos) {
+  // Base items per day (starts low, grows over time)
+  const baseItems = Math.max(4, Math.floor(dayNumber * 0.8));
+
+  // Chaos multiplier (1.0 = normal, 2.0 = double items at max chaos)
+  const chaosMultiplier = 1 + chaos / 100;
+
+  // Calculate total items
+  const totalItems = Math.ceil(baseItems * chaosMultiplier);
+
+  console.log(
+    `Day ${dayNumber}, Chaos ${chaos}: ${baseItems} base × ${chaosMultiplier.toFixed(
+      2
+    )} chaos = ${totalItems} total`
+  );
+
+  return totalItems;
+}
+
 export const generateNewMessages = (amount, dayNumber) => {
   //eventually this will be an API call to get a unique ticket / message
   const messages = {};
@@ -37,8 +57,10 @@ export const generateNewMessages = (amount, dayNumber) => {
   return messages;
 };
 
-export function spawnInboxItems(chaos, contract, num, dayNumber) {
+export function spawnInboxItems(chaos, contract, dayNumber) {
+  const num = calculateItemsToSpawn(dayNumber, chaos);
   const items = {};
+
   for (let i = 0; i < num; i++) {
     const type = pickType(chaos, contract);
     const template = pickTemplate(type);
@@ -48,7 +70,7 @@ export function spawnInboxItems(chaos, contract, num, dayNumber) {
       id,
       messageType: type,
       ...template,
-      received: dayNumber, // or Date.now()
+      received: dayNumber,
       activeItem: true,
       resolved: false,
       failCount: 0,

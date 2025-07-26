@@ -33,11 +33,9 @@ const useGame = () => {
     selectedContract,
     selectedAgents
   ) => {
-    const numOfItems = selectedContract.baseInboxSize; // simple
     const inbox = spawnInboxItems(
       gameState.chaos,
       selectedContract,
-      numOfItems,
       gameState.dayNumber
     );
 
@@ -74,8 +72,6 @@ const useGame = () => {
     console.log(agent);
     if (!agent) return;
 
-    spendEnergy();
-
     dispatch({
       type: INBOX_ACTIONS.ASSIGN_TICKET,
       payload: {
@@ -92,42 +88,6 @@ const useGame = () => {
       agent.agentName,
       `Ticket #${ticketID} assigned to ${gameState.agents[agentID].agentName}.`
     );
-
-    triggerAgentComment(
-      agentID,
-      generateAgentComment(gameState, agentID, "assign_ticket")
-    );
-  };
-
-  const triggerAgentComment = (agentID, comment, duration = 3000) => {
-    // Clear existing timeout if one exists
-    const existing = commentTimeouts.get(agentID);
-    if (existing) clearTimeout(existing);
-
-    // Always validate agent exists in current state before proceeding
-    const agent = getAgentByID(agentID);
-    if (!agent) return;
-
-    dispatch({
-      type: AGENT_ACTIONS.SET_AGENT_COMMENT,
-      payload: {
-        agentID,
-        comment,
-      },
-    });
-
-    addEntryToLog(LOG_TYPES.AGENT_COMMENT, agent.agentName, comment);
-
-    //this removes the comment after the specified duration so i can call render the comment dynamicly without needing a useEffect and timeout initilised on call change of the "currentComment"
-    const timeout = setTimeout(() => {
-      dispatch({
-        type: AGENT_ACTIONS.SET_AGENT_COMMENT,
-        payload: { agentID, comment: null },
-      });
-      commentTimeouts.delete(agentID);
-    }, duration);
-
-    commentTimeouts.set(agentID, timeout);
   };
 
   const setAgentAction = (agentID, action) => {
@@ -200,14 +160,6 @@ const useGame = () => {
         });
 
         setAgentAction(ticket.agentAssigned, "idle");
-        triggerAgentComment(
-          ticket.agentAssigned,
-          generateAgentComment(
-            gameState,
-            ticket.agentAssigned,
-            "resolved_ticket"
-          )
-        );
 
         addEntryToLog(
           LOG_TYPES.RESOLVE_SUCCESS,
@@ -250,22 +202,15 @@ const useGame = () => {
     });
   };
 
-  const addNewInboxItems = (amountToGenerate = 2) => {
-    const items = generateNewMessages(amountToGenerate, gameState.dayNumber);
-
-    //update inbox state
-    dispatch({
-      type: INBOX_ACTIONS.ADD_INBOX_ITEM,
-      payload: {
-        items,
-      },
-    });
-  };
-
   const endCurrentDay = () => {
-    //calculate contract satisfaction score
-    resolveTickets();
+    const resolvedTicketsCount = resolveTickets();
     replenishEnergy();
+
+    addEntryToLog(
+      LOG_TYPES.END_DAY,
+      "System",
+      `Day ${gameState.dayNumber} ended. ${resolvedTicketsCount} tickets resolved.`
+    );
 
     dispatch({
       type: GAME_ACTIONS.END_DAY,
@@ -274,12 +219,24 @@ const useGame = () => {
   };
 
   const startNewDay = () => {
-    addNewInboxItems(2); //eventually ill have more functions here to check other modifiers like type of emails, complains, spam, tickets etc
+    const newItems = spawnInboxItems(
+      gameState.chaos,
+      gameState.contract,
+      gameState.dayNumber
+    );
     //fire off functions to make new tweets or other actions that will happen on a new day
+
+    addEntryToLog(
+      LOG_TYPES.START_DAY,
+      "System",
+      `Day ${gameState.dayNumber} started. ${newItems.length} new items added.`
+    );
 
     dispatch({
       type: GAME_ACTIONS.START_NEW_DAY,
-      payload: {},
+      payload: {
+        newItems,
+      },
     });
   };
 
@@ -289,22 +246,28 @@ const useGame = () => {
     });
   };
 
+  const deleteSpam = (ticketID) => {
+    dispatch({
+      type: INBOX_ACTIONS.DELETE_SPAM,
+      payload: { ticketID },
+    });
+  };
+
   return {
     gameState,
     startGame,
     restartGame,
     assignTicketToAgent,
-    triggerAgentComment,
     addEntryToLog,
     getAgentByID,
     spendActionPoint: spendEnergy,
     setAgentAction,
     progressTickets: resolveTickets,
     replenishEnergy,
-    addNewInboxItems,
     endGame,
     endCurrentDay,
     startNewDay,
+    deleteSpam,
   };
 };
 

@@ -75,6 +75,10 @@ const GameProvider = ({ children }) => {
       case GAME_ACTIONS.START_NEW_DAY:
         return {
           ...state,
+          inbox: {
+            ...state.inbox,
+            ...action.payload.newItems,
+          },
           chaos: Math.max(5, state.chaos - 1), // natural decay
           gamePhase: "active",
           dayNumber: Number(state.dayNumber + 1),
@@ -163,6 +167,11 @@ const GameProvider = ({ children }) => {
             ...action.payload.items,
           },
         };
+
+      case INBOX_ACTIONS.DELETE_SPAM:
+        return updateEntity(state, "inbox", action.payload.ticketID, {
+          activeItem: false,
+        });
 
       default:
         console.warn("Unhandled action type:", action.type);

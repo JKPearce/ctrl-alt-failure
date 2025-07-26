@@ -4,8 +4,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Inbox,
+  Megaphone,
   ShoppingCart,
-  TwitterIcon,
 } from "lucide-react";
 import React, { useState } from "react";
 import InboxScreen from "./InboxScreen";
@@ -14,7 +14,7 @@ const navItems = [
   { label: "inbox", icon: Inbox },
   { label: "shop", icon: ShoppingCart },
   { label: "stats", icon: BarChart2 },
-  { label: "ctrl-alt-tweet", icon: TwitterIcon },
+  { label: "ctrl-alt-scream", icon: Megaphone },
 ];
 
 function getStatusColor(action) {
@@ -248,9 +248,9 @@ const Active = () => {
                     Stats view coming soon...
                   </div>
                 )}
-                {selectedNav === "ctrl-alt-tweet" && (
+                {selectedNav === "ctrl-alt-scream" && (
                   <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
-                    Ctrl-Alt-Tweet view coming soon...
+                    Ctrl-Alt-Scream view coming soon...
                   </div>
                 )}
               </div>

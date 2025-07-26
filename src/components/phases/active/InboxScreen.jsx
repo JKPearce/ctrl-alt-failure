@@ -25,7 +25,7 @@ function getTypeBadge(type, difficulty, small = false) {
 }
 
 const InboxScreen = () => {
-  const { gameState, assignTicketToAgent } = useGame();
+  const { gameState, assignTicketToAgent, deleteSpam } = useGame();
   const [expandedId, setExpandedId] = useState(null);
   const [filter, setFilter] = useState("all");
 
@@ -218,7 +218,10 @@ const InboxScreen = () => {
                     {/* Quick Actions for spam/complaint */}
                     {!isTicket && (
                       <div className="mt-4">
-                        <button className="btn btn-xs btn-outline btn-error">
+                        <button
+                          className="btn btn-xs btn-outline btn-error"
+                          onClick={() => deleteSpam(item.id)}
+                        >
                           Delete
                         </button>
                       </div>
