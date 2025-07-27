@@ -20,7 +20,7 @@ const GameProvider = ({ children }) => {
     switch (action.type) {
       case GAME_ACTIONS.START_GAME:
         const { contractId } = action.payload;
-        const contractDef = getContract(contractId);
+        const contract = getContract(contractId);
 
         return {
           ...state,
@@ -29,13 +29,9 @@ const GameProvider = ({ children }) => {
           agents: action.payload.selectedAgents,
           inbox: action.payload.inbox,
           founder: action.payload.selectedFounder,
-          chaos: Math.max(5, contractDef.baseChaos), // enforce floor
+          chaos: Math.max(5, contract.baseChaos), // enforce floor
           openComplaints: 0,
-          currentContract: {
-            id: contractId,
-            ticketsRequired: contractDef.ticketsRequired,
-            ticketsResolved: Number(0),
-          },
+          currentContract: contract,
         };
 
       case GAME_ACTIONS.END_GAME:

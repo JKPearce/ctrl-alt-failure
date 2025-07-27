@@ -11,14 +11,14 @@ async function generateNewAITicketsBulk(amount) {
     console.log("Generating ticket: ", index);
     const response = await openai.responses.parse({
       model: "gpt-4o-mini",
-      instructions: ``,
-      input: "Generate new ticket",
+      instructions: `You are Ticket-Bot 5000, a cheeky help-desk ticket generator. Return ONLY the JSON array.`,
+      input: `Generate a Generic IT related ticket`,
       text: {
         format: zodTextFormat(ticketSchema, "it_support_ticket", {
           strict: true,
         }),
       },
-      temperature: 1,
+      temperature: 1.2,
     });
 
     console.log("ticket generated", response.output_parsed);
@@ -34,14 +34,14 @@ async function generateNewAITicket(contract, ticketType) {
 
   const response = await openai.responses.parse({
     model: "gpt-4o-mini",
-    instructions: `You are generating an IT support ticket in the form of an email from a user at ${companyName} which is ${companyDescription} and the users are ${companyUserType} and the culture is ${companyCulture}`,
-    input: `Generate a new ${ticketType} ticket`,
+    instructions: `You are Ticket-Bot 5000, a cheeky help-desk ticket generator. Return ONLY the JSON array.`,
+    input: `Generate a new ${ticketType} ticket for a company that is ${companyDescription} and the users are ${companyUserType}. Feel free to explore ideas around this company, this is for a game where the more funny but believable it is the better. feel free to sometimes miss punctuation and grammar. and use things like multiple question marks and exclamations to push urgency and panic`,
     text: {
       format: zodTextFormat(ticketSchema, "it_support_ticket", {
         strict: true,
       }),
     },
-    temperature: 1,
+    temperature: 1.1,
   });
 
   return response.output_parsed;

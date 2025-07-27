@@ -7,7 +7,7 @@ export const ticketSchema = z.object({
   body: z
     .string()
     .min(10)
-    .max(300)
+    .max(500)
     .describe("Description of the issue from users perspective"),
   subject: z
     .string()
@@ -19,6 +19,6 @@ export const ticketSchema = z.object({
     .min(10)
     .max(300)
     .describe(
-      "From the perspective of an IT Agent that resolved the ticket, passive aggressive"
+      "sort and brief, recollection of the events that happend From the perspective of an IT Agent that resolved the ticket in the form of notes left on a ticket for colleagues to read, passive aggressive"
     ),
 });

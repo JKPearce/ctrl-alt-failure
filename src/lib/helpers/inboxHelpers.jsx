@@ -53,6 +53,7 @@ export async function spawnInboxItems(chaos, contract, dayNumber) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ contract }),
         });
+        console.log("response", response);
         return response.json();
       } catch (error) {
         console.warn("API call failed:", error);

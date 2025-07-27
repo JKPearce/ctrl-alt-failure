@@ -38,10 +38,6 @@ const useGame = () => {
         new Promise((resolve) => setTimeout(resolve, 3000)), // 3-second minimum
       ]);
 
-      console.log("Inbox received:", inbox);
-      console.log("Inbox type:", typeof inbox);
-      console.log("Inbox keys:", Object.keys(inbox));
-
       const agentMap = {};
       selectedAgents.forEach((agent) => {
         agentMap[agent.id] = agent;
@@ -238,26 +234,46 @@ const useGame = () => {
     });
   };
 
-  const startNewDay = () => {
-    const newItems = spawnInboxItems(
-      gameState.chaos,
-      gameState.contract,
-      gameState.dayNumber
-    );
-    //fire off functions to make new tweets or other actions that will happen on a new day
-
-    addEntryToLog(
-      LOG_TYPES.START_DAY,
-      "System",
-      `Day ${gameState.dayNumber} started. ${newItems.length} new items added.`
-    );
-
+  const startNewDay = async () => {
     dispatch({
-      type: GAME_ACTIONS.START_NEW_DAY,
-      payload: {
-        newItems,
-      },
+      type: GAME_ACTIONS.SET_LOADING,
+      payload: { loading: true },
     });
+
+    try {
+      const [newItems] = await Promise.all([
+        spawnInboxItems(
+          gameState.chaos,
+          gameState.currentContract,
+          gameState.dayNumber + 1
+        ),
+        new Promise((resolve) => setTimeout(resolve, 3000)), // 3-second minimum
+      ]);
+
+      //fire off functions to make new tweets or other actions that will happen on a new day
+
+      addEntryToLog(
+        LOG_TYPES.START_DAY,
+        "System",
+        `Day ${gameState.dayNumber + 1} started. ${
+          Object.keys(newItems).length
+        } new items added.`
+      );
+
+      dispatch({
+        type: GAME_ACTIONS.START_NEW_DAY,
+        payload: {
+          newItems,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to spawn inbox items:", error);
+    } finally {
+      dispatch({
+        type: GAME_ACTIONS.SET_LOADING,
+        payload: { loading: false },
+      });
+    }
   };
 
   const endGame = () => {
