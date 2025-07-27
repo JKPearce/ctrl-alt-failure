@@ -197,6 +197,18 @@ const useGame = () => {
 
   const endCurrentDay = () => {
     const resolvedTicketsCount = resolveTickets();
+
+    // Check for loss condition - inbox overflow
+    const activeItems = Object.values(gameState.inbox).filter(
+      (item) => item.activeItem
+    ).length;
+    const isGameOver = activeItems >= gameState.inboxSize;
+
+    if (isGameOver) {
+      endGame();
+      return; // Don't continue with normal day end
+    }
+
     replenishEnergy();
 
     addEntryToLog(
