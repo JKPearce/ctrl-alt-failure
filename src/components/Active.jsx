@@ -42,7 +42,9 @@ const Active = () => {
   const agents = Object.values(gameState.agents);
   const selectedAgent = agents.find((a) => a.id === selectedAgentId);
 
-  return (
+  return gameState.loading ? (
+    <div>Loading...</div>
+  ) : (
     <div className="h-screen flex flex-col">
       {/* Top Bar */}
       <div className="navbar bg-base-100 border-b">

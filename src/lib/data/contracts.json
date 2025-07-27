@@ -37,7 +37,7 @@
     "reward": { "cash": 2500 },
     "baseInboxSize": 8,
     "spawnTable": {
-      "deploy_pipeline_down": 0.14,
+      "deploy_pipeline_down": 0.19,
       "two_factor_lockout": 0.12,
       "api_rate_limit": 0.11,
       "demo_account_reset": 0.1,
@@ -61,7 +61,7 @@
     "reward": { "cash": 4500 },
     "baseInboxSize": 12,
     "spawnTable": {
-      "patient_record_frozen": 0.13,
+      "patient_record_frozen": 0.18,
       "med_dispense_terminal": 0.12,
       "pager_network_down": 0.1,
       "radiology_viewer_crash": 0.1,
@@ -86,7 +86,7 @@
     "reward": { "cash": 3200 },
     "baseInboxSize": 9,
     "spawnTable": {
-      "build_server_full": 0.14,
+      "build_server_full": 0.19,
       "git_merge_conflict": 0.12,
       "shader_cache_corrupt": 0.11,
       "steam_deploy_failed": 0.1,
@@ -111,7 +111,7 @@
     "reward": { "cash": 2800 },
     "baseInboxSize": 8,
     "spawnTable": {
-      "lab_pc_root_password_lost": 0.14,
+      "lab_pc_root_password_lost": 0.19,
       "simulation_cluster_down": 0.12,
       "latex_compile_fail": 0.11,
       "grant_submission_deadline": 0.1,

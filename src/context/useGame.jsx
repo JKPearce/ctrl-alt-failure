@@ -20,37 +20,57 @@ const useGame = () => {
 
   const { gameState, dispatch } = ctx;
 
-  const startGame = (
+  const startGame = async (
     businessName,
     selectedFounder,
     selectedContract,
     selectedAgents
   ) => {
-    const inbox = spawnInboxItems(
-      gameState.chaos,
-      selectedContract,
-      gameState.dayNumber
-    );
-
-    // Convert selectedAgents from an array into an object keyed by agent.id.
-    // This ensures agents are stored in gameState.agents as a lookup object (e.g. { [id]: agent }),
-    // which is required for reducers and ticket assignment logic to work correctly.
-    // UUID strings can't be accessed via numeric indexing, so object lookup is required.
-    const agentMap = {};
-    selectedAgents.forEach((agent) => {
-      agentMap[agent.id] = agent;
-    });
-
     dispatch({
-      type: GAME_ACTIONS.START_GAME,
+      type: GAME_ACTIONS.SET_LOADING,
       payload: {
-        businessName,
-        selectedAgents: agentMap,
-        inbox,
-        selectedFounder,
-        contractId: selectedContract.id,
+        loading: true,
       },
     });
+
+    try {
+      const inbox = await spawnInboxItems(
+        gameState.chaos,
+        selectedContract,
+        gameState.dayNumber
+      );
+      console.log("Inbox received:", inbox);
+      console.log("Inbox type:", typeof inbox);
+      console.log("Inbox keys:", Object.keys(inbox));
+
+      // Convert selectedAgents from an array into an object keyed by agent.id.
+      // This ensures agents are stored in gameState.agents as a lookup object (e.g. { [id]: agent }),
+      // which is required for reducers and ticket assignment logic to work correctly.
+      // UUID strings can't be accessed via numeric indexing, so object lookup is required.
+      const agentMap = {};
+      selectedAgents.forEach((agent) => {
+        agentMap[agent.id] = agent;
+      });
+
+      dispatch({
+        type: GAME_ACTIONS.START_GAME,
+        payload: {
+          businessName,
+          selectedAgents: agentMap,
+          inbox,
+          selectedFounder,
+          contractId: selectedContract.id,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to spawn inbox items:", error);
+      dispatch({
+        type: GAME_ACTIONS.SET_LOADING,
+        payload: {
+          loading: false,
+        },
+      });
+    }
   };
 
   const restartGame = () => {

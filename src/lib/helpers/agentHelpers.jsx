@@ -20,8 +20,6 @@ export const generateNewAgents = (amount) => {
         getAgeBracket(baseAgent.age)
       ),
     };
-
-    console.log(agents[uuid]);
   }
 
   return agents;

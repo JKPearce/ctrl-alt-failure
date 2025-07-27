@@ -24,6 +24,7 @@ const GameProvider = ({ children }) => {
 
         return {
           ...state,
+          loading: false,
           gamePhase: "active",
           businessName: action.payload.businessName,
           agents: action.payload.selectedAgents,
@@ -81,6 +82,12 @@ const GameProvider = ({ children }) => {
           },
           gamePhase: "active",
           dayNumber: Number(state.dayNumber + 1),
+        };
+
+      case GAME_ACTIONS.SET_LOADING:
+        return {
+          ...state,
+          loading: action.payload.loading,
         };
 
       case GAME_ACTIONS.END_DAY:

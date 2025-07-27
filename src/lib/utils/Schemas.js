@@ -8,9 +8,7 @@ export const ticketSchema = z.object({
     .string()
     .min(10)
     .max(300)
-    .describe(
-      "A genuine IT issue described with completely disproportionate emotional distress and unnecessary personal context"
-    ),
+    .describe("Description of the issue from users perspective"),
   subject: z
     .string()
     .min(1)

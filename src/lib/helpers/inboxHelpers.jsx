@@ -25,51 +25,76 @@ export function calculateItemsToSpawn(dayNumber, chaos) {
   return totalItems;
 }
 
-export const generateNewMessages = (amount, dayNumber) => {
-  //eventually this will be an API call to get a unique ticket / message
-  const messages = {};
+export async function spawnInboxItems(chaos, contract, dayNumber) {
+  const totalItems = calculateItemsToSpawn(dayNumber, chaos);
+  const itemTypes = [];
+  let apiTicketCount = 0;
+  const ticketSources = [];
 
-  for (let i = 0; i < amount; i++) {
-    const uuid = crypto.randomUUID();
-    messages[uuid] = {
-      id: uuid,
-      messageType: "ticket", //multiple types of messages "ticket" for something that can be assigned "spam" for a funny flavour spam email "feedback" comments on a resolved ticket etc
-      agentAssigned: null,
-      resolved: false,
-      failCount: 0,
-      activeItem: true,
-      ticketType: "hardware",
-      ticketDifficulty: 5,
-      sender: "Mary",
-      subject: "computer no go",
-      body: `Hi,
-        
-        i was trying to write an email but the screen went all blue and then it beeped very loud and now the mouse is gone and the letters are very big and sideways.
-        
-        pls fix it asap I need to tell brenda about the birthday cake thing and this is very urgent
-        
-        thx
-        Mary`,
-      received: dayNumber,
-    };
+  // Determine item types and sources upfront
+  for (let i = 0; i < totalItems; i++) {
+    const type = pickType(chaos);
+    itemTypes.push(type);
+
+    if (type === "ticket") {
+      const source = Math.random() < 0.8 ? "api" : "cached";
+      ticketSources.push(source);
+      if (source === "api") apiTicketCount++;
+    }
   }
 
-  return messages;
-};
+  // Make API calls in parallel
+  const apiPromises = Array(apiTicketCount)
+    .fill(null)
+    .map(async () => {
+      try {
+        const response = await fetch("/api/ticket", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contract }),
+        });
+        return response.json();
+      } catch (error) {
+        console.warn("API call failed:", error);
+        return null;
+      }
+    });
 
-export function spawnInboxItems(chaos, contract, dayNumber) {
-  const num = calculateItemsToSpawn(dayNumber, chaos);
+  const apiResults = await Promise.all(apiPromises);
   const items = {};
 
-  for (let i = 0; i < num; i++) {
-    const type = pickType(chaos, contract);
-    const template = pickTemplate(type);
+  let apiIndex = 0;
+  let ticketSourceIndex = 0;
+
+  // Generate inbox items
+  for (let i = 0; i < totalItems; i++) {
+    const type = itemTypes[i];
     const id = nanoid();
+    let itemData;
+
+    if (type === "ticket") {
+      const source = ticketSources[ticketSourceIndex++];
+
+      if (source === "api") {
+        itemData =
+          apiResults[apiIndex++] || getFallbackTicket(TICKET_TEMPLATES);
+      } else {
+        itemData = getFallbackTicket(TICKET_TEMPLATES);
+      }
+
+      // Validate ticket data
+      if (!itemData?.body || !itemData?.sender) {
+        console.warn("Invalid ticket data, using fallback");
+        itemData = getFallbackTicket(TICKET_TEMPLATES);
+      }
+    } else {
+      itemData = await pickTemplate(type, contract);
+    }
 
     items[id] = {
       id,
       messageType: type,
-      ...template,
+      ...itemData,
       received: dayNumber,
       activeItem: true,
       resolved: false,
@@ -77,10 +102,11 @@ export function spawnInboxItems(chaos, contract, dayNumber) {
       agentAssigned: null,
     };
   }
+
   return items;
 }
 
-function pickType(chaos, contract) {
+function pickType(chaos) {
   // weights: tickets = 1, spam = chaos/10, complaint = openComplaints * 0.5
   const spamWeight = chaos / 10;
   const ticketWeight = 1;
@@ -91,17 +117,40 @@ function pickType(chaos, contract) {
   return "spam";
 }
 
-function pickTemplate(type) {
+async function pickTemplate(type, contract) {
   switch (type) {
     case "ticket":
-      return TICKET_TEMPLATES[
-        Math.floor(Math.random() * TICKET_TEMPLATES.length)
-      ];
+      const apiOrCached = Math.random() < 0.5 ? "api" : "cached";
+      console.log("apiOrCached ", apiOrCached);
+      if (apiOrCached === "cached") {
+        return getFallbackTicket(TICKET_TEMPLATES);
+      } else {
+        try {
+          const ticket = await fetch("/api/ticket", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              contract,
+            }),
+          });
+          const ticketData = await ticket.json();
+          console.log("ticketData", ticketData);
+          return ticketData;
+        } catch (error) {
+          console.error("Error fetching ticket:", error);
+          return getFallbackTicket(TICKET_TEMPLATES);
+        }
+      }
+
     case "complaint":
-      return COMPLAINT_TEMPLATES[
-        Math.floor(Math.random() * COMPLAINT_TEMPLATES.length)
-      ];
+      return getFallbackTicket(COMPLAINT_TEMPLATES);
     default:
       return SPAM_TEMPLATES[Math.floor(Math.random() * SPAM_TEMPLATES.length)];
   }
+}
+
+function getFallbackTicket(template) {
+  return template[Math.floor(Math.random() * template.length)];
 }
