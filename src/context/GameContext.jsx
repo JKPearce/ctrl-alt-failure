@@ -24,7 +24,6 @@ const GameProvider = ({ children }) => {
 
         return {
           ...state,
-          loading: false,
           gamePhase: "active",
           businessName: action.payload.businessName,
           agents: action.payload.selectedAgents,
