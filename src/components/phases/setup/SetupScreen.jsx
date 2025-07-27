@@ -84,12 +84,14 @@ function SetupScreen() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-10">
+    <div className="max-w-6xl mx-auto p-8 space-y-12">
       {/* Business Name */}
-      <div>
-        <label className="block text-sm font-medium mb-1">Business Name</label>
+      <div className="space-y-3">
+        <h2 className="text-xl font-semibold text-base-content">
+          Business Name
+        </h2>
         <input
-          className="input input-bordered w-full text-lg"
+          className="input input-bordered w-full text-xl py-4 px-4 border-2 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
           value={businessName}
           onChange={(e) => setBusinessName(e.target.value)}
           placeholder="Ctrl-Alt-Failure Inc."
@@ -98,22 +100,42 @@ function SetupScreen() {
 
       {/* Founder Selection */}
       <div>
-        <div className="mb-2 font-semibold">Choose Your Founder</div>
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="mb-4 font-semibold text-lg">Choose Your Founder</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {DEFAULT_FOUNDERS.map((f) => (
             <div
               key={f.id}
-              className={`card w-56 p-4 cursor-pointer border transition-all duration-150 ${
+              className={`card p-5 cursor-pointer border-2 transition-all duration-200 hover:shadow-md ${
                 selectedFounder === f.id
-                  ? "border-primary ring-2 ring-primary"
-                  : "border-base-200 hover:border-primary"
+                  ? "border-primary bg-primary/5"
+                  : "border-base-300 hover:border-primary/50"
               }`}
               onClick={() => setSelectedFounder(f.id)}
             >
-              <div className="font-bold text-lg mb-1">{f.name}</div>
-              <div className="text-xs italic mb-1">{f.tagline}</div>
-              <div className="text-xs mb-1">Traits: {f.traits.join(", ")}</div>
-              <div className="badge badge-info mt-2">{f.effect}</div>
+              {/* Founder Header */}
+              <div className="mb-3">
+                <h3 className="font-bold text-lg text-base-content mb-1">
+                  {f.name}
+                </h3>
+                <p className="text-sm text-base-content/60 italic">
+                  {f.tagline}
+                </p>
+              </div>
+
+              {/* Traits */}
+              <div className="mb-3">
+                <div className="text-sm text-base-content/70">
+                  <span className="font-medium">Traits:</span>{" "}
+                  {f.traits.join(", ")}
+                </div>
+              </div>
+
+              {/* Selection Indicator */}
+              {selectedFounder === f.id && (
+                <div className="mt-3 text-center">
+                  <span className="badge badge-primary">Selected</span>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -121,25 +143,89 @@ function SetupScreen() {
 
       {/* Contract Selection */}
       <div>
-        <div className="mb-2 font-semibold">Choose a Contract</div>
-        <div className="flex gap-4">
+        <div className="mb-4 font-semibold text-lg">Choose a Contract</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {contracts.map((c) => (
             <div
               key={c.id}
-              className={`card w-64 p-4 cursor-pointer border transition-all duration-150 ${
+              className={`card p-5 cursor-pointer border-2 transition-all duration-200 hover:shadow-md relative group ${
                 selectedContract === c.id
-                  ? "border-primary ring-2 ring-primary"
-                  : "border-base-200 hover:border-primary"
+                  ? "border-primary bg-primary/5"
+                  : "border-base-300 hover:border-primary/50"
               }`}
               onClick={() => setSelectedContract(c.id)}
             >
-              <div className="font-bold text-lg mb-1">{c.name}</div>
-              <div className="text-xs mb-2">{c.description}</div>
-              <div className="text-xs mb-1">Tickets: {c.ticketsRequired}</div>
-              <div className="text-xs mb-1">Reward: ${c.reward.cash}</div>
-              <div className="badge badge-warning">
-                Difficulty: {c.baseChaos}
+              {/* Company Header */}
+              <div className="mb-3">
+                <h3 className="font-bold text-lg text-base-content mb-1">
+                  {c.companyName}
+                </h3>
+                <span className="text-sm text-base-content/60 uppercase tracking-wide">
+                  {c.industry}
+                </span>
               </div>
+
+              {/* Key Metrics */}
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <div className="text-lg font-semibold">
+                    {c.ticketsRequired}
+                  </div>
+                  <div className="text-xs text-base-content/60">
+                    Tickets Required
+                  </div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold text-success">
+                    ${c.reward.cash}
+                  </div>
+                  <div className="text-xs text-base-content/60">Reward</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold text-warning">
+                    {c.baseChaos}
+                  </div>
+                  <div className="text-xs text-base-content/60">
+                    Chaos Level
+                  </div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold">{c.baseInboxSize}</div>
+                  <div className="text-xs text-base-content/60">
+                    Daily Tickets
+                  </div>
+                </div>
+              </div>
+
+              {/* Hover for description */}
+              <div className="text-sm text-base-content/50 cursor-help">
+                Hover for details...
+              </div>
+
+              {/* Description Tooltip */}
+              <div className="absolute top-0 left-0 right-0 bottom-0 bg-base-100 border-2 border-primary rounded-lg p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto z-10 shadow-lg">
+                <h3 className="font-bold text-lg mb-2">{c.companyName}</h3>
+                <p className="text-sm text-base-content/80 mb-3">
+                  {c.companyDescription}
+                </p>
+                <div className="text-xs text-base-content/60">
+                  <div className="mb-1">
+                    <span className="font-semibold">Culture:</span>{" "}
+                    {c.companyCulture}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Users:</span>{" "}
+                    {c.companyUserType}
+                  </div>
+                </div>
+              </div>
+
+              {/* Selection Indicator */}
+              {selectedContract === c.id && (
+                <div className="mt-3 text-center">
+                  <span className="badge badge-primary">Selected</span>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -147,30 +233,59 @@ function SetupScreen() {
 
       {/* Agent Roster */}
       <div>
-        <div className="mb-2 font-semibold flex justify-between items-center">
+        <div className="mb-4 font-semibold text-lg flex justify-between items-center">
           <span>Starting Agent Roster</span>
-          <span className="badge badge-outline">💰 {money} left</span>
+          <div className="bg-base-200 px-4 py-2 rounded-lg">
+            <span className="text-lg font-medium">💰 ${money}</span>
+            <span className="text-sm text-base-content/60 ml-1">remaining</span>
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {agents.map((agent, idx) => (
-            <div key={agent.id} className="card p-4 flex flex-col items-center">
-              <img
-                src={agent.profileImage}
-                className="w-16 h-16 rounded-full mb-2 border border-base-300"
-                alt={agent.agentName}
-              />
-              <div className="font-bold mb-1">{agent.agentName}</div>
-              <div className="text-xs mb-1">
+            <div
+              key={agent.id}
+              className="card p-4 border-2 border-base-300 hover:border-primary/50 hover:shadow-md transition-all duration-200"
+            >
+              {/* Agent Header */}
+              <div className="flex flex-col items-center mb-3">
+                <img
+                  src={agent.profileImage}
+                  className="w-16 h-16 rounded-full mb-2 border-2 border-base-300"
+                  alt={agent.agentName}
+                />
+                <h4 className="font-bold text-base text-center">
+                  {agent.agentName}
+                </h4>
+              </div>
+
+              {/* Skills */}
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="text-center">
+                  <div className="text-lg font-semibold">
+                    {agent.skills.hardware}
+                  </div>
+                  <div className="text-xs text-base-content/60">Hardware</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-semibold">
+                    {agent.skills.software}
+                  </div>
+                  <div className="text-xs text-base-content/60">Software</div>
+                </div>
+              </div>
+
+              {/* Traits */}
+              <div className="text-xs text-base-content/70 text-center mb-3 line-clamp-2">
                 {agent.personality.traits.join(", ")}
               </div>
-              <div className="text-xs">Hardware: {agent.skills.hardware}</div>
-              <div className="text-xs">Software: {agent.skills.software}</div>
+
+              {/* Reroll Button */}
               <button
-                className="btn btn-xs btn-outline mt-2"
+                className="btn btn-sm btn-outline w-full"
                 disabled={money < getRerollCost(50, rerollCounts[idx])}
                 onClick={() => handleReroll(idx)}
               >
-                Reroll ({getRerollCost(50, rerollCounts[idx])})
+                Reroll (${getRerollCost(50, rerollCounts[idx])})
               </button>
             </div>
           ))}
@@ -178,9 +293,9 @@ function SetupScreen() {
       </div>
 
       {/* Start Button */}
-      <div className="sticky bottom-4 z-10">
+      <div className="sticky bottom-6 z-10 pt-4 bg-gradient-to-t from-base-100 via-base-100 to-transparent">
         <button
-          className="btn btn-primary btn-lg w-full transition-all"
+          className="btn btn-primary btn-lg w-full text-lg py-4 shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
           disabled={!readyToStart}
           onClick={handleStart}
         >

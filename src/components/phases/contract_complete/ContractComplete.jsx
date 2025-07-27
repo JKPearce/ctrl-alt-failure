@@ -99,24 +99,88 @@ const ContractComplete = () => {
               {contracts.map((contract) => (
                 <div
                   key={contract.id}
-                  className={`card p-4 cursor-pointer border transition-all duration-150 ${
+                  className={`card p-5 cursor-pointer border-2 transition-all duration-200 hover:shadow-md relative group ${
                     selectedContract === contract.id
-                      ? "border-primary ring-2 ring-primary"
-                      : "border-base-200 hover:border-primary"
+                      ? "border-primary bg-primary/5"
+                      : "border-base-300 hover:border-primary/50"
                   }`}
                   onClick={() => handleContractSelect(contract.id)}
                 >
-                  <div className="font-bold text-lg mb-1">{contract.name}</div>
-                  <div className="text-xs mb-2">{contract.description}</div>
-                  <div className="text-xs mb-1">
-                    Tickets: {contract.ticketsRequired}
+                  {/* Company Header */}
+                  <div className="mb-3">
+                    <h3 className="font-bold text-lg text-base-content mb-1">
+                      {contract.companyName}
+                    </h3>
+                    <span className="text-sm text-base-content/60 uppercase tracking-wide">
+                      {contract.industry}
+                    </span>
                   </div>
-                  <div className="text-xs mb-1">
-                    Reward: ${contract.reward.cash}
+
+                  {/* Key Metrics */}
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <div className="text-lg font-semibold">
+                        {contract.ticketsRequired}
+                      </div>
+                      <div className="text-xs text-base-content/60">
+                        Tickets Required
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-success">
+                        ${contract.reward.cash}
+                      </div>
+                      <div className="text-xs text-base-content/60">Reward</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-warning">
+                        {contract.baseChaos}
+                      </div>
+                      <div className="text-xs text-base-content/60">
+                        Chaos Level
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold">
+                        {contract.baseInboxSize}
+                      </div>
+                      <div className="text-xs text-base-content/60">
+                        Daily Tickets
+                      </div>
+                    </div>
                   </div>
-                  <div className="badge badge-warning">
-                    Difficulty: {contract.baseChaos}
+
+                  {/* Hover for description */}
+                  <div className="text-sm text-base-content/50 cursor-help">
+                    Hover for details...
                   </div>
+
+                  {/* Description Tooltip */}
+                  <div className="absolute top-0 left-0 right-0 bottom-0 bg-base-100 border-2 border-primary rounded-lg p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto z-10 shadow-lg">
+                    <h3 className="font-bold text-lg mb-2">
+                      {contract.companyName}
+                    </h3>
+                    <p className="text-sm text-base-content/80 mb-3">
+                      {contract.companyDescription}
+                    </p>
+                    <div className="text-xs text-base-content/60">
+                      <div className="mb-1">
+                        <span className="font-semibold">Culture:</span>{" "}
+                        {contract.companyCulture}
+                      </div>
+                      <div>
+                        <span className="font-semibold">Users:</span>{" "}
+                        {contract.companyUserType}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Selection Indicator */}
+                  {selectedContract === contract.id && (
+                    <div className="mt-3 text-center">
+                      <span className="badge badge-primary">Selected</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
