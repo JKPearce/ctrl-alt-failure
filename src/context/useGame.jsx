@@ -73,6 +73,7 @@ const useGame = () => {
         type: GAME_ACTIONS.SET_LOADING,
         payload: { loading: false },
       });
+      addEntryToLog(LOG_TYPES.START_DAY, "System", `Game started.`);
     }
   };
 
@@ -116,15 +117,16 @@ const useGame = () => {
     });
   };
 
-  const addEntryToLog = (eventType, actor, message) => {
+  const addEntryToLog = (eventType, actor, message, time = 0) => {
     //type is defined as "assign_ticket", "agent_comment" see actionTypes.js for the ENUM define
+    console.log("adding entry to log", eventType, actor, message, time);
     dispatch({
       type: GAME_ACTIONS.ADD_ACTIVITY_LOG,
       payload: {
         eventType,
         actor,
         message,
-        day: gameState.dayNumber,
+        time,
       },
     });
   };
@@ -232,8 +234,6 @@ const useGame = () => {
       return; // Don't continue with normal day end
     }
 
-    replenishEnergy();
-
     addEntryToLog(
       LOG_TYPES.END_DAY,
       "System",
@@ -276,6 +276,8 @@ const useGame = () => {
         } new items added.`
       );
 
+      replenishEnergy();
+
       dispatch({
         type: GAME_ACTIONS.START_NEW_DAY,
         payload: {
@@ -316,6 +318,20 @@ const useGame = () => {
     });
 
     startNewDay();
+  };
+
+  const addInboxItem = (item, time = 0) => {
+    addEntryToLog(
+      LOG_TYPES.ADD_INBOX_ITEM,
+      "System",
+      `New ${item.messageType} item added to inbox. From: ${item.sender}`,
+      time
+    );
+
+    dispatch({
+      type: INBOX_ACTIONS.ADD_INBOX_ITEM,
+      payload: { item },
+    });
   };
 
   return {

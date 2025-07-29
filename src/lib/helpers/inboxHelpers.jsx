@@ -32,110 +32,94 @@ export async function spawnInboxItems({
   gameMinutes = 0,
   dayNumber = 1,
 }) {
-  const itemTypes = [];
-  let apiTicketCount = 0;
-  const ticketSources = [];
-
-  // Determine item types and sources upfront
+  const itemDescriptors = [];
   for (let i = 0; i < totalItems; i++) {
     const type = pickType(chaos);
-    itemTypes.push(type);
+    const descriptor = {
+      id: nanoid(),
+      type,
+    };
 
     if (type === "ticket") {
-      const source = Math.random() < 0.8 ? "api" : "cached";
-      ticketSources.push(source);
-      if (source === "api") apiTicketCount++;
+      descriptor.source = Math.random() < 0.8 ? "api" : "cached";
+    } else if (type === "spam") {
+      descriptor.source = Math.random() < 0.5 ? "api" : "cached";
+    } else {
+      descriptor.source = "cached"; // complaints are always cached
     }
+
+    itemDescriptors.push(descriptor);
   }
 
+  const apiTicketCount = itemDescriptors.filter(
+    (item) => item.type === "ticket" && item.source === "api"
+  ).length;
+
+  const apiSpamCount = itemDescriptors.filter(
+    (item) => item.type === "spam" && item.source === "api"
+  ).length;
+
   // Make API calls in parallel
-  const apiPromises = Array(apiTicketCount)
+  const apiTicketPromises = Array(apiTicketCount)
     .fill(null)
-    .map(async () => {
-      try {
-        const response = await fetch("/api/ticket", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contract }),
-        });
-        console.log("response", response);
-        return response.json();
-      } catch (error) {
-        console.warn("API call failed:", error);
-        return null;
-      }
-    });
+    .map(() =>
+      fetch("/api/ticket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contract, chaos }),
+      })
+        .then((res) => res.json())
+        .catch(() => null)
+    );
 
-  const apiResults = await Promise.all(apiPromises);
+  const apiSpamPromises = Array(apiSpamCount)
+    .fill(null)
+    .map(() =>
+      fetch("/api/spam", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contract, chaos }),
+      })
+        .then((res) => res.json())
+        .catch(() => null)
+    );
+
+  const [apiTicketResults, apiSpamResults] = await Promise.all([
+    Promise.all(apiTicketPromises),
+    Promise.all(apiSpamPromises),
+  ]);
+
+  let ticketApiIndex = 0;
+  let spamApiIndex = 0;
+
   const items = {};
-
-  let apiIndex = 0;
-  let ticketSourceIndex = 0;
-
-  // Generate inbox items
-  for (let i = 0; i < totalItems; i++) {
-    const type = itemTypes[i];
-    const id = nanoid();
+  for (const descriptor of itemDescriptors) {
     let itemData;
 
-    if (type === "ticket") {
-      const source = ticketSources[ticketSourceIndex++];
-
-      if (source === "api") {
-        itemData =
-          apiResults[apiIndex++] || getFallbackTicket(TICKET_TEMPLATES);
-      } else {
-        itemData = getFallbackTicket(TICKET_TEMPLATES);
-      }
-
-      // Validate ticket data
-      if (!itemData?.body || !itemData?.sender) {
-        console.warn("Invalid ticket data, using fallback");
-        itemData = getFallbackTicket(TICKET_TEMPLATES);
-      }
-    } else {
-      switch (type) {
-        case "ticket":
-          const source = Math.random() < 0.5 ? "api" : "cached";
-          if (source === "api") {
-            try {
-              const res = await fetch("/api/ticket", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contract, chaos }),
-              });
-              itemData = await res.json();
-            } catch {
-              itemData = getFallbackTicket(TICKET_TEMPLATES);
-            }
-          } else {
-            itemData = getFallbackTicket(TICKET_TEMPLATES);
-          }
-          break;
-
-        case "spam":
-          try {
-            const res = await fetch("/api/spam", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ contract, chaos }),
-            });
-            itemData = await res.json();
-          } catch {
-            itemData = getFallbackTicket(SPAM_TEMPLATES);
-          }
-          break;
-
-        case "complaint":
-          itemData = getFallbackTicket(COMPLAINT_TEMPLATES);
-          break;
-      }
+    // For tickets, check if source is API - if so, use next API result (or fallback if API failed)
+    // If not API source, just use a fallback template. Increment API index counter after using result.
+    if (descriptor.type === "ticket") {
+      itemData =
+        descriptor.source === "api"
+          ? apiTicketResults[ticketApiIndex++] ||
+            getFallbackTicket(TICKET_TEMPLATES)
+          : getFallbackTicket(TICKET_TEMPLATES);
+    }
+    if (descriptor.type === "spam") {
+      itemData =
+        descriptor.source === "api"
+          ? apiSpamResults[spamApiIndex++] || getFallbackTicket(SPAM_TEMPLATES)
+          : getFallbackTicket(SPAM_TEMPLATES);
+    }
+    if (descriptor.type === "complaint") {
+      itemData = getFallbackTicket(COMPLAINT_TEMPLATES);
     }
 
-    items[id] = {
-      id,
-      messageType: type,
+    items[descriptor.id] = {
+      id: descriptor.id,
+      messageType: descriptor.type,
       ...itemData,
+      // ... other properties
       receivedDay: dayNumber,
       receivedTime: gameMinutes,
       activeItem: true,

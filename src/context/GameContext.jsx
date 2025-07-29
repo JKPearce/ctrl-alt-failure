@@ -15,7 +15,6 @@ const GameContext = createContext();
 const GameProvider = ({ children }) => {
   const [gameState, dispatch] = useReducer(reducer, DEFAULT_GAME_STATE);
 
-  //this is the brains of the whole game
   function reducer(state, action) {
     switch (action.type) {
       case GAME_ACTIONS.START_GAME:
@@ -29,7 +28,7 @@ const GameProvider = ({ children }) => {
           agents: action.payload.selectedAgents,
           inbox: action.payload.inbox,
           founder: action.payload.selectedFounder,
-          chaos: Math.max(5, contract.baseChaos), // enforce floor
+          chaos: contract.baseChaos,
           openComplaints: 0,
           currentContract: contract,
         };
@@ -63,6 +62,8 @@ const GameProvider = ({ children }) => {
           activityLog: [
             {
               ...action.payload,
+              day: Number(state.dayNumber),
+              time: Number(action.payload.time),
             },
             ...state.activityLog,
           ], //reverse order so the newest log entry is the first item in the array

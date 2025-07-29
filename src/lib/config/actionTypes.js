@@ -40,6 +40,8 @@ export const LOG_TYPES = {
   COMPLAINT_CREATED: "COMPLAINT_CREATED",
   END_DAY: "END_DAY",
   START_DAY: "START_DAY",
+  ADD_INBOX_ITEM: "ADD_INBOX_ITEM",
+
   // etc
   //Grumble (think cities skylines chirps)
 };
