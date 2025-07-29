@@ -3,11 +3,12 @@ import {
   BarChart2,
   ChevronLeft,
   ChevronRight,
+  Clock,
   Inbox,
   Megaphone,
   ShoppingCart,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import InboxScreen from "./InboxScreen";
 
 const navItems = [
@@ -37,10 +38,35 @@ const Active = () => {
   const [selectedNav, setSelectedNav] = useState("inbox");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedAgentId, setSelectedAgentId] = useState(null);
+  const [gameMinutes, setGameMinutes] = useState(0); //0 = 9:00AM
 
   // Convert agents object to array
   const agents = Object.values(gameState.agents);
   const selectedAgent = agents.find((a) => a.id === selectedAgentId);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGameMinutes((prev) => {
+        if (prev >= 480) {
+          clearInterval(interval); // Day ends at 17:00
+          endCurrentDay();
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 1000); // 1 second = 1 minute in game
+
+    return () => clearInterval(interval);
+  }, []);
+
+  function formatGameTime(gameMinutes) {
+    const total = 540 + gameMinutes; //540 = starting at 9:00AM
+    const hours = Math.floor(total / 60);
+    const mins = total % 60;
+    return `${hours.toString().padStart(2, "0")}:${mins
+      .toString()
+      .padStart(2, "0")}`;
+  }
 
   return (
     <div className="h-screen flex flex-col">
@@ -55,6 +81,10 @@ const Active = () => {
           </span>
         </div>
         <div className="flex-1 justify-end flex gap-4 items-center">
+          <span>
+            <Clock />
+            Time:{formatGameTime(gameMinutes)}
+          </span>
           <button
             className="btn btn-outline btn-sm"
             onClick={() => endCurrentDay()}

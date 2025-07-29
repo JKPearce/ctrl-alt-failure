@@ -20,11 +20,7 @@ function GamePage() {
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
           <span className="loading loading-spinner loading-lg"></span>
-          <p className="mt-4 text-lg">
-            Starting Day{" "}
-            {gameState.dayNumber === 1 ? "1" : gameState.dayNumber + 1}
-            ...
-          </p>
+          <p className="mt-4 text-lg">Starting new Day ...</p>
         </div>
       </div>
     );

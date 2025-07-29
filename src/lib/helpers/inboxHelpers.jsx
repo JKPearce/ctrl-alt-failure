@@ -25,8 +25,13 @@ export function calculateItemsToSpawn(dayNumber, chaos) {
   return totalItems;
 }
 
-export async function spawnInboxItems(chaos, contract, dayNumber) {
-  const totalItems = calculateItemsToSpawn(dayNumber, chaos);
+export async function spawnInboxItems({
+  chaos,
+  contract,
+  totalItems = 1,
+  gameMinutes = 0,
+  dayNumber = 1,
+}) {
   const itemTypes = [];
   let apiTicketCount = 0;
   const ticketSources = [];
@@ -96,7 +101,8 @@ export async function spawnInboxItems(chaos, contract, dayNumber) {
       id,
       messageType: type,
       ...itemData,
-      received: dayNumber,
+      receivedDay: dayNumber,
+      receivedTime: gameMinutes,
       activeItem: true,
       resolved: false,
       failCount: 0,

@@ -34,8 +34,12 @@ async function generateNewAITicket(contract, ticketType) {
 
   const response = await openai.responses.parse({
     model: "gpt-4o-mini",
-    instructions: `You are Ticket-Bot 5000, a cheeky help-desk ticket generator. Return ONLY the JSON array.`,
-    input: `Generate a new ${ticketType} ticket for a company that is ${companyDescription} and the users are ${companyUserType}. Feel free to explore ideas around this company, this is for a game where the more funny but believable it is the better. feel free to sometimes miss punctuation and grammar. and use things like multiple question marks and exclamations to push urgency and panic`,
+    instructions: `You are Ticket-Bot 5000, a cheeky help-desk ticket generator. 
+Return ONLY a single JSON object matching the expected format.
+All fields must be strictly valid. 
+Keep the 'suggestedResolution' field under 300 characters total. 
+Avoid unnecessary rambling or repetition. Stay concise and passive-aggressive.`,
+    input: `Generate a new ${ticketType} ticket for a company named ${companyName} that is a ${companyDescription} and the userbase is ${companyUserType}. Feel free to explore ideas around this company, this is for a game where the more funny but believable it is the better. feel free to sometimes miss punctuation and grammar. and use things like multiple question marks and exclamations to push urgency and panic`,
     text: {
       format: zodTextFormat(ticketSchema, "it_support_ticket", {
         strict: true,

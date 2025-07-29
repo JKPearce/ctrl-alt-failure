@@ -8,7 +8,10 @@ import {
   LOG_TYPES,
 } from "@/lib/config/actionTypes";
 import { calcSuccessChance } from "@/lib/helpers/agentHelpers";
-import { spawnInboxItems } from "@/lib/helpers/inboxHelpers";
+import {
+  calculateItemsToSpawn,
+  spawnInboxItems,
+} from "@/lib/helpers/inboxHelpers";
 import { useContext } from "react";
 import { DEFAULT_STARTING_ENERGY } from "../lib/config/defaultGameState";
 
@@ -33,8 +36,17 @@ const useGame = () => {
 
     try {
       // Wait for BOTH the inbox generation AND the minimum 3-second timer
+      const totalItems = calculateItemsToSpawn(
+        gameState.dayNumber,
+        gameState.chaos
+      );
       const [inbox] = await Promise.all([
-        spawnInboxItems(gameState.chaos, selectedContract, gameState.dayNumber),
+        spawnInboxItems({
+          chaos: gameState.chaos,
+          contract: selectedContract,
+          totalItems,
+          dayNumber: 1,
+        }),
         new Promise((resolve) => setTimeout(resolve, 3000)), // 3-second minimum
       ]);
 
@@ -242,11 +254,15 @@ const useGame = () => {
 
     try {
       const [newItems] = await Promise.all([
-        spawnInboxItems(
-          gameState.chaos,
-          gameState.currentContract,
-          gameState.dayNumber + 1
-        ),
+        spawnInboxItems({
+          chaos: gameState.chaos,
+          contract: gameState.currentContract,
+          totalItems: calculateItemsToSpawn(
+            gameState.dayNumber + 1,
+            gameState.chaos
+          ),
+          dayNumber: gameState.dayNumber + 1,
+        }),
         new Promise((resolve) => setTimeout(resolve, 3000)), // 3-second minimum
       ]);
 
