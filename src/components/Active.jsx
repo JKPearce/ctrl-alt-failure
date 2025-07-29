@@ -1,4 +1,6 @@
 import { useGame } from "@/context/useGame";
+import { formatGameTime } from "@/lib/helpers/gameHelpers";
+import { spawnInboxItems } from "@/lib/helpers/inboxHelpers";
 import {
   BarChart2,
   ChevronLeft,
@@ -59,14 +61,33 @@ const Active = () => {
     return () => clearInterval(interval);
   }, []);
 
-  function formatGameTime(gameMinutes) {
-    const total = 540 + gameMinutes; //540 = starting at 9:00AM
-    const hours = Math.floor(total / 60);
-    const mins = total % 60;
-    return `${hours.toString().padStart(2, "0")}:${mins
-      .toString()
-      .padStart(2, "0")}`;
-  }
+  useEffect(() => {
+    // every "15 mins" in the game time
+    if (gameMinutes % 15 === 0 && gameMinutes !== 0) {
+      console.log("gameMinutes", gameMinutes);
+
+      // check based on chaos% chance of a new ticket
+      const shouldSpawnTicket = Math.random() < gameState.chaos / 100;
+
+      if (shouldSpawnTicket) {
+        const spawn = async () => {
+          try {
+            const newTicket = await spawnInboxItems({
+              chaos: gameState.chaos,
+              contract: gameState.currentContract,
+              totalItems: 1,
+              dayNumber: gameState.dayNumber,
+              gameMinutes: gameMinutes,
+            });
+            console.log("new ticket", newTicket);
+          } catch (error) {
+            console.error("Error generating ticket", error);
+          }
+        };
+        spawn();
+      }
+    }
+  }, [gameMinutes]);
 
   return (
     <div className="h-screen flex flex-col">

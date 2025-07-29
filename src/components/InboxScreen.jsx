@@ -1,4 +1,5 @@
 import { useGame } from "@/context/useGame";
+import { formatGameTime } from "@/lib/helpers/gameHelpers";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import React, { useState } from "react";
 
@@ -36,8 +37,8 @@ const InboxScreen = () => {
   if (filter !== "all") {
     inboxItems = inboxItems.filter((item) => item.messageType === filter);
   }
-  // Sort by received date, newest first
-  inboxItems = inboxItems.sort((a, b) => b.received - a.received);
+  // Sort by received time, newest first
+  inboxItems = inboxItems.sort((a, b) => b.receivedTime - a.receivedTime);
 
   const agents = Object.values(gameState.agents);
   const activeCount = Object.values(gameState.inbox).filter(
@@ -80,7 +81,7 @@ const InboxScreen = () => {
         )}
         <ul>
           {inboxItems.map((item) => {
-            const isNew = gameState.dayNumber === item.received;
+            const isNew = gameState.dayNumber === item.receivedDay;
             const isExpanded = expandedId === item.id;
             const isTicket = item.messageType === "ticket";
             const isSpam = item.messageType === "spam";
@@ -104,6 +105,12 @@ const InboxScreen = () => {
                     <div className="flex flex-col min-w-0">
                       <span className="font-bold truncate mr-2">
                         {item.sender}
+                      </span>
+                      <span className="text-xs text-base-content/60"></span>
+                      <span className="text-xs text-base-content/60">
+                        {`Day ${item.receivedDay} ${formatGameTime(
+                          item.receivedTime
+                        )}`}
                       </span>
                       <span className="truncate text-base-content/80">
                         {item.subject}

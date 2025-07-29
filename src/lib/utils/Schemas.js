@@ -22,3 +22,15 @@ export const ticketSchema = z.object({
       "sort and brief, recollection of the events that happend From the perspective of an IT Agent that resolved the ticket in the form of notes left on a ticket for colleagues to read, passive aggressive"
     ),
 });
+
+export const spamEmailSchema = z.object({
+  sender: z.string().min(3).max(25).describe("name / company name"),
+  subject: z.string().min(1).max(50).describe("subject of the"),
+  body: z
+    .string()
+    .min(10)
+    .max(500)
+    .describe(
+      "body of the email with NO formatting and NO markdown, just raw text. max 500 characters."
+    ),
+});

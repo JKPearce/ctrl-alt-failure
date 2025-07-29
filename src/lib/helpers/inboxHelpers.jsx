@@ -94,7 +94,42 @@ export async function spawnInboxItems({
         itemData = getFallbackTicket(TICKET_TEMPLATES);
       }
     } else {
-      itemData = await pickTemplate(type, contract);
+      switch (type) {
+        case "ticket":
+          const source = Math.random() < 0.5 ? "api" : "cached";
+          if (source === "api") {
+            try {
+              const res = await fetch("/api/ticket", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contract, chaos }),
+              });
+              itemData = await res.json();
+            } catch {
+              itemData = getFallbackTicket(TICKET_TEMPLATES);
+            }
+          } else {
+            itemData = getFallbackTicket(TICKET_TEMPLATES);
+          }
+          break;
+
+        case "spam":
+          try {
+            const res = await fetch("/api/spam", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contract, chaos }),
+            });
+            itemData = await res.json();
+          } catch {
+            itemData = getFallbackTicket(SPAM_TEMPLATES);
+          }
+          break;
+
+        case "complaint":
+          itemData = getFallbackTicket(COMPLAINT_TEMPLATES);
+          break;
+      }
     }
 
     items[id] = {
