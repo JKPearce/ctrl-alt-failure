@@ -36,35 +36,22 @@ function getStatusColor(action) {
 }
 
 const Active = () => {
-  const { gameState, endCurrentDay } = useGame();
+  const { gameState, endCurrentDay, pauseTime, setTimeSpeed } = useGame();
   const [selectedNav, setSelectedNav] = useState("inbox");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedAgentId, setSelectedAgentId] = useState(null);
-  const [gameMinutes, setGameMinutes] = useState(0); //0 = 9:00AM
 
   // Convert agents object to array
   const agents = Object.values(gameState.agents);
   const selectedAgent = agents.find((a) => a.id === selectedAgentId);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setGameMinutes((prev) => {
-        if (prev >= 480) {
-          clearInterval(interval); // Day ends at 17:00
-          endCurrentDay();
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 1000); // 1 second = 1 minute in game
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
     // every "15 mins" in the game time
-    if (gameMinutes % 15 === 0 && gameMinutes !== 0) {
-      console.log("gameMinutes", gameMinutes);
+    if (
+      gameState.gameTime.currentTick % 15 === 0 &&
+      gameState.gameTime.currentTick !== 0
+    ) {
+      console.log("gameMinutes", gameState.gameTime.currentTick);
 
       // check based on chaos% chance of a new ticket
       const shouldSpawnTicket = Math.random() < gameState.chaos / 100;
@@ -77,7 +64,7 @@ const Active = () => {
               contract: gameState.currentContract,
               totalItems: 1,
               dayNumber: gameState.dayNumber,
-              gameMinutes: gameMinutes,
+              gameMinutes: gameState.gameTime.currentTick,
             });
             console.log("new ticket", newTicket);
           } catch (error) {
@@ -87,7 +74,7 @@ const Active = () => {
         spawn();
       }
     }
-  }, [gameMinutes]);
+  }, [gameState.gameTime.currentTick]);
 
   return (
     <div className="h-screen flex flex-col">
@@ -102,16 +89,34 @@ const Active = () => {
           </span>
         </div>
         <div className="flex-1 justify-end flex gap-4 items-center">
-          <span>
-            <Clock />
-            Time:{formatGameTime(gameMinutes)}
-          </span>
-          <button
-            className="btn btn-outline btn-sm"
-            onClick={() => endCurrentDay()}
-          >
-            End Day
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              className={`btn ${
+                gameState.gameTime.isPaused ? "btn-primary" : "btn-outline"
+              }`}
+              onClick={pauseTime}
+            >
+              {gameState.gameTime.isPaused ? "⏸️" : "▶️"}
+            </button>
+
+            {[1, 2, 3].map((speed) => (
+              <button
+                key={speed}
+                className={`btn ${
+                  gameState.gameTime.speed === speed
+                    ? "btn-active"
+                    : "btn-outline"
+                }`}
+                onClick={() => setTimeSpeed(speed)}
+              >
+                {speed}x
+              </button>
+            ))}
+            <span>
+              <Clock />
+              Time:{formatGameTime(gameState.gameTime.currentTick)}
+            </span>
+          </div>
           <span>💰 {gameState.money}</span>
           <span>⚡ {gameState.energyRemaining}</span>
           <span>Day {gameState.dayNumber}</span>

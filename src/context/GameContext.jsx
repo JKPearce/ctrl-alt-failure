@@ -86,6 +86,27 @@ const GameProvider = ({ children }) => {
           loading: action.payload.loading,
         };
 
+      case GAME_ACTIONS.GAME_TICK:
+        return {
+          ...state,
+          gameTime: {
+            ...state.gameTime,
+            currentTick: state.gameTime.currentTick + 1,
+          },
+        };
+
+      case GAME_ACTIONS.PAUSE_TIME:
+        return {
+          ...state,
+          gameTime: { ...state.gameTime, isPaused: true },
+        };
+
+      case GAME_ACTIONS.SET_TIME_SPEED:
+        return {
+          ...state,
+          gameTime: { ...state.gameTime, speed: action.payload.speed },
+        };
+
       case GAME_ACTIONS.END_DAY:
         // If the contract is already complete, do **not** override the phase
         if (state.gamePhase === "contract_complete") return state;
@@ -169,7 +190,6 @@ const GameProvider = ({ children }) => {
           {
             resolved: true,
             agentAssigned: null,
-            successChance: action.payload.successChance,
             resolvedBy: agentId,
             resolvedOnDay: state.dayNumber,
             resolutionNotes: action.payload.resolutionNotes,

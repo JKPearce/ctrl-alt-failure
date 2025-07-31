@@ -18,6 +18,13 @@ export const DEFAULT_GAME_STATE = {
   currentContract: {},
   dayNumber: 1,
   chaos: 5,
+  gameTime: {
+    currentTick: 0,
+    isPaused: false,
+    speed: 1, // 1x, 2x, 3x multiplier
+    tickInterval: 600, // base 0.6 seconds
+    actualInterval: 600, // modified by speed (600/speed)
+  },
 };
 
 export const UPGRADE_DEFINITIONS = {

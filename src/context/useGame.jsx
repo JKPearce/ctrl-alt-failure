@@ -7,12 +7,11 @@ import {
   INBOX_ACTIONS,
   LOG_TYPES,
 } from "@/lib/config/actionTypes";
-import { calcSuccessChance } from "@/lib/helpers/agentHelpers";
 import {
   calculateItemsToSpawn,
   spawnInboxItems,
 } from "@/lib/helpers/inboxHelpers";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { DEFAULT_STARTING_ENERGY } from "../lib/config/defaultGameState";
 
 const useGame = () => {
@@ -22,6 +21,25 @@ const useGame = () => {
   }
 
   const { gameState, dispatch } = ctx;
+
+  useEffect(() => {
+    if (gameState.gamePhase !== "active" || gameState.gameTime.isPaused) {
+      return; // No ticking when paused or not in active phase
+    }
+
+    const actualInterval =
+      gameState.gameTime.tickInterval / gameState.gameTime.speed;
+
+    const interval = setInterval(() => {
+      dispatch({ type: GAME_ACTIONS.GAME_TICK });
+    }, actualInterval);
+
+    return () => clearInterval(interval);
+  }, [
+    gameState.gameTime.isPaused,
+    gameState.gameTime.speed,
+    gameState.gamePhase,
+  ]);
 
   const startGame = async (
     businessName,
@@ -145,70 +163,26 @@ const useGame = () => {
     return gameState.agents[agentID] || null;
   };
 
-  const resolveTickets = () => {
-    let resolvedTicketsCount = 0;
+  const resolveTicket = (ticket) => {
+    const agent = getAgentByID(ticket.agentAssigned);
+    console.log("Resolving: ", ticket);
 
-    Object.values(gameState.inbox).forEach((ticket) => {
-      if (ticket.messageType !== "ticket") return;
-      if (ticket.agentAssigned === null) return;
-      if (ticket.resolved) return;
-
-      const agent = getAgentByID(ticket.agentAssigned);
-
-      const chance = calcSuccessChance(
-        Number(agent.skills[ticket.ticketType]),
-        Number(ticket.difficulty)
-      );
-      const success = Math.random() < chance;
-      console.log("success chance  ", chance, " - Successful roll = ", success);
-
-      if (success) {
-        console.log("Resolving: ", ticket);
-
-        resolvedTicketsCount++;
-
-        dispatch({
-          type: INBOX_ACTIONS.RESOLVE_TICKET,
-          payload: {
-            ticketID: ticket.id,
-            resolvedBy: agent.id,
-            successChance: chance,
-            resolutionNotes: "Piece of cake.", //TODO: Create a function that calls LLM for fun "resolution notes"
-          },
-        });
-
-        setAgentAction(ticket.agentAssigned, "idle");
-
-        addEntryToLog(
-          LOG_TYPES.RESOLVE_SUCCESS,
-          agent.agentName,
-          `${agent.agentName} has assigned Ticket #${ticket.id}.`
-        );
-      } else {
-        addEntryToLog(
-          LOG_TYPES.RESOLVE_FAIL,
-          agent.agentName,
-          `${agent.agentName} has failed to resolve Ticket #${
-            ticket.id
-          }. Success Chance: ${chance * 100}%`
-        );
-
-        addEntryToLog(
-          LOG_TYPES.COMPLAINT_CREATED,
-          agent.agentName,
-          `A NEW COMPLAINT HAS BEEN CREATED`
-        );
-
-        dispatch({
-          type: INBOX_ACTIONS.TICKET_FAIL,
-          payload: {
-            ticketID: ticket.id,
-          },
-        });
-      }
+    dispatch({
+      type: INBOX_ACTIONS.RESOLVE_TICKET,
+      payload: {
+        ticketID: ticket.id,
+        resolvedBy: agent.id,
+        resolutionNotes: ticket.resolutionNotes,
+      },
     });
 
-    return resolvedTicketsCount;
+    setAgentAction(ticket.agentAssigned, "idle");
+
+    addEntryToLog(
+      LOG_TYPES.RESOLVE_SUCCESS,
+      agent.agentName,
+      `${agent.agentName} has assigned Ticket #${ticket.id}.`
+    );
   };
 
   const replenishEnergy = (energy = DEFAULT_STARTING_ENERGY) => {
@@ -221,8 +195,6 @@ const useGame = () => {
   };
 
   const endCurrentDay = () => {
-    const resolvedTicketsCount = resolveTickets();
-
     // Check for loss condition - inbox overflow
     const activeItems = Object.values(gameState.inbox).filter(
       (item) => item.activeItem
@@ -237,7 +209,7 @@ const useGame = () => {
     addEntryToLog(
       LOG_TYPES.END_DAY,
       "System",
-      `Day ${gameState.dayNumber} ended. ${resolvedTicketsCount} tickets resolved.`
+      `Day ${gameState.dayNumber} ended.`
     );
 
     dispatch({
@@ -300,6 +272,14 @@ const useGame = () => {
     });
   };
 
+  const pauseTime = () => dispatch({ type: GAME_ACTIONS.PAUSE_TIME });
+
+  const setTimeSpeed = (speed) =>
+    dispatch({
+      type: GAME_ACTIONS.SET_TIME_SPEED,
+      payload: { speed },
+    });
+
   const deleteSpam = (ticketID) => {
     dispatch({
       type: INBOX_ACTIONS.DELETE_SPAM,
@@ -343,13 +323,15 @@ const useGame = () => {
     getAgentByID,
     spendEnergy,
     setAgentAction,
-    resolveTickets,
+    resolveTicket,
     replenishEnergy,
     endGame,
     endCurrentDay,
     startNewDay,
     deleteSpam,
     startNewContract,
+    pauseTime,
+    setTimeSpeed,
   };
 };
 
