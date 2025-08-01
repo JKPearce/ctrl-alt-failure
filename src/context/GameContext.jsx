@@ -8,7 +8,7 @@ import {
 import { DEFAULT_GAME_STATE } from "@/lib/config/defaultGameState";
 import { getContract } from "@/lib/helpers/contractHelpers";
 import { summariseDay } from "@/lib/helpers/summariseDay";
-import { createContext, useReducer } from "react";
+import { createContext, useEffect, useReducer } from "react";
 
 const GameContext = createContext();
 
@@ -99,6 +99,12 @@ const GameProvider = ({ children }) => {
         return {
           ...state,
           gameTime: { ...state.gameTime, isPaused: true },
+        };
+
+      case GAME_ACTIONS.RESUME_TIME:
+        return {
+          ...state,
+          gameTime: { ...state.gameTime, isPaused: false },
         };
 
       case GAME_ACTIONS.SET_TIME_SPEED:
@@ -227,7 +233,7 @@ const GameProvider = ({ children }) => {
           ...state,
           inbox: {
             ...state.inbox,
-            ...action.payload.items,
+            ...action.payload.item,
           },
         };
 

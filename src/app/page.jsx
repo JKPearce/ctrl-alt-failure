@@ -6,14 +6,9 @@ import GameOver from "@/components/GameOver";
 import SetupScreen from "@/components/SetupScreen";
 import Summary from "@/components/Summary";
 import { useGame } from "@/context/useGame";
-import { useEffect } from "react";
 
 function GamePage() {
   const { gameState } = useGame();
-
-  useEffect(() => {
-    console.log("updated gamestate: ", gameState);
-  }, [gameState]);
 
   if (gameState.loading) {
     return (

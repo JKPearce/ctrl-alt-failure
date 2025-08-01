@@ -22,25 +22,6 @@ const useGame = () => {
 
   const { gameState, dispatch } = ctx;
 
-  useEffect(() => {
-    if (gameState.gamePhase !== "active" || gameState.gameTime.isPaused) {
-      return; // No ticking when paused or not in active phase
-    }
-
-    const actualInterval =
-      gameState.gameTime.tickInterval / gameState.gameTime.speed;
-
-    const interval = setInterval(() => {
-      dispatch({ type: GAME_ACTIONS.GAME_TICK });
-    }, actualInterval);
-
-    return () => clearInterval(interval);
-  }, [
-    gameState.gameTime.isPaused,
-    gameState.gameTime.speed,
-    gameState.gamePhase,
-  ]);
-
   const startGame = async (
     businessName,
     selectedFounder,
@@ -125,6 +106,21 @@ const useGame = () => {
     );
   };
 
+  const addItemToInbox = (item) => {
+    dispatch({
+      type: INBOX_ACTIONS.ADD_INBOX_ITEM,
+      payload: { item },
+    });
+
+    const newTicket = Object.values(item)[0]; // Get first item;
+    addEntryToLog(
+      LOG_TYPES.ADD_INBOX_ITEM,
+      "System",
+      `New ${newTicket.messageType} item added to inbox. From: ${newTicket.sender}`,
+      gameState.gameTime.currentTick
+    );
+  };
+
   const setAgentAction = (agentID, action) => {
     dispatch({
       type: AGENT_ACTIONS.SET_AGENT_ACTION,
@@ -161,6 +157,10 @@ const useGame = () => {
   const getAgentByID = (agentID) => {
     if (agentID == null) return null;
     return gameState.agents[agentID] || null;
+  };
+
+  const gameTick = () => {
+    dispatch({ type: GAME_ACTIONS.GAME_TICK });
   };
 
   const resolveTicket = (ticket) => {
@@ -274,6 +274,8 @@ const useGame = () => {
 
   const pauseTime = () => dispatch({ type: GAME_ACTIONS.PAUSE_TIME });
 
+  const resumeTime = () => dispatch({ type: GAME_ACTIONS.RESUME_TIME });
+
   const setTimeSpeed = (speed) =>
     dispatch({
       type: GAME_ACTIONS.SET_TIME_SPEED,
@@ -300,20 +302,6 @@ const useGame = () => {
     startNewDay();
   };
 
-  const addInboxItem = (item, time = 0) => {
-    addEntryToLog(
-      LOG_TYPES.ADD_INBOX_ITEM,
-      "System",
-      `New ${item.messageType} item added to inbox. From: ${item.sender}`,
-      time
-    );
-
-    dispatch({
-      type: INBOX_ACTIONS.ADD_INBOX_ITEM,
-      payload: { item },
-    });
-  };
-
   return {
     gameState,
     startGame,
@@ -332,6 +320,9 @@ const useGame = () => {
     startNewContract,
     pauseTime,
     setTimeSpeed,
+    resumeTime,
+    gameTick,
+    addItemToInbox,
   };
 };
 

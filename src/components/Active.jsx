@@ -36,7 +36,14 @@ function getStatusColor(action) {
 }
 
 const Active = () => {
-  const { gameState, endCurrentDay, pauseTime, setTimeSpeed } = useGame();
+  const {
+    gameState,
+    addItemToInbox,
+    pauseTime,
+    resumeTime,
+    setTimeSpeed,
+    gameTick,
+  } = useGame();
   const [selectedNav, setSelectedNav] = useState("inbox");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedAgentId, setSelectedAgentId] = useState(null);
@@ -46,6 +53,45 @@ const Active = () => {
   const selectedAgent = agents.find((a) => a.id === selectedAgentId);
 
   useEffect(() => {
+    if (gameState.gamePhase !== "active" || gameState.gameTime.isPaused) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      gameTick();
+    }, 1000 / gameState.gameTime.speed);
+
+    return () => clearInterval(interval);
+  }, [gameState.gameTime.isPaused, gameState.gameTime.speed]);
+
+  useEffect(() => {
+    // No ticking when not in active phase or paused, may be redundant
+    if (gameState.gamePhase !== "active") return;
+    if (gameState.gameTime.isPaused) return;
+
+    console.log(
+      "gameState.gameTime.currentTick",
+      gameState.gameTime.currentTick
+    );
+
+    //check if overflow inbox every tick?
+    const activeItems = Object.values(gameState.inbox).filter(
+      (item) => item.activeItem
+    ).length;
+    const isGameOver = activeItems >= gameState.inboxSize;
+    if (isGameOver) {
+      endGame();
+      return; // Don't continue with normal day end
+    }
+
+    //check if day is over every tick
+    //480 is 480 minutes, or 8 hours
+    if (gameState.gameTime.currentTick >= 480) {
+      console.log("day is over");
+      endCurrentDay();
+      return; // Don't continue with normal day end
+    }
+
     // every "15 mins" in the game time
     if (
       gameState.gameTime.currentTick % 15 === 0 &&
@@ -59,18 +105,21 @@ const Active = () => {
       if (shouldSpawnTicket) {
         const spawn = async () => {
           try {
-            const newTicket = await spawnInboxItems({
+            //returns a keyed object with the ticket as the value
+            const newTicketObject = await spawnInboxItems({
               chaos: gameState.chaos,
               contract: gameState.currentContract,
               totalItems: 1,
               dayNumber: gameState.dayNumber,
               gameMinutes: gameState.gameTime.currentTick,
             });
-            console.log("new ticket", newTicket);
+
+            addItemToInbox(newTicketObject);
           } catch (error) {
             console.error("Error generating ticket", error);
           }
         };
+
         spawn();
       }
     }
@@ -94,7 +143,13 @@ const Active = () => {
               className={`btn ${
                 gameState.gameTime.isPaused ? "btn-primary" : "btn-outline"
               }`}
-              onClick={pauseTime}
+              onClick={() => {
+                if (gameState.gameTime.isPaused) {
+                  resumeTime();
+                } else {
+                  pauseTime();
+                }
+              }}
             >
               {gameState.gameTime.isPaused ? "⏸️" : "▶️"}
             </button>
