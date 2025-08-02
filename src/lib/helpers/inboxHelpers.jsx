@@ -126,6 +126,8 @@ export async function spawnInboxItems({
       resolved: false,
       failCount: 0,
       agentAssigned: null,
+      resolveProgress: 0,
+      timeToResolve: 100,
     };
   }
 
@@ -179,4 +181,41 @@ async function pickTemplate(type, contract) {
 
 function getFallbackTicket(template) {
   return template[Math.floor(Math.random() * template.length)];
+}
+
+export function progressAndResolveTickets(inbox, nextTick, currentDay) {
+  return Object.fromEntries(
+    Object.entries(inbox).map(([id, ticket]) => {
+      // only bump progress for assigned tickets
+      if (!ticket.agentAssigned) return [id, ticket];
+
+      const progress = ticket.resolveProgress + 1;
+      if (progress >= ticket.timeToResolve) {
+        // resolved
+        return [
+          id,
+          {
+            ...ticket,
+            activeItem: false,
+            agentAssigned: null,
+            resolved: true,
+            resolvedOnDay: currentDay,
+            resolvedOnTick: nextTick,
+            resolveProgress: 0,
+            resolvedBy: ticket.agentAssigned,
+            resolutionNotes: ticket.resolutionNotes,
+          },
+        ];
+      }
+
+      // still in progress
+      return [
+        id,
+        {
+          ...ticket,
+          resolveProgress: progress,
+        },
+      ];
+    })
+  );
 }

@@ -62,68 +62,11 @@ const Active = () => {
     }, 1000 / gameState.gameTime.speed);
 
     return () => clearInterval(interval);
-  }, [gameState.gameTime.isPaused, gameState.gameTime.speed]);
-
-  useEffect(() => {
-    // No ticking when not in active phase or paused, may be redundant
-    if (gameState.gamePhase !== "active") return;
-    if (gameState.gameTime.isPaused) return;
-
-    console.log(
-      "gameState.gameTime.currentTick",
-      gameState.gameTime.currentTick
-    );
-
-    //check if overflow inbox every tick?
-    const activeItems = Object.values(gameState.inbox).filter(
-      (item) => item.activeItem
-    ).length;
-    const isGameOver = activeItems >= gameState.inboxSize;
-    if (isGameOver) {
-      endGame();
-      return; // Don't continue with normal day end
-    }
-
-    //check if day is over every tick
-    //480 is 480 minutes, or 8 hours
-    if (gameState.gameTime.currentTick >= 480) {
-      console.log("day is over");
-      endCurrentDay();
-      return; // Don't continue with normal day end
-    }
-
-    // every "15 mins" in the game time
-    if (
-      gameState.gameTime.currentTick % 15 === 0 &&
-      gameState.gameTime.currentTick !== 0
-    ) {
-      console.log("gameMinutes", gameState.gameTime.currentTick);
-
-      // check based on chaos% chance of a new ticket
-      const shouldSpawnTicket = Math.random() < gameState.chaos / 100;
-
-      if (shouldSpawnTicket) {
-        const spawn = async () => {
-          try {
-            //returns a keyed object with the ticket as the value
-            const newTicketObject = await spawnInboxItems({
-              chaos: gameState.chaos,
-              contract: gameState.currentContract,
-              totalItems: 1,
-              dayNumber: gameState.dayNumber,
-              gameMinutes: gameState.gameTime.currentTick,
-            });
-
-            addItemToInbox(newTicketObject);
-          } catch (error) {
-            console.error("Error generating ticket", error);
-          }
-        };
-
-        spawn();
-      }
-    }
-  }, [gameState.gameTime.currentTick]);
+  }, [
+    gameState.gameTime.isPaused,
+    gameState.gameTime.speed,
+    gameState.gamePhase,
+  ]);
 
   return (
     <div className="h-screen flex flex-col">

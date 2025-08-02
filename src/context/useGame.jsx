@@ -195,16 +195,7 @@ const useGame = () => {
   };
 
   const endCurrentDay = () => {
-    // Check for loss condition - inbox overflow
-    const activeItems = Object.values(gameState.inbox).filter(
-      (item) => item.activeItem
-    ).length;
-    const isGameOver = activeItems >= gameState.inboxSize;
-
-    if (isGameOver) {
-      endGame();
-      return; // Don't continue with normal day end
-    }
+    console.log("Ending current day");
 
     addEntryToLog(
       LOG_TYPES.END_DAY,
@@ -267,6 +258,7 @@ const useGame = () => {
   };
 
   const endGame = () => {
+    console.log("Ending game");
     dispatch({
       type: GAME_ACTIONS.END_GAME,
     });

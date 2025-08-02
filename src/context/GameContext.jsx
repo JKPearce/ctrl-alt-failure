@@ -7,6 +7,7 @@ import {
 } from "@/lib/config/actionTypes";
 import { DEFAULT_GAME_STATE } from "@/lib/config/defaultGameState";
 import { getContract } from "@/lib/helpers/contractHelpers";
+import { progressAndResolveTickets } from "@/lib/helpers/inboxHelpers";
 import { summariseDay } from "@/lib/helpers/summariseDay";
 import { createContext, useEffect, useReducer } from "react";
 
@@ -14,6 +15,44 @@ const GameContext = createContext();
 
 const GameProvider = ({ children }) => {
   const [gameState, dispatch] = useReducer(reducer, DEFAULT_GAME_STATE);
+
+  useEffect(() => {
+    // No ticking when not in active phase or paused, may be redundant
+    if (gameState.gamePhase !== "active") return;
+    if (gameState.gameTime.isPaused) return;
+
+    // every "15 mins" in the game time
+    if (
+      gameState.gameTime.currentTick % 15 === 0 &&
+      gameState.gameTime.currentTick !== 0
+    ) {
+      console.log("gameMinutes", gameState.gameTime.currentTick);
+
+      // check based on chaos% chance of a new ticket
+      const shouldSpawnTicket = Math.random() < gameState.chaos / 100;
+
+      if (shouldSpawnTicket) {
+        const spawn = async () => {
+          try {
+            //returns a keyed object with the ticket as the value
+            const newTicketObject = await spawnInboxItems({
+              chaos: gameState.chaos,
+              contract: gameState.currentContract,
+              totalItems: 1,
+              dayNumber: gameState.dayNumber,
+              gameMinutes: gameState.gameTime.currentTick,
+            });
+
+            addItemToInbox(newTicketObject);
+          } catch (error) {
+            console.error("Error generating ticket", error);
+          }
+        };
+
+        spawn();
+      }
+    }
+  }, [gameState.gameTime.currentTick]);
 
   function reducer(state, action) {
     switch (action.type) {
@@ -31,12 +70,6 @@ const GameProvider = ({ children }) => {
           chaos: contract.baseChaos,
           openComplaints: 0,
           currentContract: contract,
-        };
-
-      case GAME_ACTIONS.END_GAME:
-        return {
-          ...state,
-          gamePhase: "game_over",
         };
 
       case GAME_ACTIONS.RESTART_GAME:
@@ -87,12 +120,27 @@ const GameProvider = ({ children }) => {
         };
 
       case GAME_ACTIONS.GAME_TICK:
+        const nextTick = state.gameTime.currentTick + 1;
+        const newInbox = progressAndResolveTickets(
+          state.inbox,
+          nextTick,
+          state.dayNumber
+        );
+        const activeCount = Object.values(newInbox).filter(
+          (t) => t.activeItem
+        ).length;
+        const newPhase =
+          activeCount >= state.inboxSize
+            ? "game_over"
+            : nextTick >= 480
+            ? "summary"
+            : state.gamePhase;
+
         return {
           ...state,
-          gameTime: {
-            ...state.gameTime,
-            currentTick: state.gameTime.currentTick + 1,
-          },
+          gameTime: { ...state.gameTime, currentTick: nextTick },
+          inbox: newInbox,
+          gamePhase: newPhase,
         };
 
       case GAME_ACTIONS.PAUSE_TIME:
@@ -123,6 +171,12 @@ const GameProvider = ({ children }) => {
           ...state,
           gamePhase: "summary",
           dailySummaries: [summary, ...state.dailySummaries],
+        };
+
+      case GAME_ACTIONS.END_GAME:
+        return {
+          ...state,
+          gamePhase: "game_over",
         };
 
       case GAME_ACTIONS.CONTRACT_COMPLETE: {
