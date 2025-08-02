@@ -8,8 +8,8 @@ import {
 import { DEFAULT_GAME_STATE } from "@/lib/config/defaultGameState";
 import { clearResolvedTicketAssignments } from "@/lib/helpers/agentHelpers";
 import { getContract } from "@/lib/helpers/contractHelpers";
+import { summariseDay } from "@/lib/helpers/gameHelpers";
 import { progressAndResolveTickets } from "@/lib/helpers/inboxHelpers";
-import { summariseDay } from "@/lib/helpers/summariseDay";
 import { createContext, useReducer } from "react";
 
 const GameContext = createContext();
@@ -37,20 +37,6 @@ const GameProvider = ({ children }) => {
 
       case GAME_ACTIONS.RESTART_GAME:
         return DEFAULT_GAME_STATE;
-
-      case GAME_ACTIONS.USE_ENERGY:
-        return {
-          ...state,
-          energyRemaining: Number(
-            state.energyRemaining - action.payload.actionCost
-          ),
-        };
-
-      case GAME_ACTIONS.REPLENISH_ENERGY:
-        return {
-          ...state,
-          energyRemaining: Number(action.payload.energy),
-        };
 
       case GAME_ACTIONS.ADD_ACTIVITY_LOG:
         return {
@@ -198,59 +184,6 @@ const GameProvider = ({ children }) => {
 
         //return the updated state
         return updatedAgents;
-      }
-
-      case INBOX_ACTIONS.TICKET_FAIL:
-        const updatedState = updateEntity(
-          state,
-          "inbox",
-          action.payload.ticketID,
-          {
-            failCount: state.inbox[action.payload.ticketID].failCount + 1,
-          }
-        );
-        return { ...updatedState, openComplaints: state.openComplaints + 1 };
-
-      case INBOX_ACTIONS.RESOLVE_TICKET: {
-        const agentId = action.payload.resolvedBy;
-
-        const updatedInboxState = updateEntity(
-          state,
-          "inbox",
-          action.payload.ticketID,
-          {
-            resolved: true,
-            agentAssigned: null,
-            resolvedBy: agentId,
-            resolvedOnDay: state.dayNumber,
-            resolutionNotes: action.payload.resolutionNotes,
-            activeItem: false,
-          }
-        );
-
-        // check for game win (contract goal reached)
-        const newTotal = state.currentContract.ticketsResolved + 1;
-        const won = newTotal >= state.currentContract.ticketsRequired;
-
-        // update agent's currentAssignedTickets
-        const updatedState = updateEntity(
-          updatedInboxState,
-          "agents",
-          agentId,
-          {
-            currentAssignedTickets:
-              updatedInboxState.agents[agentId].currentAssignedTickets - 1,
-          }
-        );
-
-        return {
-          ...updatedState,
-          currentContract: {
-            ...state.currentContract,
-            ticketsResolved: newTotal,
-          },
-          gamePhase: won ? "contract_complete" : state.gamePhase,
-        };
       }
 
       case INBOX_ACTIONS.ADD_INBOX_ITEM:

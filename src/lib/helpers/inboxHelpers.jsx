@@ -208,7 +208,7 @@ export function progressAndResolveTickets(inbox, nextTick, currentDay) {
         ];
       }
 
-      // still in progress
+      // ticket is still in progress
       return [
         id,
         {

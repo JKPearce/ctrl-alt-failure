@@ -7,12 +7,12 @@ import {
   INBOX_ACTIONS,
   LOG_TYPES,
 } from "@/lib/config/actionTypes";
+import { getRandomBehaviour } from "@/lib/helpers/agentHelpers";
 import {
   calculateItemsToSpawn,
   spawnInboxItems,
 } from "@/lib/helpers/inboxHelpers";
 import { useContext, useEffect } from "react";
-import { DEFAULT_STARTING_ENERGY } from "../lib/config/defaultGameState";
 
 const useGame = () => {
   const ctx = useContext(GameContext);
@@ -21,46 +21,6 @@ const useGame = () => {
   }
 
   const { gameState, dispatch } = ctx;
-
-  useEffect(() => {
-    // No ticking when not in active phase or paused, may be redundant
-    if (gameState.gamePhase !== "active") return;
-    if (gameState.gameTime.isPaused) return;
-
-    console.log("gameState.gameTime.currentTick", gameState);
-
-    // every "15 mins" in the game time
-    if (
-      gameState.gameTime.currentTick % 15 === 0 &&
-      gameState.gameTime.currentTick !== 0
-    ) {
-      console.log("gameMinutes", gameState.gameTime.currentTick);
-
-      // check based on chaos% chance of a new ticket
-      const shouldSpawnTicket = Math.random() < gameState.chaos / 100;
-
-      if (shouldSpawnTicket) {
-        const spawn = async () => {
-          try {
-            //returns a keyed object with the ticket as the value
-            const newTicketObject = await spawnInboxItems({
-              chaos: gameState.chaos,
-              contract: gameState.currentContract,
-              totalItems: 1,
-              dayNumber: gameState.dayNumber,
-              gameMinutes: gameState.gameTime.currentTick,
-            });
-
-            addItemToInbox(newTicketObject);
-          } catch (error) {
-            console.error("Error generating ticket", error);
-          }
-        };
-
-        spawn();
-      }
-    }
-  }, [gameState.gameTime.currentTick]);
 
   const startGame = async (
     businessName,
@@ -184,15 +144,6 @@ const useGame = () => {
     });
   };
 
-  const spendEnergy = (amount = 1) => {
-    dispatch({
-      type: GAME_ACTIONS.USE_ENERGY,
-      payload: {
-        actionCost: amount,
-      },
-    });
-  };
-
   const getAgentByID = (agentID) => {
     if (agentID == null) return null;
     return gameState.agents[agentID] || null;
@@ -202,52 +153,6 @@ const useGame = () => {
     dispatch({ type: GAME_ACTIONS.GAME_TICK });
   };
 
-  const resolveTicket = (ticket) => {
-    const agent = getAgentByID(ticket.agentAssigned);
-    console.log("Resolving: ", ticket);
-
-    dispatch({
-      type: INBOX_ACTIONS.RESOLVE_TICKET,
-      payload: {
-        ticketID: ticket.id,
-        resolvedBy: agent.id,
-        resolutionNotes: ticket.resolutionNotes,
-      },
-    });
-
-    setAgentAction(ticket.agentAssigned, "idle");
-
-    addEntryToLog(
-      LOG_TYPES.RESOLVE_SUCCESS,
-      agent.agentName,
-      `${agent.agentName} has assigned Ticket #${ticket.id}.`
-    );
-  };
-
-  const replenishEnergy = (energy = DEFAULT_STARTING_ENERGY) => {
-    dispatch({
-      type: GAME_ACTIONS.REPLENISH_ENERGY,
-      payload: {
-        energy,
-      },
-    });
-  };
-
-  const endCurrentDay = () => {
-    console.log("Ending current day");
-
-    addEntryToLog(
-      LOG_TYPES.END_DAY,
-      "System",
-      `Day ${gameState.dayNumber} ended.`
-    );
-
-    dispatch({
-      type: GAME_ACTIONS.END_DAY,
-      payload: {},
-    });
-  };
-
   const startNewDay = async () => {
     dispatch({
       type: GAME_ACTIONS.SET_LOADING,
@@ -255,6 +160,7 @@ const useGame = () => {
     });
 
     try {
+      //setup inbox for new day
       const [newItems] = await Promise.all([
         spawnInboxItems({
           chaos: gameState.chaos,
@@ -268,8 +174,6 @@ const useGame = () => {
         new Promise((resolve) => setTimeout(resolve, 3000)), // 3-second minimum
       ]);
 
-      //fire off functions to make new tweets or other actions that will happen on a new day
-
       addEntryToLog(
         LOG_TYPES.START_DAY,
         "System",
@@ -277,8 +181,6 @@ const useGame = () => {
           Object.keys(newItems).length
         } new items added.`
       );
-
-      replenishEnergy();
 
       dispatch({
         type: GAME_ACTIONS.START_NEW_DAY,
@@ -294,13 +196,6 @@ const useGame = () => {
         payload: { loading: false },
       });
     }
-  };
-
-  const endGame = () => {
-    console.log("Ending game");
-    dispatch({
-      type: GAME_ACTIONS.END_GAME,
-    });
   };
 
   const pauseTime = () => dispatch({ type: GAME_ACTIONS.PAUSE_TIME });
@@ -322,7 +217,6 @@ const useGame = () => {
 
   const startNewContract = (selectedContract) => {
     //TODO add calculation for new chaos based on complaints left in inbox?
-
     dispatch({
       type: GAME_ACTIONS.START_NEW_CONTRACT,
       payload: {
@@ -340,12 +234,7 @@ const useGame = () => {
     assignTicketToAgent,
     addEntryToLog,
     getAgentByID,
-    spendEnergy,
     setAgentAction,
-    resolveTicket,
-    replenishEnergy,
-    endGame,
-    endCurrentDay,
     startNewDay,
     deleteSpam,
     startNewContract,

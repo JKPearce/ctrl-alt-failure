@@ -1,21 +1,21 @@
 import { useGame } from "@/context/useGame";
 import { formatGameTime } from "@/lib/helpers/gameHelpers";
-import { spawnInboxItems } from "@/lib/helpers/inboxHelpers";
 import {
   BarChart2,
   ChevronLeft,
   ChevronRight,
   Clock,
+  Handshake,
   Inbox,
   Megaphone,
-  ShoppingCart,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import ContractView from "./ContractView";
 import InboxScreen from "./InboxScreen";
 
 const navItems = [
   { label: "inbox", icon: Inbox },
-  { label: "shop", icon: ShoppingCart },
+  { label: "contract", icon: Handshake },
   { label: "stats", icon: BarChart2 },
   { label: "ctrl-alt-scream", icon: Megaphone },
 ];
@@ -36,14 +36,8 @@ function getStatusColor(action) {
 }
 
 const Active = () => {
-  const {
-    gameState,
-    addItemToInbox,
-    pauseTime,
-    resumeTime,
-    setTimeSpeed,
-    gameTick,
-  } = useGame();
+  const { gameState, pauseTime, resumeTime, setTimeSpeed, gameTick } =
+    useGame();
   const [selectedNav, setSelectedNav] = useState("inbox");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedAgentId, setSelectedAgentId] = useState(null);
@@ -67,6 +61,64 @@ const Active = () => {
     gameState.gameTime.speed,
     gameState.gamePhase,
   ]);
+
+  useEffect(() => {
+    //dont check on start of game or if paused
+    if (gameState.gamePhase !== "active") return;
+    if (gameState.gameTime.isPaused) return;
+    if (gameState.gameTime.currentTick === 0) return;
+
+    // every "15 mins" in the game time
+    if (gameState.gameTime.currentTick % 15 === 0) {
+      console.log("gameMinutes", gameState.gameTime.currentTick);
+      handleTickSpawn();
+    }
+    if (gameState.gameTime.currentTick % 30 === 0) {
+      handleAgentBehaviors();
+    }
+  }, [gameState.gameTime.currentTick]);
+
+  const handleAgentBehaviors = () => {
+    const agents = Object.values(gameState.agents);
+
+    agents.forEach((agent) => {
+      const selectedAction = getRandomBehaviour(agent);
+      console.log("selectedAction", selectedAction);
+      switch (selectedAction.dispatchAction) {
+        case AGENT_ACTIONS.WORKING:
+          console.log("agent is working", agent.agentName);
+          break;
+        case AGENT_ACTIONS.CREATE_SCREAM:
+          console.log("agent is creating a scream", agent.agentName);
+          break;
+        case AGENT_ACTIONS.ON_BREAK:
+          console.log("agent is on break", agent.agentName);
+          break;
+      }
+    });
+  };
+
+  const handleTickSpawn = async () => {
+    // check based on chaos% chance of a new ticket
+    const shouldSpawnTicket = Math.random() < gameState.chaos / 100;
+
+    if (shouldSpawnTicket) {
+      try {
+        //returns a keyed object with the ticket as the value
+        const newTicketObject = await spawnInboxItems({
+          chaos: gameState.chaos,
+          contract: gameState.currentContract,
+          totalItems: 1,
+          dayNumber: gameState.dayNumber,
+          gameMinutes: gameState.gameTime.currentTick,
+        });
+
+        addItemToInbox(newTicketObject);
+      } catch (error) {
+        console.error("Error generating ticket", error);
+      }
+    }
+  };
 
   return (
     <div className="h-screen flex flex-col">
@@ -94,7 +146,7 @@ const Active = () => {
                 }
               }}
             >
-              {gameState.gameTime.isPaused ? "⏸️" : "▶️"}
+              {gameState.gameTime.isPaused ? "▶️" : "⏸️"}
             </button>
 
             {[1, 2, 3].map((speed) => (
@@ -115,9 +167,8 @@ const Active = () => {
               Time:{formatGameTime(gameState.gameTime.currentTick)}
             </span>
           </div>
-          <span>💰 {gameState.money}</span>
-          <span>⚡ {gameState.energyRemaining}</span>
           <span>Day {gameState.dayNumber}</span>
+          <span>Chaos {gameState.chaos}</span>
         </div>
       </div>
 
@@ -305,11 +356,6 @@ const Active = () => {
             ) : (
               <div className="flex-1 flex flex-col">
                 {selectedNav === "inbox" && <InboxScreen />}
-                {selectedNav === "shop" && (
-                  <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
-                    Shop view coming soon...
-                  </div>
-                )}
                 {selectedNav === "stats" && (
                   <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
                     Stats view coming soon...
@@ -318,6 +364,11 @@ const Active = () => {
                 {selectedNav === "ctrl-alt-scream" && (
                   <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
                     Ctrl-Alt-Scream view coming soon...
+                  </div>
+                )}
+                {selectedNav === "contract" && (
+                  <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
+                    <ContractView contract={gameState.currentContract} />
                   </div>
                 )}
               </div>

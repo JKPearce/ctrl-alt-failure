@@ -1,4 +1,23 @@
-import { PRE_GENERATED_AGENTS } from "../config/preGeneratedAgents";
+import { PRE_GENERATED_AGENTS } from "@/lib/data/preGeneratedAgents";
+import { AGENT_ACTIONS } from "../config/actionTypes";
+
+const BEHAVIOR_TEMPLATES = {
+  WORKAHOLIC: [
+    { dispatchAction: AGENT_ACTIONS.WORKING, weight: 80 },
+    { dispatchAction: AGENT_ACTIONS.CREATE_SCREAM, weight: 10 },
+    { dispatchAction: AGENT_ACTIONS.ON_BREAK, weight: 10 },
+  ],
+  COMPLAINER: [
+    { dispatchAction: AGENT_ACTIONS.WORKING, weight: 30 },
+    { dispatchAction: AGENT_ACTIONS.CREATE_SCREAM, weight: 60 },
+    { dispatchAction: AGENT_ACTIONS.ON_BREAK, weight: 10 },
+  ],
+  SLACKER: [
+    { dispatchAction: AGENT_ACTIONS.WORKING, weight: 20 },
+    { dispatchAction: AGENT_ACTIONS.CREATE_SCREAM, weight: 30 },
+    { dispatchAction: AGENT_ACTIONS.ON_BREAK, weight: 50 },
+  ],
+};
 
 export const generateNewAgents = (amount) => {
   const agents = {};
@@ -36,28 +55,7 @@ const getAgeBracket = (age) => {
   return "old";
 };
 
-export const generateAgentComment = (state, agentID, context) => {
-  //TODO: Logic here to send to do an API call based on the ticket and agent
-  //switch case based on the context that gets sent "assgined to ticket" "resolved ticket"etc
-
-  if (context === "assigned_ticket")
-    return "What the hell did she even click? How do you break a screen, a mouse, and gravity in one email? Ugh — I’ll fix it, but if Brenda's cake comes up one more time, I’m bricking the whole network.";
-
-  if (context === "resolved_ticket") return "Done and dusted, piece of cake";
-  else return "Agent is making a generic comment";
-};
-
-/**
- * @param {number} skill      – agent.skills[ticket.type] (1–10)
- * @param {number} difficulty – ticket.difficulty    (1–10)
- * @returns {number}          – success chance, 0–0.95
- */
-export const calcSuccessChance = (skill, difficulty) => {
-  const raw = (skill / difficulty) * 0.95;
-  console.log("skill: ", skill, " difficulty: ", difficulty, " Raw: ", raw);
-  return Math.min(raw, 0.95);
-};
-
+//clear resolved ticket assignments remove the ticket ID from the agent object
 export function clearResolvedTicketAssignments(agents, inbox) {
   return Object.fromEntries(
     Object.entries(agents).map(([agentId, agent]) => {
@@ -71,3 +69,19 @@ export function clearResolvedTicketAssignments(agents, inbox) {
     })
   );
 }
+
+export const getRandomBehaviour = (agent) => {
+  const agentBehaviors = BEHAVIOR_TEMPLATES[agent.behavior];
+  if (!agentBehaviors) return null;
+
+  const totalWeight = actions.reduce((sum, action) => sum + action.weight, 0);
+  const randomValue = Math.random() * totalWeight; // random number between 0 to totalWeight
+
+  let cumulativeWeight = 0;
+  for (const behaviour of agentBehaviors) {
+    cumulativeWeight += behaviour.weight;
+    if (randomValue <= cumulativeWeight) {
+      return behaviour;
+    }
+  }
+};

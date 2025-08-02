@@ -1,7 +1,6 @@
 "use client";
 
 import { useGame } from "@/context/useGame";
-import { DEFAULT_STARTING_MONEY } from "@/lib/config/defaultGameState";
 import contractsData from "@/lib/data/contracts.json";
 import { generateNewAgents } from "@/lib/helpers/agentHelpers";
 import React, { useEffect, useState } from "react";
@@ -28,8 +27,6 @@ const getRandomContracts = (contracts, n = 3) => {
   return shuffled.slice(0, n);
 };
 
-const getRerollCost = (base, count) => Math.floor(base * Math.pow(2, count));
-
 function SetupScreen() {
   const [businessName, setBusinessName] = useState("Ctrl-Alt-Failure Inc.");
   const [selectedFounder, setSelectedFounder] = useState(
@@ -37,9 +34,7 @@ function SetupScreen() {
   );
   const [contracts, setContracts] = useState([]);
   const [selectedContract, setSelectedContract] = useState("");
-  const [agents, setAgents] = useState([]); // [{agent, rerollCount}]
-  const [money, setMoney] = useState(DEFAULT_STARTING_MONEY);
-  const [rerollCounts, setRerollCounts] = useState([0, 0, 0, 0]);
+  const [agents, setAgents] = useState([]);
 
   const { startGame } = useGame();
 
@@ -54,20 +49,13 @@ function SetupScreen() {
   const rerollAllAgents = () => {
     const newAgents = Object.values(generateNewAgents(4));
     setAgents(newAgents);
-    setRerollCounts([0, 0, 0, 0]);
   };
 
   const handleReroll = (idx) => {
-    const cost = getRerollCost(50, rerollCounts[idx]);
-    if (money < cost) return;
     const newAgent = Object.values(generateNewAgents(1))[0];
     const newAgents = [...agents];
     newAgents[idx] = newAgent;
     setAgents(newAgents);
-    const newCounts = [...rerollCounts];
-    newCounts[idx] += 1;
-    setRerollCounts(newCounts);
-    setMoney(money - cost);
   };
 
   const readyToStart =
@@ -235,10 +223,6 @@ function SetupScreen() {
       <div>
         <div className="mb-4 font-semibold text-lg flex justify-between items-center">
           <span>Starting Agent Roster</span>
-          <div className="bg-base-200 px-4 py-2 rounded-lg">
-            <span className="text-lg font-medium">💰 ${money}</span>
-            <span className="text-sm text-base-content/60 ml-1">remaining</span>
-          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {agents.map((agent, idx) => (
@@ -276,16 +260,24 @@ function SetupScreen() {
 
               {/* Traits */}
               <div className="text-xs text-base-content/70 text-center mb-3 line-clamp-2">
-                {agent.personality.traits.join(", ")}
+                {agent.personality}
+              </div>
+              <div className="text-xs text-base-content/70 text-center mb-3 line-clamp-2">
+                {agent.behavior}
+              </div>
+              <div className="text-xs text-base-content/70 text-center mb-3 line-clamp-2">
+                {agent.quirk}
+              </div>
+              <div className="text-xs text-base-content/70 text-center mb-3 line-clamp-2">
+                {agent.favFood}
               </div>
 
               {/* Reroll Button */}
               <button
                 className="btn btn-sm btn-outline w-full"
-                disabled={money < getRerollCost(50, rerollCounts[idx])}
                 onClick={() => handleReroll(idx)}
               >
-                Reroll (${getRerollCost(50, rerollCounts[idx])})
+                Reroll
               </button>
             </div>
           ))}
