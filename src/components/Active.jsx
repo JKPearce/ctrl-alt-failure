@@ -1,4 +1,5 @@
 import { useGame } from "@/context/useGame";
+import { getRandomBehaviour } from "@/lib/helpers/agentHelpers";
 import { formatGameTime } from "@/lib/helpers/gameHelpers";
 import {
   BarChart2,
