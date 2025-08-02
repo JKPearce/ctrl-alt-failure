@@ -6,53 +6,16 @@ import {
   INBOX_ACTIONS,
 } from "@/lib/config/actionTypes";
 import { DEFAULT_GAME_STATE } from "@/lib/config/defaultGameState";
+import { clearResolvedTicketAssignments } from "@/lib/helpers/agentHelpers";
 import { getContract } from "@/lib/helpers/contractHelpers";
 import { progressAndResolveTickets } from "@/lib/helpers/inboxHelpers";
 import { summariseDay } from "@/lib/helpers/summariseDay";
-import { createContext, useEffect, useReducer } from "react";
+import { createContext, useReducer } from "react";
 
 const GameContext = createContext();
 
 const GameProvider = ({ children }) => {
   const [gameState, dispatch] = useReducer(reducer, DEFAULT_GAME_STATE);
-
-  useEffect(() => {
-    // No ticking when not in active phase or paused, may be redundant
-    if (gameState.gamePhase !== "active") return;
-    if (gameState.gameTime.isPaused) return;
-
-    // every "15 mins" in the game time
-    if (
-      gameState.gameTime.currentTick % 15 === 0 &&
-      gameState.gameTime.currentTick !== 0
-    ) {
-      console.log("gameMinutes", gameState.gameTime.currentTick);
-
-      // check based on chaos% chance of a new ticket
-      const shouldSpawnTicket = Math.random() < gameState.chaos / 100;
-
-      if (shouldSpawnTicket) {
-        const spawn = async () => {
-          try {
-            //returns a keyed object with the ticket as the value
-            const newTicketObject = await spawnInboxItems({
-              chaos: gameState.chaos,
-              contract: gameState.currentContract,
-              totalItems: 1,
-              dayNumber: gameState.dayNumber,
-              gameMinutes: gameState.gameTime.currentTick,
-            });
-
-            addItemToInbox(newTicketObject);
-          } catch (error) {
-            console.error("Error generating ticket", error);
-          }
-        };
-
-        spawn();
-      }
-    }
-  }, [gameState.gameTime.currentTick]);
 
   function reducer(state, action) {
     switch (action.type) {
@@ -121,11 +84,19 @@ const GameProvider = ({ children }) => {
 
       case GAME_ACTIONS.GAME_TICK:
         const nextTick = state.gameTime.currentTick + 1;
+        //progress and resolve tickets
         const newInbox = progressAndResolveTickets(
           state.inbox,
           nextTick,
           state.dayNumber
         );
+        //clear resolved ticket assignments remove the ticket ID from the agent object
+        const newAgents = clearResolvedTicketAssignments(
+          state.agents,
+          newInbox
+        );
+
+        //check for game over conditions
         const activeCount = Object.values(newInbox).filter(
           (t) => t.activeItem
         ).length;
@@ -140,6 +111,7 @@ const GameProvider = ({ children }) => {
           ...state,
           gameTime: { ...state.gameTime, currentTick: nextTick },
           inbox: newInbox,
+          agents: newAgents,
           gamePhase: newPhase,
         };
 
@@ -203,7 +175,7 @@ const GameProvider = ({ children }) => {
         });
 
       case INBOX_ACTIONS.ASSIGN_TICKET: {
-        // Assign the agent to the ticket and mark it inactive
+        //update the inbox state to mark the ticket as inactive
         const updatedInboxState = updateEntity(
           state,
           "inbox",
@@ -214,18 +186,17 @@ const GameProvider = ({ children }) => {
           }
         );
 
-        // Increment the agent's assigned ticket count
-        const agentId = action.payload.agentID;
+        //update the agents state to assign the ticket to the agent
         const updatedAgents = updateEntity(
           updatedInboxState,
           "agents",
-          agentId,
+          action.payload.agentID,
           {
-            currentAssignedTickets:
-              updatedInboxState.agents[agentId].currentAssignedTickets + 1,
+            assignedTicketId: action.payload.ticketID,
           }
         );
 
+        //return the updated state
         return updatedAgents;
       }
 

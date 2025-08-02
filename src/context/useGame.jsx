@@ -22,6 +22,46 @@ const useGame = () => {
 
   const { gameState, dispatch } = ctx;
 
+  useEffect(() => {
+    // No ticking when not in active phase or paused, may be redundant
+    if (gameState.gamePhase !== "active") return;
+    if (gameState.gameTime.isPaused) return;
+
+    console.log("gameState.gameTime.currentTick", gameState);
+
+    // every "15 mins" in the game time
+    if (
+      gameState.gameTime.currentTick % 15 === 0 &&
+      gameState.gameTime.currentTick !== 0
+    ) {
+      console.log("gameMinutes", gameState.gameTime.currentTick);
+
+      // check based on chaos% chance of a new ticket
+      const shouldSpawnTicket = Math.random() < gameState.chaos / 100;
+
+      if (shouldSpawnTicket) {
+        const spawn = async () => {
+          try {
+            //returns a keyed object with the ticket as the value
+            const newTicketObject = await spawnInboxItems({
+              chaos: gameState.chaos,
+              contract: gameState.currentContract,
+              totalItems: 1,
+              dayNumber: gameState.dayNumber,
+              gameMinutes: gameState.gameTime.currentTick,
+            });
+
+            addItemToInbox(newTicketObject);
+          } catch (error) {
+            console.error("Error generating ticket", error);
+          }
+        };
+
+        spawn();
+      }
+    }
+  }, [gameState.gameTime.currentTick]);
+
   const startGame = async (
     businessName,
     selectedFounder,
@@ -96,7 +136,6 @@ const useGame = () => {
       },
     });
 
-    spendEnergy(1);
     setAgentAction(agentID, "Working");
 
     addEntryToLog(

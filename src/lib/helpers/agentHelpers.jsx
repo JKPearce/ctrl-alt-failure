@@ -57,3 +57,17 @@ export const calcSuccessChance = (skill, difficulty) => {
   console.log("skill: ", skill, " difficulty: ", difficulty, " Raw: ", raw);
   return Math.min(raw, 0.95);
 };
+
+export function clearResolvedTicketAssignments(agents, inbox) {
+  return Object.fromEntries(
+    Object.entries(agents).map(([agentId, agent]) => {
+      if (agent.assignedTicketId && inbox[agent.assignedTicketId]?.resolved) {
+        return [
+          agentId,
+          { ...agent, assignedTicketId: null, currentAction: "idle" },
+        ];
+      }
+      return [agentId, agent];
+    })
+  );
+}

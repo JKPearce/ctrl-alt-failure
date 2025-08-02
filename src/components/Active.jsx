@@ -215,6 +215,19 @@ const Active = () => {
                       <div className="text-xs text-base-content/60">
                         {agent.currentAction}
                       </div>
+                      {agent.assignedTicketId && (
+                        <progress
+                          className="progress progress-primary"
+                          value={
+                            gameState.inbox[agent.assignedTicketId]
+                              .resolveProgress
+                          }
+                          max={
+                            gameState.inbox[agent.assignedTicketId]
+                              .timeToResolve
+                          }
+                        />
+                      )}
                     </div>
                   )}
                 </button>

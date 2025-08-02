@@ -167,10 +167,7 @@ const InboxScreen = () => {
                             )
                             .filter((agent) => {
                               // Hide agents who are already working or at max capacity
-                              return (
-                                agent.currentAssignedTickets <
-                                agent.maxAssignedTickets
-                              );
+                              return !agent.assignedTicketId;
                             })
                             .map((agent) => {
                               const agentSkill = agent.skills[item.ticketType];

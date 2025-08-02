@@ -213,7 +213,7 @@ export function progressAndResolveTickets(inbox, nextTick, currentDay) {
         id,
         {
           ...ticket,
-          resolveProgress: progress,
+          resolveProgress: Number(progress),
         },
       ];
     })
