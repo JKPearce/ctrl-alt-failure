@@ -1,3 +1,4 @@
+import { useActivityLog } from "@/hooks/useActivityLog";
 import { useAgent } from "@/hooks/useAgent";
 import { useInbox } from "@/hooks/useInbox";
 import { formatGameTime } from "@/lib/helpers/gameHelpers";
@@ -39,10 +40,11 @@ function getStatusColor(action) {
 
 const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
   const { assignTicketToAgent, deleteSpam } = useInbox();
-  const { handleAgentBehaviors } = useAgent();
   const [selectedNav, setSelectedNav] = useState("inbox");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedAgentId, setSelectedAgentId] = useState(null);
+  useAgent();
+  useActivityLog();
 
   // Convert agents object to array
   const agents = Object.values(gameState.agents);

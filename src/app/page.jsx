@@ -6,6 +6,7 @@ import GameOver from "@/components/GameOver";
 import SetupScreen from "@/components/SetupScreen";
 import Summary from "@/components/Summary";
 import { useGame } from "@/hooks/useGame";
+import { Toaster } from "react-hot-toast";
 
 function GamePage() {
   const {
@@ -33,6 +34,7 @@ function GamePage() {
 
   return (
     <>
+      <Toaster />
       {gameState.gamePhase === "setup" && <SetupScreen startGame={startGame} />}
       {gameState.gamePhase === "active" && (
         <Active

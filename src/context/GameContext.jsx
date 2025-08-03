@@ -46,10 +46,16 @@ const GameProvider = ({ children }) => {
             {
               ...action.payload,
               day: Number(state.dayNumber),
-              time: Number(action.payload.time),
+              time: Number(state.gameTime.currentTick),
             },
             ...state.activityLog,
           ], //reverse order so the newest log entry is the first item in the array
+        };
+
+      case GAME_ACTIONS.ADD_NOTIFICATION:
+        return {
+          ...state,
+          notifications: [action.payload, ...state.notifications],
         };
 
       case GAME_ACTIONS.START_NEW_DAY:
