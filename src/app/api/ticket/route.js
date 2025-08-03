@@ -74,7 +74,6 @@ export async function GET(request) {
 // This handles POST requests
 export async function POST(request) {
   const { contract } = await request.json();
-  console.log("contract", contract);
 
   //I want to make a "generic IT Ticket" one that can happen in any company
   //i also want to roll on the spawnTable to get a specific type of ticket related to the company
@@ -90,8 +89,6 @@ export async function POST(request) {
       break;
     }
   }
-
-  console.log("selectedTicketIssue ", selectedTicketIssue);
 
   const aiGeneratedTicket = await generateNewAITicket(
     contract,

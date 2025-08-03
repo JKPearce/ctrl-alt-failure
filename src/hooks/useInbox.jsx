@@ -2,7 +2,7 @@
 
 import { GameContext } from "@/context/GameContext";
 import { INBOX_ACTIONS } from "@/lib/config/actionTypes";
-import { spawnInboxItems } from "@/lib/helpers/inboxHelpers";
+import { spawnNewTicket } from "@/lib/helpers/inboxHelpers";
 import { useContext, useEffect } from "react";
 
 const useInbox = () => {
@@ -32,13 +32,16 @@ const useInbox = () => {
     if (shouldSpawnTicket) {
       try {
         //returns a keyed object with the ticket as the value
-        const newTicketObject = await spawnInboxItems({
-          chaos: gameState.chaos,
-          contract: gameState.currentContract,
-          totalItems: 1,
-          dayNumber: gameState.dayNumber,
-          gameMinutes: gameState.gameTime.currentTick,
-        });
+        const newTicket = await spawnNewTicket(
+          gameState.currentContract,
+          gameState.chaos,
+          gameState.dayNumber,
+          gameState.gameTime.currentTick
+        );
+
+        const newTicketObject = {
+          [newTicket.id]: newTicket,
+        };
 
         addItemToInbox(newTicketObject);
       } catch (error) {

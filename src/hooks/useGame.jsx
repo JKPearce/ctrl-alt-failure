@@ -46,16 +46,12 @@ const useGame = () => {
 
     try {
       // Wait for BOTH the inbox generation AND the minimum 3-second timer
-      const totalItems = calculateItemsToSpawn(
-        gameState.dayNumber,
-        gameState.chaos
-      );
       const [inbox] = await Promise.all([
         spawnInboxItems({
-          chaos: gameState.chaos,
-          contract: selectedContract,
-          totalItems,
+          totalItems: calculateItemsToSpawn(1, selectedContract.baseChaos),
           dayNumber: 1,
+          chaos: selectedContract.baseChaos,
+          contract: selectedContract,
         }),
         new Promise((resolve) => setTimeout(resolve, 3000)), // 3-second minimum
       ]);
@@ -121,13 +117,13 @@ const useGame = () => {
       //setup inbox for new day
       const [newItems] = await Promise.all([
         spawnInboxItems({
-          chaos: gameState.chaos,
-          contract: gameState.currentContract,
           totalItems: calculateItemsToSpawn(
             gameState.dayNumber + 1,
             gameState.chaos
           ),
           dayNumber: gameState.dayNumber + 1,
+          chaos: gameState.chaos,
+          contract: gameState.currentContract,
         }),
         new Promise((resolve) => setTimeout(resolve, 3000)), // 3-second minimum
       ]);

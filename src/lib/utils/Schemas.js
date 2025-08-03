@@ -44,3 +44,16 @@ export const screamSchema = z.object({
       "a short scream with some hastags at the end related to the agents personality and the current situations happening in the game."
     ),
 });
+
+export const complaintSchema = z.object({
+  complaintBody: z
+    .string()
+    .min(10)
+    .max(500)
+    .describe("a complaint email body to the CEO of the company."),
+  complaintSubject: z
+    .string()
+    .min(1)
+    .max(50)
+    .describe("a complaint email subject to the CEO of the company."),
+});

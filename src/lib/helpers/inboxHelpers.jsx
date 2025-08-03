@@ -25,126 +25,6 @@ export function calculateItemsToSpawn(dayNumber, chaos) {
   return totalItems;
 }
 
-export async function spawnInboxItems({
-  chaos,
-  contract,
-  totalItems = 1,
-  gameMinutes = 0,
-  dayNumber = 1,
-}) {
-  const itemDescriptors = [];
-  for (let i = 0; i < totalItems; i++) {
-    const type = pickType(chaos);
-    const descriptor = {
-      id: nanoid(),
-      type,
-    };
-
-    if (type === "ticket") {
-      descriptor.source = Math.random() < 0.8 ? "api" : "cached";
-    } else if (type === "spam") {
-      descriptor.source = Math.random() < 0.5 ? "api" : "cached";
-    } else {
-      descriptor.source = "cached"; // complaints are always cached
-    }
-
-    itemDescriptors.push(descriptor);
-  }
-
-  const apiTicketCount = itemDescriptors.filter(
-    (item) => item.type === "ticket" && item.source === "api"
-  ).length;
-
-  const apiSpamCount = itemDescriptors.filter(
-    (item) => item.type === "spam" && item.source === "api"
-  ).length;
-
-  // Make API calls in parallel
-  const apiTicketPromises = Array(apiTicketCount)
-    .fill(null)
-    .map(() =>
-      fetch("/api/ticket", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contract, chaos }),
-      })
-        .then((res) => res.json())
-        .catch(() => null)
-    );
-
-  const apiSpamPromises = Array(apiSpamCount)
-    .fill(null)
-    .map(() =>
-      fetch("/api/spam", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contract, chaos }),
-      })
-        .then((res) => res.json())
-        .catch(() => null)
-    );
-
-  const [apiTicketResults, apiSpamResults] = await Promise.all([
-    Promise.all(apiTicketPromises),
-    Promise.all(apiSpamPromises),
-  ]);
-
-  let ticketApiIndex = 0;
-  let spamApiIndex = 0;
-
-  const items = {};
-  for (const descriptor of itemDescriptors) {
-    let itemData;
-
-    // For tickets, check if source is API - if so, use next API result (or fallback if API failed)
-    // If not API source, just use a fallback template. Increment API index counter after using result.
-    if (descriptor.type === "ticket") {
-      itemData =
-        descriptor.source === "api"
-          ? apiTicketResults[ticketApiIndex++] ||
-            getFallbackTicket(TICKET_TEMPLATES)
-          : getFallbackTicket(TICKET_TEMPLATES);
-    }
-    if (descriptor.type === "spam") {
-      itemData =
-        descriptor.source === "api"
-          ? apiSpamResults[spamApiIndex++] || getFallbackTicket(SPAM_TEMPLATES)
-          : getFallbackTicket(SPAM_TEMPLATES);
-    }
-    if (descriptor.type === "complaint") {
-      itemData = getFallbackTicket(COMPLAINT_TEMPLATES);
-    }
-
-    items[descriptor.id] = {
-      id: descriptor.id,
-      messageType: descriptor.type,
-      ...itemData,
-      // ... other properties
-      receivedDay: dayNumber,
-      receivedTime: gameMinutes,
-      activeItem: true,
-      resolved: false,
-      failCount: 0,
-      agentAssigned: null,
-      resolveProgress: 0,
-      timeToResolve: 100,
-    };
-  }
-
-  return items;
-}
-
-function pickType(chaos) {
-  // weights: tickets = 1, spam = chaos/10, complaint = openComplaints * 0.5
-  const spamWeight = chaos / 10;
-  const ticketWeight = 1;
-  const total = spamWeight + ticketWeight;
-
-  const roll = Math.random() * total;
-  if (roll < ticketWeight) return "ticket";
-  return "spam";
-}
-
 function getFallbackTicket(template) {
   return template[Math.floor(Math.random() * template.length)];
 }
@@ -190,3 +70,175 @@ export function progressAndResolveTickets(inbox, nextTick, currentDay, agents) {
     })
   );
 }
+
+export const checkAndSpawnComplaint = async (
+  ticket,
+  agent,
+  dayNumber,
+  gameMinutes,
+  chaos
+) => {
+  let chance = 0.1; // Base 10% chance
+
+  // Agent skill vs ticket difficulty
+  if (agent.skills[ticket.ticketType] < ticket.difficulty) chance += 0.2;
+
+  // How long ticket took
+  if (ticket.timeToResolve > 100) chance += 0.15;
+
+  // Current chaos level
+  chance += chaos * 0.01;
+
+  if (Math.random() < chance) {
+    return await spawnNewComplaint(ticket, agent, dayNumber, gameMinutes);
+  }
+
+  return null;
+};
+
+export async function spawnInboxItems({
+  totalItems = 1,
+  chaos,
+  contract,
+  dayNumber,
+  gameMinutes,
+}) {
+  // Calculate what types of items to spawn
+  const itemTypes = calculateItemTypes(totalItems, chaos);
+
+  // Spawn all items in parallel
+  const spawnPromises = [];
+
+  // Spawn tickets
+  for (let i = 0; i < itemTypes.tickets; i++) {
+    spawnPromises.push(spawnNewTicket(contract, chaos, dayNumber, gameMinutes));
+  }
+
+  // Spawn spam
+  for (let i = 0; i < itemTypes.spam; i++) {
+    spawnPromises.push(spawnNewSpam(contract, chaos, dayNumber, gameMinutes));
+  }
+
+  // Wait for all items to spawn
+  const spawnedItems = await Promise.all(spawnPromises);
+
+  // Convert array to object with IDs as keys
+  const items = {};
+  spawnedItems.forEach((item) => {
+    items[item.id] = item;
+  });
+
+  return items;
+}
+
+// Helper function to calculate item distribution
+const calculateItemTypes = (totalItems, chaos) => {
+  const spamWeight = chaos / 10;
+  const ticketWeight = 1;
+  const totalWeight = spamWeight + ticketWeight;
+
+  const tickets = Math.floor((ticketWeight / totalWeight) * totalItems);
+  const spam = totalItems - tickets;
+
+  return { tickets, spam };
+};
+
+// Individual spawn functions (simplified)
+export const spawnNewTicket = async (
+  contract,
+  chaos,
+  dayNumber,
+  gameMinutes
+) => {
+  const shouldUseAPI = Math.random() < 0.5;
+
+  let ticketData;
+  if (shouldUseAPI) {
+    try {
+      const response = await fetch("/api/ticket", {
+        method: "POST",
+        body: JSON.stringify({ contract }),
+      });
+      ticketData = await response.json();
+    } catch (error) {
+      ticketData = getFallbackTicket(TICKET_TEMPLATES);
+    }
+  } else {
+    ticketData = getFallbackTicket(TICKET_TEMPLATES);
+  }
+
+  return {
+    id: nanoid(),
+    messageType: "ticket",
+    ...ticketData,
+    receivedDay: dayNumber,
+    receivedTime: gameMinutes,
+    activeItem: true,
+    resolved: false,
+    failCount: 0,
+    agentAssigned: null,
+    resolveProgress: 0,
+    timeToResolve: 100,
+  };
+};
+
+export const spawnNewSpam = async (contract, chaos, dayNumber, gameMinutes) => {
+  const shouldUseAPI = Math.random() < 0.5;
+
+  let spamData;
+  if (shouldUseAPI) {
+    try {
+      const response = await fetch("/api/spam", {
+        method: "POST",
+        body: JSON.stringify({ contract }),
+      });
+      spamData = await response.json();
+    } catch (error) {
+      spamData = getFallbackTicket(SPAM_TEMPLATES);
+    }
+  } else {
+    spamData = getFallbackTicket(SPAM_TEMPLATES);
+  }
+
+  return {
+    id: nanoid(),
+    messageType: "spam",
+    ...spamData,
+    receivedDay: dayNumber,
+    receivedTime: gameMinutes,
+    activeItem: true,
+  };
+};
+
+export const spawnNewComplaint = async (
+  ticket,
+  agent,
+  dayNumber,
+  gameMinutes
+) => {
+  const shouldUseAPI = Math.random() < 0.8;
+
+  let complaintData;
+  if (shouldUseAPI) {
+    try {
+      const response = await fetch("/api/complaint", {
+        method: "POST",
+        body: JSON.stringify({ ticket, agent, dayNumber, gameMinutes }),
+      });
+      complaintData = await response.json();
+    } catch (error) {
+      complaintData = getFallbackTicket(COMPLAINT_TEMPLATES);
+    }
+  } else {
+    complaintData = getFallbackTicket(COMPLAINT_TEMPLATES);
+  }
+
+  return {
+    id: nanoid(),
+    messageType: "complaint",
+    ...complaintData,
+    receivedDay: dayNumber,
+    receivedTime: gameMinutes,
+    activeItem: true,
+  };
+};

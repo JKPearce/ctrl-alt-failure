@@ -16,10 +16,11 @@ Keep the tone authentic to the agent's personality - don't make everyone sound t
 - Use 2-4 hashtags maximum
 - Keep it under 280 characters
 - Make it feel like a real social media post
-- Vary the tone based on personality (WORKAHOLIC = more professional, SLACKER = more casual)`,
-    input: `The current chaos level is ${chaos}% the current day is ${currentDay} and the current game time is ${currentTime}.
+- Vary the tone based on personality (WORKAHOLIC = more professional, SLACKER = more casual)
+The current chaos level is ${chaos}% the current day is ${currentDay} and the current game time is ${currentTime}.`,
+    input: `
     Generate a new scream from the agent ${agent.agentName} who is a ${agent.age} year old ${agent.gender} and their work ethic is ${agent.behavior} and personality is ${agent.personality}.
-    The current ticket is ${currentTicket} and the current chaos level is ${chaos}%.
+    The current ticket is ${currentTicket}
     The more chaotic the better, but keep it believable and in line with the current chaos level of ${chaos}%.
     feel free to potentially use any of the following:
     Agent quirks: ${agent.quirk}
