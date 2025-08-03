@@ -1,6 +1,5 @@
 "use client";
 
-import { useGame } from "@/context/useGame";
 import contractsData from "@/lib/data/contracts.json";
 import { generateNewAgents } from "@/lib/helpers/agentHelpers";
 import React, { useEffect, useState } from "react";
@@ -27,7 +26,7 @@ const getRandomContracts = (contracts, n = 3) => {
   return shuffled.slice(0, n);
 };
 
-function SetupScreen() {
+function SetupScreen({ startGame }) {
   const [businessName, setBusinessName] = useState("Ctrl-Alt-Failure Inc.");
   const [selectedFounder, setSelectedFounder] = useState(
     DEFAULT_FOUNDERS[0].id
@@ -35,8 +34,6 @@ function SetupScreen() {
   const [contracts, setContracts] = useState([]);
   const [selectedContract, setSelectedContract] = useState("");
   const [agents, setAgents] = useState([]);
-
-  const { startGame } = useGame();
 
   // On mount, pick contracts and generate agents
   useEffect(() => {

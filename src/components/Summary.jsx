@@ -1,10 +1,6 @@
-import { useGame } from "@/context/useGame";
 import { AlertTriangle, CheckCircle, Star, XCircle } from "lucide-react";
 
-export default function Summary() {
-  const { gameState, startNewDay } = useGame();
-  const today = gameState.dailySummaries[0]; // latest
-
+export default function Summary({ startNewDay, today }) {
   if (!today) return null;
 
   return (

@@ -1,6 +1,5 @@
 "use client";
 
-import { useGame } from "@/context/useGame";
 import {
   AlertTriangle,
   Award,
@@ -10,8 +9,7 @@ import {
   XCircle,
 } from "lucide-react";
 
-const GameOver = () => {
-  const { gameState, restartGame } = useGame();
+const GameOver = ({ restartGame, gameState }) => {
   const {
     businessName,
     founder,

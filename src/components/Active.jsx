@@ -1,5 +1,5 @@
-import { useGame } from "@/context/useGame";
-import { getRandomBehaviour } from "@/lib/helpers/agentHelpers";
+import { useAgent } from "@/hooks/useAgent";
+import { useInbox } from "@/hooks/useInbox";
 import { formatGameTime } from "@/lib/helpers/gameHelpers";
 import {
   BarChart2,
@@ -10,7 +10,7 @@ import {
   Inbox,
   Megaphone,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ContractView from "./ContractView";
 import InboxScreen from "./InboxScreen";
 
@@ -36,9 +36,9 @@ function getStatusColor(action) {
   }
 }
 
-const Active = () => {
-  const { gameState, pauseTime, resumeTime, setTimeSpeed, gameTick } =
-    useGame();
+const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
+  const { assignTicketToAgent, deleteSpam } = useInbox();
+  const { getAgentByID, setAgentAction } = useAgent();
   const [selectedNav, setSelectedNav] = useState("inbox");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedAgentId, setSelectedAgentId] = useState(null);
@@ -46,80 +46,6 @@ const Active = () => {
   // Convert agents object to array
   const agents = Object.values(gameState.agents);
   const selectedAgent = agents.find((a) => a.id === selectedAgentId);
-
-  useEffect(() => {
-    if (gameState.gamePhase !== "active" || gameState.gameTime.isPaused) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      gameTick();
-    }, 1000 / gameState.gameTime.speed);
-
-    return () => clearInterval(interval);
-  }, [
-    gameState.gameTime.isPaused,
-    gameState.gameTime.speed,
-    gameState.gamePhase,
-  ]);
-
-  useEffect(() => {
-    //dont check on start of game or if paused
-    if (gameState.gamePhase !== "active") return;
-    if (gameState.gameTime.isPaused) return;
-    if (gameState.gameTime.currentTick === 0) return;
-
-    // every "15 mins" in the game time
-    if (gameState.gameTime.currentTick % 15 === 0) {
-      console.log("gameMinutes", gameState.gameTime.currentTick);
-      handleTickSpawn();
-    }
-    if (gameState.gameTime.currentTick % 30 === 0) {
-      handleAgentBehaviors();
-    }
-  }, [gameState.gameTime.currentTick]);
-
-  const handleAgentBehaviors = () => {
-    const agents = Object.values(gameState.agents);
-
-    agents.forEach((agent) => {
-      const selectedAction = getRandomBehaviour(agent);
-      console.log("selectedAction", selectedAction);
-      switch (selectedAction.dispatchAction) {
-        case AGENT_ACTIONS.WORKING:
-          console.log("agent is working", agent.agentName);
-          break;
-        case AGENT_ACTIONS.CREATE_SCREAM:
-          console.log("agent is creating a scream", agent.agentName);
-          break;
-        case AGENT_ACTIONS.ON_BREAK:
-          console.log("agent is on break", agent.agentName);
-          break;
-      }
-    });
-  };
-
-  const handleTickSpawn = async () => {
-    // check based on chaos% chance of a new ticket
-    const shouldSpawnTicket = Math.random() < gameState.chaos / 100;
-
-    if (shouldSpawnTicket) {
-      try {
-        //returns a keyed object with the ticket as the value
-        const newTicketObject = await spawnInboxItems({
-          chaos: gameState.chaos,
-          contract: gameState.currentContract,
-          totalItems: 1,
-          dayNumber: gameState.dayNumber,
-          gameMinutes: gameState.gameTime.currentTick,
-        });
-
-        addItemToInbox(newTicketObject);
-      } catch (error) {
-        console.error("Error generating ticket", error);
-      }
-    }
-  };
 
   return (
     <div className="h-screen flex flex-col">
@@ -356,7 +282,13 @@ const Active = () => {
               </div>
             ) : (
               <div className="flex-1 flex flex-col">
-                {selectedNav === "inbox" && <InboxScreen />}
+                {selectedNav === "inbox" && (
+                  <InboxScreen
+                    gameState={gameState}
+                    assignTicketToAgent={assignTicketToAgent}
+                    deleteSpam={deleteSpam}
+                  />
+                )}
                 {selectedNav === "stats" && (
                   <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
                     Stats view coming soon...

@@ -1,6 +1,5 @@
 "use client";
 
-import { useGame } from "@/context/useGame";
 import contractsData from "@/lib/data/contracts.json";
 import { useEffect, useState } from "react";
 
@@ -9,8 +8,7 @@ const getRandomContracts = (contracts, n = 3) => {
   return shuffled.slice(0, n);
 };
 
-const ContractComplete = () => {
-  const { gameState, startNewContract } = useGame();
+const ContractComplete = ({ startNewContract, gameState }) => {
   const [contracts, setContracts] = useState([]);
   const [selectedContract, setSelectedContract] = useState("");
 

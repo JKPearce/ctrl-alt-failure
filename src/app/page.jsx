@@ -5,10 +5,20 @@ import ContractComplete from "@/components/ContractComplete";
 import GameOver from "@/components/GameOver";
 import SetupScreen from "@/components/SetupScreen";
 import Summary from "@/components/Summary";
-import { useGame } from "@/context/useGame";
+import { useGame } from "@/hooks/useGame";
 
 function GamePage() {
-  const { gameState } = useGame();
+  const {
+    gameState,
+    gameTick,
+    pauseTime,
+    resumeTime,
+    setTimeSpeed,
+    startGame,
+    startNewDay,
+    restartGame,
+    startNewContract,
+  } = useGame();
 
   if (gameState.loading) {
     return (
@@ -23,11 +33,31 @@ function GamePage() {
 
   return (
     <>
-      {gameState.gamePhase === "setup" && <SetupScreen />}
-      {gameState.gamePhase === "active" && <Active />}
-      {gameState.gamePhase === "summary" && <Summary />}
-      {gameState.gamePhase === "game_over" && <GameOver />}
-      {gameState.gamePhase === "contract_complete" && <ContractComplete />}
+      {gameState.gamePhase === "setup" && <SetupScreen startGame={startGame} />}
+      {gameState.gamePhase === "active" && (
+        <Active
+          gameState={gameState}
+          gameTick={gameTick}
+          pauseTime={pauseTime}
+          resumeTime={resumeTime}
+          setTimeSpeed={setTimeSpeed}
+        />
+      )}
+      {gameState.gamePhase === "summary" && (
+        <Summary
+          startNewDay={startNewDay}
+          today={gameState.dailySummaries[0]}
+        />
+      )}
+      {gameState.gamePhase === "game_over" && (
+        <GameOver restartGame={restartGame} gameState={gameState} />
+      )}
+      {gameState.gamePhase === "contract_complete" && (
+        <ContractComplete
+          startNewContract={startNewContract}
+          gameState={gameState}
+        />
+      )}
     </>
   );
 }

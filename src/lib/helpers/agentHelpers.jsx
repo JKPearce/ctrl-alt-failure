@@ -74,7 +74,10 @@ export const getRandomBehaviour = (agent) => {
   const agentBehaviors = BEHAVIOR_TEMPLATES[agent.behavior];
   if (!agentBehaviors) return null;
 
-  const totalWeight = actions.reduce((sum, action) => sum + action.weight, 0);
+  const totalWeight = agentBehaviors.reduce(
+    (sum, action) => sum + action.weight,
+    0
+  );
   const randomValue = Math.random() * totalWeight; // random number between 0 to totalWeight
 
   let cumulativeWeight = 0;

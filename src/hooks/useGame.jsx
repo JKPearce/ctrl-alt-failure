@@ -1,13 +1,7 @@
 "use client";
 
 import { GameContext } from "@/context/GameContext";
-import {
-  AGENT_ACTIONS,
-  GAME_ACTIONS,
-  INBOX_ACTIONS,
-  LOG_TYPES,
-} from "@/lib/config/actionTypes";
-import { getRandomBehaviour } from "@/lib/helpers/agentHelpers";
+import { GAME_ACTIONS, LOG_TYPES } from "@/lib/config/actionTypes";
 import {
   calculateItemsToSpawn,
   spawnInboxItems,
@@ -21,6 +15,23 @@ const useGame = () => {
   }
 
   const { gameState, dispatch } = ctx;
+
+  useEffect(() => {
+    if (gameState.gamePhase !== "active" || gameState.gameTime.isPaused) {
+      return;
+    }
+
+    console.log("gameState.gameTime.speed", gameState.gameTime.speed);
+    const interval = setInterval(() => {
+      gameTick();
+    }, 1000 / gameState.gameTime.speed);
+
+    return () => clearInterval(interval);
+  }, [
+    gameState.gameTime.isPaused,
+    gameState.gameTime.speed,
+    gameState.gamePhase,
+  ]);
 
   const startGame = async (
     businessName,
@@ -82,54 +93,6 @@ const useGame = () => {
     });
   };
 
-  const assignTicketToAgent = (ticketID, agentID) => {
-    // Always validate agent exists before proceeding
-    const agent = getAgentByID(agentID);
-    console.log(agent);
-    if (!agent) return;
-
-    dispatch({
-      type: INBOX_ACTIONS.ASSIGN_TICKET,
-      payload: {
-        ticketID,
-        agentID,
-      },
-    });
-
-    setAgentAction(agentID, "Working");
-
-    addEntryToLog(
-      LOG_TYPES.ASSIGN_TICKET,
-      agent.agentName,
-      `Ticket #${ticketID} assigned to ${gameState.agents[agentID].agentName}.`
-    );
-  };
-
-  const addItemToInbox = (item) => {
-    dispatch({
-      type: INBOX_ACTIONS.ADD_INBOX_ITEM,
-      payload: { item },
-    });
-
-    const newTicket = Object.values(item)[0]; // Get first item;
-    addEntryToLog(
-      LOG_TYPES.ADD_INBOX_ITEM,
-      "System",
-      `New ${newTicket.messageType} item added to inbox. From: ${newTicket.sender}`,
-      gameState.gameTime.currentTick
-    );
-  };
-
-  const setAgentAction = (agentID, action) => {
-    dispatch({
-      type: AGENT_ACTIONS.SET_AGENT_ACTION,
-      payload: {
-        agentID,
-        action,
-      },
-    });
-  };
-
   const addEntryToLog = (eventType, actor, message, time = 0) => {
     //type is defined as "assign_ticket", "agent_comment" see actionTypes.js for the ENUM define
     console.log("adding entry to log", eventType, actor, message, time);
@@ -142,11 +105,6 @@ const useGame = () => {
         time,
       },
     });
-  };
-
-  const getAgentByID = (agentID) => {
-    if (agentID == null) return null;
-    return gameState.agents[agentID] || null;
   };
 
   const gameTick = () => {
@@ -208,13 +166,6 @@ const useGame = () => {
       payload: { speed },
     });
 
-  const deleteSpam = (ticketID) => {
-    dispatch({
-      type: INBOX_ACTIONS.DELETE_SPAM,
-      payload: { ticketID },
-    });
-  };
-
   const startNewContract = (selectedContract) => {
     //TODO add calculation for new chaos based on complaints left in inbox?
     dispatch({
@@ -231,18 +182,13 @@ const useGame = () => {
     gameState,
     startGame,
     restartGame,
-    assignTicketToAgent,
     addEntryToLog,
-    getAgentByID,
-    setAgentAction,
     startNewDay,
-    deleteSpam,
     startNewContract,
     pauseTime,
     setTimeSpeed,
     resumeTime,
     gameTick,
-    addItemToInbox,
   };
 };
 

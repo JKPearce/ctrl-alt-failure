@@ -1,5 +1,4 @@
 export default function ContractView({ contract }) {
-  console.log(contract);
   const {
     companyName,
     companyCulture,

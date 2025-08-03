@@ -60,6 +60,10 @@ const GameProvider = ({ children }) => {
           },
           gamePhase: "active",
           dayNumber: Number(state.dayNumber + 1),
+          gameTime: {
+            ...state.gameTime,
+            currentTick: 0,
+          },
         };
 
       case GAME_ACTIONS.SET_LOADING:
@@ -70,6 +74,33 @@ const GameProvider = ({ children }) => {
 
       case GAME_ACTIONS.GAME_TICK:
         const nextTick = state.gameTime.currentTick + 1;
+
+        const activeCount = Object.values(state.inbox).filter(
+          (t) => t.activeItem
+        ).length;
+        const newPhase =
+          activeCount >= state.inboxSize
+            ? "game_over"
+            : nextTick >= 480
+            ? "summary"
+            : state.gamePhase;
+
+        //check for game over conditions
+        if (newPhase === "game_over") {
+          return {
+            ...state,
+            gamePhase: "game_over",
+          };
+        } else if (newPhase === "summary") {
+          const summary = summariseDay(state, state.dayNumber);
+
+          return {
+            ...state,
+            gamePhase: "summary",
+            dailySummaries: [summary, ...state.dailySummaries],
+          };
+        }
+
         //progress and resolve tickets
         const newInbox = progressAndResolveTickets(
           state.inbox,
@@ -82,23 +113,11 @@ const GameProvider = ({ children }) => {
           newInbox
         );
 
-        //check for game over conditions
-        const activeCount = Object.values(newInbox).filter(
-          (t) => t.activeItem
-        ).length;
-        const newPhase =
-          activeCount >= state.inboxSize
-            ? "game_over"
-            : nextTick >= 480
-            ? "summary"
-            : state.gamePhase;
-
         return {
           ...state,
           gameTime: { ...state.gameTime, currentTick: nextTick },
           inbox: newInbox,
           agents: newAgents,
-          gamePhase: newPhase,
         };
 
       case GAME_ACTIONS.PAUSE_TIME:
@@ -117,24 +136,6 @@ const GameProvider = ({ children }) => {
         return {
           ...state,
           gameTime: { ...state.gameTime, speed: action.payload.speed },
-        };
-
-      case GAME_ACTIONS.END_DAY:
-        // If the contract is already complete, do **not** override the phase
-        if (state.gamePhase === "contract_complete") return state;
-
-        const summary = summariseDay(state, state.dayNumber);
-
-        return {
-          ...state,
-          gamePhase: "summary",
-          dailySummaries: [summary, ...state.dailySummaries],
-        };
-
-      case GAME_ACTIONS.END_GAME:
-        return {
-          ...state,
-          gamePhase: "game_over",
         };
 
       case GAME_ACTIONS.CONTRACT_COMPLETE: {

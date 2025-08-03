@@ -1,4 +1,3 @@
-import { useGame } from "@/context/useGame";
 import { formatGameTime } from "@/lib/helpers/gameHelpers";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import React, { useState } from "react";
@@ -25,8 +24,7 @@ function getTypeBadge(type, difficulty, small = false) {
   return null;
 }
 
-const InboxScreen = () => {
-  const { gameState, assignTicketToAgent, deleteSpam } = useGame();
+const InboxScreen = ({ gameState, assignTicketToAgent, deleteSpam }) => {
   const [expandedId, setExpandedId] = useState(null);
   const [filter, setFilter] = useState("all");
 
@@ -172,7 +170,6 @@ const InboxScreen = () => {
                             .map((agent) => {
                               const agentSkill = agent.skills[item.ticketType];
                               const isGood = agentSkill >= item.difficulty;
-                              const hasEnergy = gameState.energyRemaining > 0;
 
                               return (
                                 <div
@@ -213,19 +210,12 @@ const InboxScreen = () => {
                                     </div>
                                   </div>
                                   <button
-                                    className={`btn btn-xs ${
-                                      !hasEnergy
-                                        ? "btn-outline btn-error"
-                                        : isGood
-                                        ? "btn-success"
-                                        : "btn-outline"
-                                    }`}
-                                    disabled={!hasEnergy}
+                                    className={`btn btn-xs`}
                                     onClick={() =>
                                       assignTicketToAgent(item.id, agent.id)
                                     }
                                   >
-                                    {!hasEnergy ? "No Energy" : "Assign"}
+                                    Assign
                                   </button>
                                 </div>
                               );
