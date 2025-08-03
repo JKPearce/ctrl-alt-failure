@@ -34,3 +34,13 @@ export const spamEmailSchema = z.object({
       "body of the email with NO formatting and NO markdown, just raw text. max 500 characters."
     ),
 });
+
+export const screamSchema = z.object({
+  screamMessage: z
+    .string()
+    .min(10)
+    .max(500)
+    .describe(
+      "a short scream with some hastags at the end related to the agents personality and the current situations happening in the game."
+    ),
+});

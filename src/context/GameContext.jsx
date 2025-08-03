@@ -4,6 +4,7 @@ import {
   AGENT_ACTIONS,
   GAME_ACTIONS,
   INBOX_ACTIONS,
+  SCREAM_ACTIONS,
 } from "@/lib/config/actionTypes";
 import { DEFAULT_GAME_STATE } from "@/lib/config/defaultGameState";
 import { clearResolvedTicketAssignments } from "@/lib/helpers/agentHelpers";
@@ -172,6 +173,14 @@ const GameProvider = ({ children }) => {
           {
             assignedTicketId: action.payload.ticketID,
             currentAction: "WORKING",
+            behaviourLog: [
+              ...state.agents[action.payload.agentID].behaviourLog,
+              {
+                action: "WORKING",
+                day: state.dayNumber,
+                time: state.gameTime.currentTick,
+              },
+            ],
           }
         );
 
@@ -196,7 +205,30 @@ const GameProvider = ({ children }) => {
       case AGENT_ACTIONS.SET_AGENT_ACTION:
         return updateEntity(state, "agents", action.payload.agentID, {
           currentAction: action.payload.action,
+          behaviourLog: [
+            ...state.agents[action.payload.agentID].behaviourLog,
+            {
+              action: action.payload.action,
+              day: state.dayNumber,
+              time: state.gameTime.currentTick,
+            },
+          ],
         });
+
+      case SCREAM_ACTIONS.ADD_SCREAM:
+        return {
+          ...state,
+          screams: [
+            {
+              screamId: action.payload.screamId,
+              agentID: action.payload.agentID,
+              message: action.payload.message,
+              dayCreated: state.dayNumber,
+              createdAt: state.gameTime.currentTick,
+            },
+            ...state.screams,
+          ],
+        };
 
       default:
         console.warn("Unhandled action type:", action.type);

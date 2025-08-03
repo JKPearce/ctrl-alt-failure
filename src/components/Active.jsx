@@ -13,6 +13,7 @@ import {
 import React, { useState } from "react";
 import ContractView from "./ContractView";
 import InboxScreen from "./InboxScreen";
+import ScreamFeed from "./ScreamFeed";
 
 const navItems = [
   { label: "inbox", icon: Inbox },
@@ -295,9 +296,10 @@ const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
                   </div>
                 )}
                 {selectedNav === "ctrl-alt-scream" && (
-                  <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
-                    Ctrl-Alt-Scream view coming soon...
-                  </div>
+                  <ScreamFeed
+                    screams={gameState.screams}
+                    agents={gameState.agents}
+                  />
                 )}
                 {selectedNav === "contract" && (
                   <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">

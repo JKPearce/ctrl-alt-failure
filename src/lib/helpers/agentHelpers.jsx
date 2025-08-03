@@ -35,6 +35,7 @@ export const generateNewAgents = (amount) => {
       ),
       currentAction: "IDLE",
       assignedTicketId: null,
+      behaviourLog: [],
     };
   }
 

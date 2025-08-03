@@ -27,6 +27,10 @@ export const INBOX_ACTIONS = {
   DELETE_SPAM: "DELETE_SPAM",
 };
 
+export const SCREAM_ACTIONS = {
+  ADD_SCREAM: "ADD_SCREAM",
+};
+
 export const LOG_TYPES = {
   ASSIGN_TICKET: "ASSIGN_TICKET",
   AGENT_COMMENT: "AGENT_COMMENT",

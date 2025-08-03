@@ -20,4 +20,5 @@ export const DEFAULT_GAME_STATE = {
     speed: 1, // 1x, 2x, 3x multiplier
     tickInterval: 1000, // base 1 second
   },
+  screams: [],
 };
