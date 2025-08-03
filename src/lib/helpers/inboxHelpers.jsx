@@ -145,49 +145,20 @@ function pickType(chaos) {
   return "spam";
 }
 
-async function pickTemplate(type, contract) {
-  switch (type) {
-    case "ticket":
-      const apiOrCached = Math.random() < 0.5 ? "api" : "cached";
-      console.log("apiOrCached ", apiOrCached);
-      if (apiOrCached === "cached") {
-        return getFallbackTicket(TICKET_TEMPLATES);
-      } else {
-        try {
-          const ticket = await fetch("/api/ticket", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              contract,
-            }),
-          });
-          const ticketData = await ticket.json();
-          console.log("ticketData", ticketData);
-          return ticketData;
-        } catch (error) {
-          console.error("Error fetching ticket:", error);
-          return getFallbackTicket(TICKET_TEMPLATES);
-        }
-      }
-
-    case "complaint":
-      return getFallbackTicket(COMPLAINT_TEMPLATES);
-    default:
-      return SPAM_TEMPLATES[Math.floor(Math.random() * SPAM_TEMPLATES.length)];
-  }
-}
-
 function getFallbackTicket(template) {
   return template[Math.floor(Math.random() * template.length)];
 }
 
-export function progressAndResolveTickets(inbox, nextTick, currentDay) {
+export function progressAndResolveTickets(inbox, nextTick, currentDay, agents) {
   return Object.fromEntries(
     Object.entries(inbox).map(([id, ticket]) => {
       // only bump progress for assigned tickets
       if (!ticket.agentAssigned) return [id, ticket];
+
+      //if the agent isnt set to "WORKING" then we dont want to progress the ticket
+      if (agents[ticket.agentAssigned].currentAction !== "WORKING") {
+        return [id, ticket];
+      }
 
       const progress = ticket.resolveProgress + 1;
       if (progress >= ticket.timeToResolve) {

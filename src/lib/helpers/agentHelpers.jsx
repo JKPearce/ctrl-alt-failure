@@ -1,22 +1,19 @@
 import { PRE_GENERATED_AGENTS } from "@/lib/data/preGeneratedAgents";
-import { AGENT_ACTIONS } from "../config/actionTypes";
 
-const BEHAVIOR_TEMPLATES = {
-  WORKAHOLIC: [
-    { dispatchAction: AGENT_ACTIONS.WORKING, weight: 80 },
-    { dispatchAction: AGENT_ACTIONS.CREATE_SCREAM, weight: 10 },
-    { dispatchAction: AGENT_ACTIONS.ON_BREAK, weight: 10 },
-  ],
-  COMPLAINER: [
-    { dispatchAction: AGENT_ACTIONS.WORKING, weight: 30 },
-    { dispatchAction: AGENT_ACTIONS.CREATE_SCREAM, weight: 60 },
-    { dispatchAction: AGENT_ACTIONS.ON_BREAK, weight: 10 },
-  ],
-  SLACKER: [
-    { dispatchAction: AGENT_ACTIONS.WORKING, weight: 20 },
-    { dispatchAction: AGENT_ACTIONS.CREATE_SCREAM, weight: 30 },
-    { dispatchAction: AGENT_ACTIONS.ON_BREAK, weight: 50 },
-  ],
+//weights for the likelihood of an action being chosen based on the agent's personality
+const PERSONALITY_TEMPLATES = {
+  WORKAHOLIC: {
+    working: { WORKING: 90, CREATE_SCREAM: 5, ON_BREAK: 5, IDLE: 0 },
+    idle: { IDLE: 80, CREATE_SCREAM: 10, ON_BREAK: 10, WORKING: 0 },
+  },
+  SLACKER: {
+    working: { WORKING: 40, CREATE_SCREAM: 30, ON_BREAK: 30, IDLE: 0 },
+    idle: { IDLE: 60, CREATE_SCREAM: 25, ON_BREAK: 15, WORKING: 0 },
+  },
+  COMPLAINER: {
+    working: { WORKING: 50, CREATE_SCREAM: 40, ON_BREAK: 10, IDLE: 0 },
+    idle: { IDLE: 40, CREATE_SCREAM: 50, ON_BREAK: 10, WORKING: 0 },
+  },
 };
 
 export const generateNewAgents = (amount) => {
@@ -32,12 +29,12 @@ export const generateNewAgents = (amount) => {
       id: uuid,
       maxAssignedTickets: 1, //TODO: make this dynamic based on agent skill or special unlocks
       currentAssignedTickets: 0,
-      currentAction: "idle",
-      currentComment: null,
       profileImage: getRandomPortrait(
         baseAgent.gender,
         getAgeBracket(baseAgent.age)
       ),
+      currentAction: "IDLE",
+      assignedTicketId: null,
     };
   }
 
@@ -56,7 +53,7 @@ const getAgeBracket = (age) => {
 };
 
 //clear resolved ticket assignments remove the ticket ID from the agent object
-export function clearResolvedTicketAssignments(agents, inbox) {
+export const clearResolvedTicketAssignments = (agents, inbox) => {
   return Object.fromEntries(
     Object.entries(agents).map(([agentId, agent]) => {
       if (agent.assignedTicketId && inbox[agent.assignedTicketId]?.resolved) {
@@ -68,20 +65,29 @@ export function clearResolvedTicketAssignments(agents, inbox) {
       return [agentId, agent];
     })
   );
-}
+};
 
+//gets a random behaviour for the agent based on their personality and if they have an assigned ticket
 export const getRandomBehaviour = (agent) => {
-  const agentBehaviors = BEHAVIOR_TEMPLATES[agent.behavior];
-  if (!agentBehaviors) return null;
+  const template = PERSONALITY_TEMPLATES[agent.behavior];
+  const context = agent.assignedTicketId ? "working" : "idle";
 
-  const totalWeight = agentBehaviors.reduce(
+  const behaviours = Object.entries(template[context]).map(
+    ([action, weight]) => ({
+      dispatchAction: action,
+      weight,
+    })
+  );
+
+  // Weighted selection logic
+  const totalWeight = behaviours.reduce(
     (sum, action) => sum + action.weight,
     0
   );
-  const randomValue = Math.random() * totalWeight; // random number between 0 to totalWeight
+  const randomValue = Math.random() * totalWeight;
 
   let cumulativeWeight = 0;
-  for (const behaviour of agentBehaviors) {
+  for (const behaviour of behaviours) {
     cumulativeWeight += behaviour.weight;
     if (randomValue <= cumulativeWeight) {
       return behaviour;

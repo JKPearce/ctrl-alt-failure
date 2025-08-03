@@ -105,7 +105,8 @@ const GameProvider = ({ children }) => {
         const newInbox = progressAndResolveTickets(
           state.inbox,
           nextTick,
-          state.dayNumber
+          state.dayNumber,
+          state.agents
         );
         //clear resolved ticket assignments remove the ticket ID from the agent object
         const newAgents = clearResolvedTicketAssignments(
@@ -151,16 +152,6 @@ const GameProvider = ({ children }) => {
           chaos: action.payload.contract.baseChaos,
         };
 
-      case AGENT_ACTIONS.SET_AGENT_COMMENT:
-        return updateEntity(state, "agents", action.payload.agentID, {
-          currentComment: action.payload.comment,
-        });
-
-      case AGENT_ACTIONS.SET_AGENT_ACTION:
-        return updateEntity(state, "agents", action.payload.agentID, {
-          currentAction: action.payload.action,
-        });
-
       case INBOX_ACTIONS.ASSIGN_TICKET: {
         //update the inbox state to mark the ticket as inactive
         const updatedInboxState = updateEntity(
@@ -180,6 +171,7 @@ const GameProvider = ({ children }) => {
           action.payload.agentID,
           {
             assignedTicketId: action.payload.ticketID,
+            currentAction: "WORKING",
           }
         );
 
@@ -199,6 +191,11 @@ const GameProvider = ({ children }) => {
       case INBOX_ACTIONS.DELETE_SPAM:
         return updateEntity(state, "inbox", action.payload.ticketID, {
           activeItem: false,
+        });
+
+      case AGENT_ACTIONS.SET_AGENT_ACTION:
+        return updateEntity(state, "agents", action.payload.agentID, {
+          currentAction: action.payload.action,
         });
 
       default:

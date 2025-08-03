@@ -18,6 +18,7 @@ export const AGENT_ACTIONS = {
   CREATE_SCREAM: "CREATE_SCREAM",
   WORKING: "WORKING",
   ON_BREAK: "ON_BREAK",
+  IDLE: "IDLE",
 };
 
 export const INBOX_ACTIONS = {

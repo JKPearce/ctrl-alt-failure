@@ -27,39 +27,35 @@ const useAgent = () => {
 
     agents.forEach((agent) => {
       const selectedAction = getRandomBehaviour(agent);
-      console.log("selectedAction", selectedAction);
+
       switch (selectedAction.dispatchAction) {
         case AGENT_ACTIONS.WORKING:
-          console.log("agent is working", agent.agentName);
+          setAgentAction(agent.id, AGENT_ACTIONS.WORKING);
           break;
         case AGENT_ACTIONS.CREATE_SCREAM:
-          console.log("agent is creating a scream", agent.agentName);
+          setAgentAction(agent.id, AGENT_ACTIONS.CREATE_SCREAM);
           break;
         case AGENT_ACTIONS.ON_BREAK:
-          console.log("agent is on break", agent.agentName);
+          setAgentAction(agent.id, AGENT_ACTIONS.ON_BREAK);
           break;
+        case AGENT_ACTIONS.IDLE:
+          setAgentAction(agent.id, AGENT_ACTIONS.IDLE);
+          break;
+        default:
+          console.log("selected action is not handled: ", selectedAction);
       }
     });
-  };
-
-  const getAgentByID = (agentID) => {
-    if (agentID == null) return null;
-    return gameState.agents[agentID] || null;
   };
 
   const setAgentAction = (agentID, action) => {
     dispatch({
       type: AGENT_ACTIONS.SET_AGENT_ACTION,
-      payload: {
-        agentID,
-        action,
-      },
+      payload: { agentID, action },
     });
   };
 
   return {
-    getAgentByID,
-    setAgentAction,
+    handleAgentBehaviors,
   };
 };
 

@@ -38,7 +38,7 @@ function getStatusColor(action) {
 
 const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
   const { assignTicketToAgent, deleteSpam } = useInbox();
-  const { getAgentByID, setAgentAction } = useAgent();
+  const { handleAgentBehaviors } = useAgent();
   const [selectedNav, setSelectedNav] = useState("inbox");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedAgentId, setSelectedAgentId] = useState(null);
