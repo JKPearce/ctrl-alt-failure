@@ -1,5 +1,6 @@
 import { GameContext } from "@/context/GameContext";
 import { GAME_ACTIONS, LOG_TYPES } from "@/lib/config/actionTypes";
+import { checkAndSpawnComplaint } from "@/lib/helpers/inboxHelpers";
 import { useContext, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 
@@ -32,9 +33,10 @@ const useActivityLog = () => {
     });
 
     // New screams
+
     if (currentScreams.length > previousState.current.screams.length) {
-      const newScream = currentScreams[currentScreams.length - 1];
-      const agentName = currentAgents[newScream.agentID].agentName;
+      const newScream = currentScreams[0];
+      const agentName = currentAgents[newScream.agentId].agentName;
 
       logEvent(
         LOG_TYPES.SCREAM_CREATED,
@@ -49,9 +51,32 @@ const useActivityLog = () => {
         ticket.resolved && !previousState.current.inbox[ticket.id]?.resolved
     );
 
-    resolvedTickets.forEach((ticket) => {
+    resolvedTickets.forEach(async (ticket) => {
       logEvent(LOG_TYPES.TICKET_RESOLVED, `Ticket #${ticket.id} resolved`);
       showToast("Ticket resolved!", "success");
+
+      // Check for complaint spawning
+      const complaint = await checkAndSpawnComplaint(
+        ticket,
+        currentAgents[ticket.resolvedBy],
+        gameState.dayNumber,
+        gameState.gameTime.currentTick,
+        gameState.chaos
+      );
+
+      if (complaint) {
+        // Add complaint to inbox
+        dispatch({
+          type: INBOX_ACTIONS.ADD_INBOX_ITEM,
+          payload: { item: { [complaint.id]: complaint } },
+        });
+
+        logEvent(
+          LOG_TYPES.COMPLAINT_CREATED,
+          `Complaint filed for ticket #${ticket.id}`
+        );
+        showToast("Customer filed a complaint!", "complaint");
+      }
     });
 
     // Update previous state
@@ -86,6 +111,10 @@ const useActivityLog = () => {
       info: {
         style: { background: "#3b82f6", color: "white" },
         icon: "📧",
+      },
+      complaint: {
+        style: { background: "#f59e0b", color: "white" },
+        icon: "👎",
       },
     };
 

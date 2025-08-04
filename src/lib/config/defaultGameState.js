@@ -1,3 +1,5 @@
+import { GAME_TIME } from "../helpers/gameHelpers";
+
 //initial game state values (new players will start with these )
 export const DEFAULT_BUSINESS_NAME = "UserError Inc.";
 export const DEFAULT_INBOX_SIZE = 10;
@@ -15,7 +17,7 @@ export const DEFAULT_GAME_STATE = {
   dayNumber: 1,
   chaos: 5,
   gameTime: {
-    currentTick: 0,
+    currentTick: GAME_TIME.DAY_START,
     isPaused: false,
     speed: 1, // 1x, 2x, 3x multiplier
     tickInterval: 1000, // base 1 second

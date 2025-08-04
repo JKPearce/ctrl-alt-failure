@@ -2,7 +2,7 @@ import { ticketSchema } from "@/lib/utils/Schemas";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_DEVKEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
 async function generateNewAITicketsBulk(amount) {
   const newTickets = [];

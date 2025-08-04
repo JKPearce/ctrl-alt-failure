@@ -4,6 +4,7 @@ import {
   TICKET_TEMPLATES,
 } from "@/lib/data/inboxTemplates";
 import { nanoid } from "nanoid";
+import { getRandomOvernightTime } from "./gameHelpers";
 
 // Calculate how many items to spawn based on day number and chaos
 export function calculateItemsToSpawn(dayNumber, chaos) {
@@ -89,6 +90,8 @@ export const checkAndSpawnComplaint = async (
   // Current chaos level
   chance += chaos * 0.01;
 
+  console.log("chance to spawn complaint", chance);
+
   if (Math.random() < chance) {
     return await spawnNewComplaint(ticket, agent, dayNumber, gameMinutes);
   }
@@ -101,7 +104,7 @@ export async function spawnInboxItems({
   chaos,
   contract,
   dayNumber,
-  gameMinutes,
+  gameMinutes = null,
 }) {
   // Calculate what types of items to spawn
   const itemTypes = calculateItemTypes(totalItems, chaos);
@@ -172,7 +175,7 @@ export const spawnNewTicket = async (
     messageType: "ticket",
     ...ticketData,
     receivedDay: dayNumber,
-    receivedTime: gameMinutes,
+    receivedTime: gameMinutes || getRandomOvernightTime(),
     activeItem: true,
     resolved: false,
     failCount: 0,
@@ -205,7 +208,7 @@ export const spawnNewSpam = async (contract, chaos, dayNumber, gameMinutes) => {
     messageType: "spam",
     ...spamData,
     receivedDay: dayNumber,
-    receivedTime: gameMinutes,
+    receivedTime: gameMinutes || getRandomOvernightTime(),
     activeItem: true,
   };
 };

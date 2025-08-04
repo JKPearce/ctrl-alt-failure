@@ -56,7 +56,7 @@ const useAgent = () => {
                 payload: {
                   screamId: crypto.randomUUID(),
                   message: screamData.screamMessage,
-                  agentID: agent.id,
+                  agentId: agent.id,
                 },
               });
 

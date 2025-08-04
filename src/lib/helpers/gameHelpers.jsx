@@ -1,17 +1,20 @@
-export function formatGameTime(gameTicks) {
-  // Clamp to workday (0-480 minutes)
-  const clampedMinutes = Math.min(gameTicks, 480);
+// Game time constants
+export const GAME_TIME = {
+  DAY_START: 540, // 9:00 AM (9 * 60)
+  DAY_END: 1020, // 5:00 PM (17 * 60)
+  DAY_LENGTH: 480, // 8 hours (1020 - 540)
+  FULL_DAY: 1440, // 24 hours (24 * 60)
+};
 
-  // Add to 9:00 AM start time (540 minutes since midnight)
-  const totalMinutes = 540 + clampedMinutes;
-
-  const hours = Math.floor(totalMinutes / 60);
-  const mins = totalMinutes % 60;
-
-  return `${hours.toString().padStart(2, "0")}:${mins
+// Convert game tick to real time
+export const formatGameTime = (tick) => {
+  const totalMinutes = tick;
+  const hours = Math.floor(totalMinutes / 60) % 24;
+  const minutes = totalMinutes % 60;
+  return `${hours.toString().padStart(2, "0")}:${minutes
     .toString()
     .padStart(2, "0")}`;
-}
+};
 
 import { LOG_TYPES } from "../config/actionTypes";
 
@@ -59,3 +62,15 @@ function inc(obj, name, key) {
   obj[name] ??= { resolves: 0, fails: 0 };
   obj[name][key]++;
 }
+
+export const getRandomOvernightTime = () => {
+  const roll = Math.random();
+
+  if (roll < 0.7) {
+    // 70% chance: Evening (17:00 to 23:59)
+    return Math.floor(Math.random() * 360) + 1020; // 1020-1379 = 17:00-23:59
+  } else {
+    // 30% chance: Early morning (00:00 to 9:00)
+    return Math.floor(Math.random() * 540); // 0-539 = 00:00-8:59
+  }
+};

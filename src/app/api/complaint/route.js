@@ -2,7 +2,7 @@ import { complaintSchema } from "@/lib/utils/Schemas";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_DEVKEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
 export async function POST(request) {
   const { agent, ticket } = await request.json();
@@ -11,11 +11,7 @@ export async function POST(request) {
     model: "gpt-4o-mini",
     instructions: `You are taking the perspective of a user that just had their IT issue resolved. You are not happy with the service and are writing a complain to the company.
     You will be given the ticket details and the agent details. You will be returning a complaint letter to the CEO of the company.
-    The complaint letter should be 1-2 paragraphs long.
-    The complaint letter should be written in a professional tone.
-    The complaint letter should be written in a way that is easy to understand.
-    The complaint letter should be written in a way that is easy to understand.
-    `,
+    The complaint email should be written in the same tone as the tickets body.    `,
     input: `
     The ticket is ${JSON.stringify(ticket)}
     The agent is ${JSON.stringify(agent)}

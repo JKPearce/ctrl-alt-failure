@@ -44,6 +44,7 @@ export const LOG_TYPES = {
   SCREAM_CREATED: "SCREAM_CREATED",
   TICKET_RESOLVED: "TICKET_RESOLVED",
   INBOX_ITEM_ADDED: "INBOX_ITEM_ADDED",
+  COMPLAINT_ADDED: "COMPLAINT_ADDED",
   // etc
   //Grumble (think cities skylines chirps)
 };

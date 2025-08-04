@@ -9,7 +9,7 @@ import {
 import { DEFAULT_GAME_STATE } from "@/lib/config/defaultGameState";
 import { clearResolvedTicketAssignments } from "@/lib/helpers/agentHelpers";
 import { getContract } from "@/lib/helpers/contractHelpers";
-import { summariseDay } from "@/lib/helpers/gameHelpers";
+import { GAME_TIME, summariseDay } from "@/lib/helpers/gameHelpers";
 import { progressAndResolveTickets } from "@/lib/helpers/inboxHelpers";
 import { createContext, useReducer } from "react";
 
@@ -52,12 +52,6 @@ const GameProvider = ({ children }) => {
           ], //reverse order so the newest log entry is the first item in the array
         };
 
-      case GAME_ACTIONS.ADD_NOTIFICATION:
-        return {
-          ...state,
-          notifications: [action.payload, ...state.notifications],
-        };
-
       case GAME_ACTIONS.START_NEW_DAY:
         return {
           ...state,
@@ -88,7 +82,7 @@ const GameProvider = ({ children }) => {
         const newPhase =
           activeCount >= state.inboxSize
             ? "game_over"
-            : nextTick >= 480
+            : nextTick >= GAME_TIME.DAY_END
             ? "summary"
             : state.gamePhase;
 
@@ -227,7 +221,7 @@ const GameProvider = ({ children }) => {
           screams: [
             {
               screamId: action.payload.screamId,
-              agentID: action.payload.agentID,
+              agentId: action.payload.agentId,
               message: action.payload.message,
               dayCreated: state.dayNumber,
               createdAt: state.gameTime.currentTick,
