@@ -7,7 +7,7 @@ const ScreamFeed = ({ screams, agents }) => {
     <>
       {screams.map((scream) => (
         <div key={scream.screamId} className="scream">
-          <span className="agent-name">{agents[scream.agentID].agentName}</span>
+          <span className="agent-name">{agents[scream.agentId].agentName}</span>
           <span className="scream-body">{scream.message}</span>
           <span className="scream-time">
             {formatGameTime(scream.createdAt)} - Day {scream.dayCreated}
