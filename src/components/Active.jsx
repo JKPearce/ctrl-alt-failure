@@ -58,10 +58,14 @@ const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
         <div className="flex-1">
           <span className="btn btn-ghost text-xl">CTRL-ALT-FAIL</span>
         </div>
+<<<<<<< HEAD
         <div className="flex-1 justify-center flex">
           <span className="text-lg font-semibold">{gameState.businessName}</span>
         </div>
         <div className="flex-1 justify-end flex gap-3 items-center pr-2">
+=======
+        <div className="flex-1 justify-end flex gap-4 items-center">
+>>>>>>> 44f9761 (refactored to json for the data templates instead of exports. Removed founder selector and business name input options. Swapped default theme to night daisyui)
           <div className="flex items-center gap-2">
             <button
               className={`btn ${gameState.gameTime.isPaused ? "btn-primary" : "btn-outline"}`}

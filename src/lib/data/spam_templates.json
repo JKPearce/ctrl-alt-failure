@@ -1,0 +1,42 @@
+[
+  {
+    "sender": "System Admin",
+    "subject": "URGENT: Your mailbox is full",
+    "body": "Click here to upgrade your storage ⬇️"
+  },
+  {
+    "sender": "Promotional Panda",
+    "subject": "You've won a free coffee!",
+    "body": "Claim your free latte 🐼☕ before midnight—no catch!"
+  },
+  {
+    "sender": "Dr. Malware",
+    "subject": "Your antivirus subscription expired",
+    "body": "Renew now or risk losing all your data! 🔒"
+  },
+  {
+    "sender": "Crypto King",
+    "subject": "Double your BTC today",
+    "body": "Send 0.1 BTC and get 0.2 BTC back in 5 minutes! 🚀"
+  },
+  {
+    "sender": "Lottery Larry",
+    "subject": "Congratulations, you've won $1,000,000!",
+    "body": "Provide your bank details to claim your prize now."
+  },
+  {
+    "sender": "Nigerian Prince",
+    "subject": "URGENT: Transfer inheritance",
+    "body": "Help me move $5,000,000 out of the country. Full reimbursement promised."
+  },
+  {
+    "sender": "Discount Dan",
+    "subject": "90% off all IT equipment",
+    "body": "Limited-time offer on servers, routers, and more—click here!"
+  },
+  {
+    "sender": "Freebie Fiona",
+    "subject": "Get a free iPhone 17 today",
+    "body": "No surveys, no catch. Simply click & fill in your address."
+  }
+]

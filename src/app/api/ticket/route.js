@@ -31,6 +31,7 @@ async function generateNewAITicketsBulk(amount) {
 
   return newTickets;
 }
+const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
 async function generateNewAITicket(contract, ticketType) {
   const openai = await getOpenAI();
@@ -40,11 +41,12 @@ async function generateNewAITicket(contract, ticketType) {
 
   const response = await openai.responses.parse({
     model: "gpt-4o-mini",
-    instructions: `You are Ticket-Bot 5000, a cheeky help-desk ticket generator. 
+    instructions: `You know exactly how to craft the best ragebait IT related tickets from the point of view of the end user.
 Return ONLY a single JSON object matching the expected format.
 All fields must be strictly valid. 
 Keep the 'suggestedResolution' field under 300 characters total. 
-Avoid unnecessary rambling or repetition. Stay concise and passive-aggressive.`,
+Keep the 'body' field under 1000 characters total. 
+the suggested resolution should be from the perspective of an IT agent that worked on the issue, they are burnt out and stressed`,
     input: `Generate a new ${ticketType} ticket for a company named ${companyName} that is a ${companyDescription} and the userbase is ${companyUserType}. Feel free to explore ideas around this company, this is for a game where the more funny but believable it is the better. feel free to sometimes miss punctuation and grammar. and use things like multiple question marks and exclamations to push urgency and panic`,
     text: {
       format: zodTextFormat(ticketSchema, "it_support_ticket", {
@@ -61,13 +63,17 @@ Avoid unnecessary rambling or repetition. Stay concise and passive-aggressive.`,
 export async function GET(request) {
   try {
     const openai = await getOpenAI();
-    if (!openai) return Response.json({ error: "OPENAI key missing" }, { status: 503 });
+    if (!openai)
+      return Response.json({ error: "OPENAI key missing" }, { status: 503 });
 
     const tickets = await generateNewAITicketsBulk(1);
     return Response.json(tickets);
   } catch (error) {
     console.error("Error generating tickets:", error);
-    return Response.json({ error: "Failed to generate tickets" }, { status: 500 });
+    return Response.json(
+      { error: "Failed to generate tickets" },
+      { status: 500 }
+    );
   }
 }
 
@@ -91,11 +97,18 @@ export async function POST(request) {
 
   try {
     const openai = await getOpenAI();
-    if (!openai) return Response.json({ error: "OPENAI key missing" }, { status: 503 });
+    if (!openai)
+      return Response.json({ error: "OPENAI key missing" }, { status: 503 });
 
-    const aiGeneratedTicket = await generateNewAITicket(contract, selectedTicketIssue);
+    const aiGeneratedTicket = await generateNewAITicket(
+      contract,
+      selectedTicketIssue
+    );
     return Response.json(aiGeneratedTicket);
   } catch (e) {
-    return Response.json({ error: "Failed to generate ticket" }, { status: 500 });
+    return Response.json(
+      { error: "Failed to generate ticket" },
+      { status: 500 }
+    );
   }
 }

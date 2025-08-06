@@ -1,8 +1,6 @@
-import {
-  COMPLAINT_TEMPLATES,
-  SPAM_TEMPLATES,
-  TICKET_TEMPLATES,
-} from "@/lib/data/inboxTemplates";
+import COMPLAINT_TEMPLATES from "@/lib/data/complaint_templates.json";
+import SPAM_TEMPLATES from "@/lib/data/spam_templates.json";
+import TICKET_TEMPLATES from "@/lib/data/ticket_templates.json";
 import { nanoid } from "nanoid";
 import { getRandomOvernightTime } from "./gameHelpers";
 

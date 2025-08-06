@@ -4,33 +4,12 @@ import contractsData from "@/lib/data/contracts.json";
 import { generateNewAgents } from "@/lib/helpers/agentHelpers";
 import React, { useEffect, useState } from "react";
 
-const DEFAULT_FOUNDERS = [
-  {
-    id: "founder_nullman",
-    name: "Bob Nullman",
-    tagline: "Nothing to lose, nothing to gain.",
-    traits: ["balanced", "coffee snob"],
-    effect: "Start with +1 energy",
-  },
-  {
-    id: "founder_blitz",
-    name: "Sandra Blitz",
-    tagline: "Speed is efficiency. Efficiency is life.",
-    traits: ["fast resolver", "high pressure"],
-    effect: "Agents start with +1 to all skills",
-  },
-];
-
 const getRandomContracts = (contracts, n = 3) => {
   const shuffled = [...contracts].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, n);
 };
 
 function SetupScreen({ startGame }) {
-  const [businessName, setBusinessName] = useState("Ctrl-Alt-Failure Inc.");
-  const [selectedFounder, setSelectedFounder] = useState(
-    DEFAULT_FOUNDERS[0].id
-  );
   const [contracts, setContracts] = useState([]);
   const [selectedContract, setSelectedContract] = useState("");
   const [agents, setAgents] = useState([]);
@@ -55,14 +34,11 @@ function SetupScreen({ startGame }) {
     setAgents(newAgents);
   };
 
-  const readyToStart =
-    businessName && selectedFounder && selectedContract && agents.length === 4;
+  const readyToStart = selectedContract && agents.length === 4;
 
   const handleStart = () => {
     if (!readyToStart) return;
     startGame(
-      businessName,
-      DEFAULT_FOUNDERS.find((f) => f.id === selectedFounder),
       contracts.find((c) => c.id === selectedContract),
       agents
     );
@@ -70,62 +46,6 @@ function SetupScreen({ startGame }) {
 
   return (
     <div className="max-w-6xl mx-auto p-8 space-y-12">
-      {/* Business Name */}
-      <div className="space-y-3">
-        <h2 className="text-xl font-semibold text-base-content">
-          Business Name
-        </h2>
-        <input
-          className="input input-bordered w-full text-xl py-4 px-4 border-2 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-          value={businessName}
-          onChange={(e) => setBusinessName(e.target.value)}
-          placeholder="Ctrl-Alt-Failure Inc."
-        />
-      </div>
-
-      {/* Founder Selection */}
-      <div>
-        <div className="mb-4 font-semibold text-lg">Choose Your Founder</div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {DEFAULT_FOUNDERS.map((f) => (
-            <div
-              key={f.id}
-              className={`card p-5 cursor-pointer border-2 transition-all duration-200 hover:shadow-md ${
-                selectedFounder === f.id
-                  ? "border-primary bg-primary/5"
-                  : "border-base-300 hover:border-primary/50"
-              }`}
-              onClick={() => setSelectedFounder(f.id)}
-            >
-              {/* Founder Header */}
-              <div className="mb-3">
-                <h3 className="font-bold text-lg text-base-content mb-1">
-                  {f.name}
-                </h3>
-                <p className="text-sm text-base-content/60 italic">
-                  {f.tagline}
-                </p>
-              </div>
-
-              {/* Traits */}
-              <div className="mb-3">
-                <div className="text-sm text-base-content/70">
-                  <span className="font-medium">Traits:</span>{" "}
-                  {f.traits.join(", ")}
-                </div>
-              </div>
-
-              {/* Selection Indicator */}
-              {selectedFounder === f.id && (
-                <div className="mt-3 text-center">
-                  <span className="badge badge-primary">Selected</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Contract Selection */}
       <div>
         <div className="mb-4 font-semibold text-lg">Choose a Contract</div>

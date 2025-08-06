@@ -1,5 +1,9 @@
 import { GameContext } from "@/context/GameContext";
-import { GAME_ACTIONS, LOG_TYPES } from "@/lib/config/actionTypes";
+import {
+  GAME_ACTIONS,
+  INBOX_ACTIONS,
+  LOG_TYPES,
+} from "@/lib/config/actionTypes";
 import { checkAndSpawnComplaint } from "@/lib/helpers/inboxHelpers";
 import { useContext, useEffect, useRef } from "react";
 import toast from "react-hot-toast";

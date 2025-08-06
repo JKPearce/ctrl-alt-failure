@@ -33,12 +33,7 @@ const useGame = () => {
     gameState.gamePhase,
   ]);
 
-  const startGame = async (
-    businessName,
-    selectedFounder,
-    selectedContract,
-    selectedAgents
-  ) => {
+  const startGame = async (selectedContract, selectedAgents) => {
     dispatch({
       type: GAME_ACTIONS.SET_LOADING,
       payload: { loading: true },
@@ -64,10 +59,8 @@ const useGame = () => {
       dispatch({
         type: GAME_ACTIONS.START_GAME,
         payload: {
-          businessName,
           selectedAgents: agentMap,
           inbox,
-          selectedFounder,
           contractId: selectedContract.id,
         },
       });

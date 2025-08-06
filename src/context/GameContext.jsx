@@ -27,10 +27,8 @@ const GameProvider = ({ children }) => {
         return {
           ...state,
           gamePhase: "active",
-          businessName: action.payload.businessName,
           agents: action.payload.selectedAgents,
           inbox: action.payload.inbox,
-          founder: action.payload.selectedFounder,
           chaos: contract.baseChaos,
           openComplaints: 0,
           currentContract: contract,
@@ -63,7 +61,7 @@ const GameProvider = ({ children }) => {
           dayNumber: Number(state.dayNumber + 1),
           gameTime: {
             ...state.gameTime,
-            currentTick: 0,
+            currentTick: GAME_TIME.DAY_START,
           },
         };
 

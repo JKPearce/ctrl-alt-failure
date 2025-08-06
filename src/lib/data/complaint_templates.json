@@ -1,0 +1,52 @@
+[
+  {
+    "sender": "Rebecca Wong",
+    "subject": "Issue fixed, but support was condescending",
+    "body": "To IT Management,\nThe VPN issue is resolved, so technically you did your job. However, the agent spent the entire call making me feel like I personally broke the internet. Comments like \"Did you even try flushing the DNS?\" and \"It's not hard, just follow the steps\" came with zero patience or explanation. I left feeling embarrassed, not empowered."
+  },
+  {
+    "sender": "Marcus Li",
+    "subject": "Thanks for the fix; your tone needed a patch",
+    "body": "Dear Support,\nMy email sync is back, so that part's done. The problem was how the agent talked to me—\"Next time don't flood the system before trying the obvious\" was delivered like I had sabotaged infrastructure. I get burnout exists, but taking it out on users makes a routine help request feel like a reprimand."
+  },
+  {
+    "sender": "Sophie Grant",
+    "subject": "Resolved, yet felt lectured",
+    "body": "IT Leadership,\nThe application crash was fixed, thank you. The interaction, however, felt like a scolding. I was repeatedly told things like \"You installed that unsupported plugin, didn't you?\" and given a guilt trip instead of clear guidance. The solution worked, but the delivery discouraged me from asking for help next time."
+  },
+  {
+    "sender": "Jeremy Brooks",
+    "subject": "Problem solved, attitude not acceptable",
+    "body": "To Whom It May Concern,\nMy workstation is functioning again, so credit where it's due. That said, being told \"You should've checked the cable before calling\" multiple times came off as accusatory and dismissive. I understand workloads are heavy, but making a user feel stupid while fixing something reflects poorly on service culture."
+  },
+  {
+    "sender": "Nia Patel",
+    "subject": "Printer jam cleared, but interaction felt punitive",
+    "body": "Hello,\nThe printer jam was cleared and it works now, but the agent kept saying \"You keep doing this wrong\" in a tone that felt more punishing than helpful. Suggestions were framed as blame instead of instruction. The fix was fine; the way it was communicated made me apologize to them instead of feeling supported."
+  },
+  {
+    "sender": "Carlos Mendez",
+    "subject": "Support made me feel dumb despite resolution",
+    "body": "IT Team,\nCache cleared, system responsive, issue resolved—so yes, fine. What I'm complaining about is the delivery. Being told \"Why didn't you just clear your cache like a normal person?\" with sarcasm and no explanation was unnecessary. A bit of patience would have made the same fix feel like actual support."
+  },
+  {
+    "sender": "Tara O'Neill",
+    "subject": "Fixed, but felt publicly shamed",
+    "body": "Dear IT,\nThe app crash was sorted, but I left the session feeling publicly shamed. The agent opened with \"I told you this would happen if you installed that junk\" and repeatedly cut me off with \"Just do this, trust me.\" I needed help, not a performance review."
+  },
+  {
+    "sender": "Devon Harper",
+    "subject": "Ticket closed, emotional damage remains",
+    "body": "Support,\nIssue: resolved. Experience: not great. The agent responded in one-word bursts, offered no explanation of what was done, and ended the session with \"Glad it's working now, next time read the FAQ.\" I felt like I had to beg for respect while being treated like a checkbox."
+  },
+  {
+    "sender": "Lena Brooks",
+    "subject": "Efficient fix, zero empathy",
+    "body": "To IT Management,\nMy license issue was resolved quickly, but the agent was visibly rushed and kept saying \"Hurry up, I don't have all day\" while walking me through steps. I was made to feel like a burden. Efficiency is fine; a little basic courtesy would've made it feel like support instead of throughput."
+  },
+  {
+    "sender": "Omar Farouk",
+    "subject": "Resolved, but dismissive attitude unacceptable",
+    "body": "Hi,\nThe network dropouts are gone, which is good. The agent, however, was dismissive—cut me off, used phrases like \"This is basic stuff,\" and closed the ticket with no context. I left knowing what was done but not why, and feeling like I shouldn't bother next time. That's a problem for a support system."
+  }
+]

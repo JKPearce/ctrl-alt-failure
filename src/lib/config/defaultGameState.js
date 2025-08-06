@@ -1,12 +1,9 @@
 import { GAME_TIME } from "../helpers/gameHelpers";
 
 //initial game state values (new players will start with these )
-export const DEFAULT_BUSINESS_NAME = "UserError Inc.";
 export const DEFAULT_INBOX_SIZE = 10;
 
 export const DEFAULT_GAME_STATE = {
-  businessName: DEFAULT_BUSINESS_NAME,
-  founder: {},
   inboxSize: DEFAULT_INBOX_SIZE,
   gamePhase: "setup", //options are "setup" | "active" | "summary" | "game_over",
   agents: {},

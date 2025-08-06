@@ -1,0 +1,90 @@
+[
+  {
+    "ticketType": "hardware",
+    "sender": "Mary Simmons",
+    "subject": "Monitor won't turn on",
+    "body": "Hi IT,\nMy screen is black but the power light is on...\nThanks!",
+    "difficulty": 4,
+    "resolutionNotes": "Confirmed it was plugged in (because apparently that's not assumed anymore), reseated cables, swapped in a known-good monitor to rule out drama, replaced the flaky power brick. Told user next time to try 'turn it off and on' before escalating."
+  },
+  {
+    "ticketType": "software",
+    "sender": "John Patel",
+    "subject": "Cannot save files in Word",
+    "body": "I keep getting an error code 0x887….",
+    "difficulty": 3,
+    "resolutionNotes": "Cleared temp/autosave junk, disabled the dozen unnecessary add-ins, repaired Office install, verified permissions. Explained gently that saving to a shaky network share without checking it was mounted will always bite you in the ass."
+  },
+  {
+    "ticketType": "hardware",
+    "sender": "Alice \"No-Scope\" Nguyen",
+    "subject": "USB port swallowed my flash drive",
+    "body": "Hey team,\nI stuck my USB in but it won't eject and I can't reach it… Pls help!\n– Alice",
+    "difficulty": 6,
+    "resolutionNotes": "Powered down the machine, extracted the stuck USB with the correct tool (no, you can't just yank it), inspected the port, flagged it for future replacement. Gave the standard passive reminder about not jamming things like they're trying to plug in a black hole."
+  },
+  {
+    "ticketType": "hardware",
+    "sender": "Bob \"Bluetooth\" Brown",
+    "subject": "Wireless mouse only works upside down",
+    "body": "IT, my mouse only clicks if I hold it upside down. What sorcery is this?\nCheers!",
+    "difficulty": 5,
+    "resolutionNotes": "Replaced batteries, cleaned the sensor (because dust is forever), tested on a normal surface, updated firmware. Sensor was misaligned/garbled—issued a replacement and silently questioned how the original survived this long."
+  },
+  {
+    "ticketType": "hardware",
+    "sender": "Charlie Chip",
+    "subject": "Headset mic keeps squawking",
+    "body": "Hello,\nEvery time I speak the mic makes a chicken-like squawk. Not helpful on calls.\nThanks!",
+    "difficulty": 7,
+    "resolutionNotes": "Swapped ports, updated drivers, killed off audio enhancement junk. Traced the interference to a rogue wireless device near their desk, swapped them to a backup headset. Told them the mic isn't auditioning for a farm animal choir anymore."
+  },
+  {
+    "ticketType": "hardware",
+    "sender": "Ima Buffer",
+    "subject": "Printer jammed on last sheet… again",
+    "body": "IT, the printer ate my TPS report and won't spit it back out. Please rescue it.\n– Baffled Buffer",
+    "difficulty": 4,
+    "resolutionNotes": "Cleared the jam, cleaned rollers, reset the device, applied firmware update. Gave the 'how to load paper properly' talk with the kind of tone reserved for explaining breathing—again."
+  },
+  {
+    "ticketType": "hardware",
+    "sender": "Diana Disk",
+    "subject": "PC beeping seven times on startup",
+    "body": "Hi,\nMy computer beeps 7 times and then goes dark. Do I need a new motherboard?\n– Diana",
+    "difficulty": 8,
+    "resolutionNotes": "Looked up beep codes (7 = CPU/microcode exception), reseated CPU/RAM, inspected for bent pins, confirmed hardware failure, replaced the motherboard. Told user the PC wasn't haunted, just dying slowly and dramatically."
+  },
+  {
+    "ticketType": "software",
+    "sender": "Elon Putsch",
+    "subject": "Excel froze on cell A1 forever",
+    "body": "Greetings,\nTyped '1+1', hit enter, and Excel has been staring at me for 10 minutes.\nPlease advise.",
+    "difficulty": 2,
+    "resolutionNotes": "Forced Excel to quit, nuked cache, disabled extension circus, applied updates, recreated the sheet. Explained that '1+1' isn't supposed to trigger a system existential crisis, but hey—fixed."
+  },
+  {
+    "ticketType": "software",
+    "sender": "Fiona Firewall",
+    "subject": "Can't access internet—error 403",
+    "body": "Hey,\nSuddenly every site says 403 forbidden. Did I do something naughty online?\nThanks!",
+    "difficulty": 6,
+    "resolutionNotes": "Cleared browser cache, checked proxy/firewall rules, flushed DNS, discovered expired auth token. Reauthenticated user and gently reminded them that sessions don't last forever and blaming the internet won't fix it faster."
+  },
+  {
+    "ticketType": "software",
+    "sender": "Gregory Glitch",
+    "subject": "VPN disconnects whenever I blink",
+    "body": "IT,\nMy VPN drops connection if I look away for more than 2 seconds. Help?\n– Greg",
+    "difficulty": 7,
+    "resolutionNotes": "Dug through logs, disabled power-saving on network adapter (because apparently the adapter needs naps), tweaked keepalive settings. Fixed by turning off the 'sleep when you blink' behavior. Told him VPN isn't sentient—just overzealous about connection drops."
+  },
+  {
+    "ticketType": "software",
+    "sender": "Hannah Hotkey",
+    "subject": "Shortcut Ctrl+Alt+Delete opened fan controls",
+    "body": "Hello,\nI pressed Ctrl+Alt+Del and my fans started spinning at 9000 RPM. That's new…\n– Hannah",
+    "difficulty": 5,
+    "resolutionNotes": "Found a hotkey conflict with the system utility, reset fan profile, updated the control software, disabled the rogue mapping. Reminded user that Ctrl+Alt+Del isn't a secret overclock spell (but sure, we'll call it magic for now)."
+  }
+]
