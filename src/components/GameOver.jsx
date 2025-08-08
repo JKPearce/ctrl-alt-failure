@@ -1,363 +1,238 @@
 "use client";
 
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import {
-  AlertTriangle,
-  Award,
-  CheckCircle,
-  Crown,
-  Trash2,
-  XCircle,
-} from "lucide-react";
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  Grid,
+  LinearProgress,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 
-const GameOver = ({ restartGame, gameState }) => {
-  const {
-    businessName,
-    founder,
-    money,
-    inbox,
-    inboxSize,
-    agents,
-    dayNumber,
-    dailySummaries,
-    currentContract,
-    openComplaints,
-  } = gameState;
+export default function GameOver({ restartGame, gameState }) {
+  const inboxItems = Object.values(gameState.inbox || {});
+  const inboxSize = gameState.inboxSize || 0;
+  const activeItems = inboxItems.filter((i) => i.activeItem).length;
+  const agents = gameState.agents || {};
+  const dayNumber = gameState.dayNumber || 1;
+  const contractName = gameState.currentContract?.companyName || "Contract";
 
-  // Calculate comprehensive stats
-  const inboxItems = Object.values(inbox);
-  const activeItems = inboxItems.filter((item) => item.activeItem);
-
-  // Overall stats
-  const totalTicketsResolved = inboxItems.filter(
-    (item) => item.resolved && item.messageType === "ticket"
+  const ticketsResolved = inboxItems.filter(
+    (i) => i.messageType === "ticket" && i.resolved
   ).length;
-  const totalTicketsFailed = inboxItems.filter(
-    (item) => item.failCount > 0 && item.messageType === "ticket"
+  const ticketsFailed = inboxItems.filter(
+    (i) => i.messageType === "ticket" && (i.failCount || 0) > 0
   ).length;
-  const totalSpamDeleted = inboxItems.filter(
-    (item) => !item.activeItem && item.messageType === "spam"
+  const spamDeleted = inboxItems.filter(
+    (i) => i.messageType === "spam" && !i.activeItem
   ).length;
-  const totalComplaints = dailySummaries.reduce(
-    (sum, day) => sum + day.complaints,
-    0
-  );
-  const contractsCompleted =
-    dailySummaries.length > 0 ? Math.floor(totalTicketsResolved / 15) : 0; // Assuming 15 tickets per contract average
+  const totalComplaints = inboxItems.filter(
+    (i) => i.messageType === "complaint"
+  ).length;
 
-  // Agent performance stats
-  const agentStats = {};
-  Object.values(agents).forEach((agent) => {
-    agentStats[agent.agentName] = {
-      resolved: 0,
-      failed: 0,
-      agent: agent,
-    };
-  });
-
-  // Calculate agent stats from inbox items
-  inboxItems.forEach((item) => {
-    if (item.resolvedBy && agentStats[agents[item.resolvedBy]?.agentName]) {
-      agentStats[agents[item.resolvedBy].agentName].resolved++;
+  const resolvesByAgentId = {};
+  const failsByAgentId = {};
+  inboxItems.forEach((i) => {
+    if (i.messageType !== "ticket") return;
+    if (i.resolved && i.resolvedBy) {
+      resolvesByAgentId[i.resolvedBy] =
+        (resolvesByAgentId[i.resolvedBy] || 0) + 1;
     }
-    if (
-      item.failCount > 0 &&
-      item.agentAssigned &&
-      agentStats[agents[item.agentAssigned]?.agentName]
-    ) {
-      agentStats[agents[item.agentAssigned].agentName].failed++;
+    if ((i.failCount || 0) > 0 && i.agentAssigned) {
+      failsByAgentId[i.agentAssigned] =
+        (failsByAgentId[i.agentAssigned] || 0) + 1;
     }
   });
-
-  // Find MVP and worst performer
-  const agentPerformance = Object.entries(agentStats)
-    .map(([name, stats]) => ({
-      name,
-      ...stats,
-      total: stats.resolved + stats.failed,
-      successRate:
-        stats.total > 0 ? ((stats.resolved / stats.total) * 100).toFixed(1) : 0,
-    }))
-    .filter((agent) => agent.total > 0);
-
-  const mvpAgent = agentPerformance.reduce(
-    (best, current) => (current.resolved > best.resolved ? current : best),
-    agentPerformance[0] || {}
-  );
-
-  const worstAgent = agentPerformance.reduce(
-    (worst, current) =>
-      current.failed > worst.failed ||
-      (current.failed === worst.failed &&
-        current.successRate < worst.successRate)
-        ? current
-        : worst,
-    agentPerformance[0] || {}
-  );
+  const performance = Object.keys(agents).map((id) => {
+    const resolved = resolvesByAgentId[id] || 0;
+    const failed = failsByAgentId[id] || 0;
+    const total = resolved + failed;
+    const successRate = total > 0 ? Math.round((resolved / total) * 100) : 0;
+    return { id, resolved, failed, total, successRate, agent: agents[id] };
+  });
+  performance.sort((a, b) => b.resolved - a.resolved);
+  const mvp = performance[0] || null;
 
   return (
-    <div className="min-h-screen bg-base-200 flex items-center justify-center p-4">
-      <div className="card w-full max-w-6xl bg-base-100 shadow-xl">
-        <div className="card-body">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 flex items-center justify-center gap-2">
-              <AlertTriangle className="w-10 h-10 text-error" />
-              Inbox Overflow!
-            </h1>
-            <p className="text-xl text-base-content/80 mb-2">
-              {businessName} collapsed under the weight of unresolved tickets
-            </p>
-            <p className="text-sm opacity-60">
-              Founded by {founder.name} • Survived {dayNumber} days •{" "}
-              {activeItems.length}/{inboxSize} inbox overflow
-            </p>
-          </div>
+    <Box sx={{ maxWidth: 1100, mx: "auto", p: 3 }}>
+      <Paper sx={{ p: 2, mb: 2 }}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={1}
+          alignItems={{ md: "center" }}
+        >
+          <WarningAmberIcon color="warning" />
+          <Typography variant="h5" fontWeight={700} sx={{ flex: 1 }}>
+            Game Over — Inbox Overflow
+          </Typography>
+          <Chip label={`Day ${dayNumber}`} size="small" />
+          <Chip
+            label={contractName}
+            size="small"
+            color="primary"
+            variant="outlined"
+          />
+        </Stack>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+          Inbox reached {activeItems}/{inboxSize}. Your team couldn’t keep up.
+        </Typography>
+      </Paper>
 
-          {/* Main Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="stat bg-base-200 rounded-lg p-4">
-              <div className="stat-figure text-success">
-                <CheckCircle className="w-8 h-8" />
-              </div>
-              <div className="stat-title">Tickets Resolved</div>
-              <div className="stat-value text-success">
-                {totalTicketsResolved}
-              </div>
-            </div>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={3}>
+          <Paper sx={{ p: 2 }}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <CheckCircleOutlineIcon color="success" />
+              <Typography variant="overline">Tickets Resolved</Typography>
+            </Stack>
+            <Typography variant="h4">{ticketsResolved}</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Paper sx={{ p: 2 }}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <ErrorOutlineIcon color="error" />
+              <Typography variant="overline">Tickets Failed</Typography>
+            </Stack>
+            <Typography variant="h4">{ticketsFailed}</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Paper sx={{ p: 2 }}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <DeleteOutlineIcon color="info" />
+              <Typography variant="overline">Spam Deleted</Typography>
+            </Stack>
+            <Typography variant="h4">{spamDeleted}</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Paper sx={{ p: 2 }}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <WarningAmberIcon color="warning" />
+              <Typography variant="overline">Complaints</Typography>
+            </Stack>
+            <Typography variant="h4">{totalComplaints}</Typography>
+          </Paper>
+        </Grid>
+      </Grid>
 
-            <div className="stat bg-base-200 rounded-lg p-4">
-              <div className="stat-figure text-error">
-                <XCircle className="w-8 h-8" />
-              </div>
-              <div className="stat-title">Tickets Failed</div>
-              <div className="stat-value text-error">{totalTicketsFailed}</div>
-            </div>
+      <Paper sx={{ p: 2, mt: 2 }}>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+          <EmojiEventsIcon color="secondary" />
+          <Typography variant="subtitle1">Team Performance</Typography>
+          <Box sx={{ flex: 1 }} />
+          <Chip
+            size="small"
+            label={`${performance.filter((p) => p.total > 0).length} active`}
+          />
+        </Stack>
+        {performance.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            No team data.
+          </Typography>
+        ) : (
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Agent</TableCell>
+                <TableCell align="right">Resolved</TableCell>
+                <TableCell align="right">Failed</TableCell>
+                <TableCell align="right">Success</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {performance.map((p) => (
+                <TableRow key={p.id} selected={mvp && p.id === mvp.id}>
+                  <TableCell>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Avatar
+                        src={p.agent?.profileImage}
+                        alt={p.agent?.agentName}
+                        sx={{ width: 28, height: 28 }}
+                      />
+                      <Typography variant="body2">
+                        {p.agent?.agentName || p.id}
+                      </Typography>
+                    </Stack>
+                  </TableCell>
+                  <TableCell align="right">{p.resolved}</TableCell>
+                  <TableCell align="right">{p.failed}</TableCell>
+                  <TableCell align="right" sx={{ minWidth: 120 }}>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Typography variant="body2" sx={{ width: 28 }}>
+                        {p.successRate}%
+                      </Typography>
+                      <LinearProgress
+                        variant="determinate"
+                        value={p.successRate}
+                        sx={{ height: 8, borderRadius: 4, flex: 1 }}
+                      />
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </Paper>
 
-            <div className="stat bg-base-200 rounded-lg p-4">
-              <div className="stat-figure text-info">
-                <Trash2 className="w-8 h-8" />
-              </div>
-              <div className="stat-title">Spam Deleted</div>
-              <div className="stat-value text-info">{totalSpamDeleted}</div>
-            </div>
+      <Paper sx={{ p: 2, mt: 2 }}>
+        <Typography variant="subtitle1">Final Statistics</Typography>
+        <Grid container spacing={2} sx={{ mt: 0.5 }}>
+          <Grid item xs={12} sm={3}>
+            <Typography variant="caption" color="text.secondary">
+              Total Items Processed
+            </Typography>
+            <Typography variant="h6">{inboxItems.length}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Typography variant="caption" color="text.secondary">
+              Chaos Level
+            </Typography>
+            <Typography variant="h6">{gameState.chaos}/100</Typography>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Typography variant="caption" color="text.secondary">
+              Team Size
+            </Typography>
+            <Typography variant="h6">{Object.keys(agents).length}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Typography variant="caption" color="text.secondary">
+              Contract
+            </Typography>
+            <Typography variant="h6">{contractName}</Typography>
+          </Grid>
+        </Grid>
+      </Paper>
 
-            <div className="stat bg-base-200 rounded-lg p-4">
-              <div className="stat-figure text-warning">
-                <AlertTriangle className="w-8 h-8" />
-              </div>
-              <div className="stat-title">Complaints</div>
-              <div className="stat-value text-warning">{totalComplaints}</div>
-            </div>
-          </div>
-
-          {/* Additional Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Company Performance */}
-            <div className="card bg-base-200">
-              <div className="card-body">
-                <h3 className="card-title text-lg">Company Performance</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Contracts Completed:</span>
-                    <span className="font-bold">{contractsCompleted}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Money Remaining:</span>
-                    <span className="font-bold text-success">${money}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Open Complaints:</span>
-                    <span className="font-bold text-error">
-                      {openComplaints}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Success Rate:</span>
-                    <span className="font-bold">
-                      {totalTicketsResolved + totalTicketsFailed > 0
-                        ? (
-                            (totalTicketsResolved /
-                              (totalTicketsResolved + totalTicketsFailed)) *
-                            100
-                          ).toFixed(1)
-                        : 0}
-                      %
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* MVP Agent */}
-            {mvpAgent && (
-              <div className="card bg-success/10 border border-success/20">
-                <div className="card-body">
-                  <h3 className="card-title text-lg flex items-center gap-2">
-                    <Crown className="w-5 h-5 text-warning" />
-                    MVP Agent
-                  </h3>
-                  <div className="flex items-center gap-3">
-                    <div className="avatar">
-                      <div className="w-12 rounded-full">
-                        <img
-                          src={mvpAgent.agent?.profileImage}
-                          alt={mvpAgent.name}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="font-bold">{mvpAgent.name}</div>
-                      <div className="text-sm opacity-70">
-                        {mvpAgent.agent?.nickName}
-                      </div>
-                      <div className="text-xs">
-                        {mvpAgent.resolved} resolved • {mvpAgent.successRate}%
-                        success rate
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Worst Performer */}
-            {worstAgent && worstAgent !== mvpAgent && (
-              <div className="card bg-error/10 border border-error/20">
-                <div className="card-body">
-                  <h3 className="card-title text-lg">Needs Improvement</h3>
-                  <div className="flex items-center gap-3">
-                    <div className="avatar">
-                      <div className="w-12 rounded-full">
-                        <img
-                          src={worstAgent.agent?.profileImage}
-                          alt={worstAgent.name}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="font-bold">{worstAgent.name}</div>
-                      <div className="text-sm opacity-70">
-                        {worstAgent.agent?.nickName}
-                      </div>
-                      <div className="text-xs">
-                        {worstAgent.failed} failed • {worstAgent.successRate}%
-                        success rate
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Team Performance */}
-          <div className="card bg-base-200 mb-8">
-            <div className="card-body">
-              <h3 className="card-title">Team Performance</h3>
-              <div className="overflow-x-auto">
-                <table className="table table-sm">
-                  <thead>
-                    <tr>
-                      <th>Agent</th>
-                      <th>Resolved</th>
-                      <th>Failed</th>
-                      <th>Success Rate</th>
-                      <th>Skills</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {agentPerformance.map((agent) => (
-                      <tr
-                        key={agent.name}
-                        className={
-                          agent === mvpAgent
-                            ? "bg-success/20"
-                            : agent === worstAgent
-                            ? "bg-error/20"
-                            : ""
-                        }
-                      >
-                        <td>
-                          <div className="flex items-center gap-2">
-                            <div className="avatar">
-                              <div className="w-8 rounded-full">
-                                <img
-                                  src={agent.agent?.profileImage}
-                                  alt={agent.name}
-                                />
-                              </div>
-                            </div>
-                            <span className="font-semibold">{agent.name}</span>
-                            {agent === mvpAgent && (
-                              <Crown className="w-4 h-4 text-warning" />
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <span className="badge badge-success badge-sm">
-                            {agent.resolved}
-                          </span>
-                        </td>
-                        <td>
-                          <span className="badge badge-error badge-sm">
-                            {agent.failed}
-                          </span>
-                        </td>
-                        <td>{agent.successRate}%</td>
-                        <td className="text-xs">
-                          HW: {agent.agent?.skills.hardware} | SW:{" "}
-                          {agent.agent?.skills.software}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          {/* Fun Facts */}
-          <div className="card bg-gradient-to-r from-primary/10 to-secondary/10 mb-8">
-            <div className="card-body">
-              <h3 className="card-title">📊 Final Statistics</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span className="font-bold">Total Items Processed:</span>
-                  <div className="text-lg">{inboxItems.length}</div>
-                </div>
-                <div>
-                  <span className="font-bold">Chaos Level:</span>
-                  <div className="text-lg">{gameState.chaos}/100</div>
-                </div>
-                <div>
-                  <span className="font-bold">Team Size:</span>
-                  <div className="text-lg">
-                    {Object.keys(agents).length} agents
-                  </div>
-                </div>
-                <div>
-                  <span className="font-bold">Current Contract:</span>
-                  <div className="text-sm">
-                    {currentContract?.name || "None"}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Restart Button */}
-          <div className="text-center">
-            <button
-              className="btn btn-primary btn-lg"
-              onClick={() => restartGame()}
-            >
-              🔄 Start New Company
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={1.5}
+        justifyContent="center"
+        sx={{ mt: 3 }}
+      >
+        <Button variant="outlined" onClick={restartGame}>
+          Back to Main Menu
+        </Button>
+        <Button variant="contained" onClick={restartGame}>
+          Restart
+        </Button>
+      </Stack>
+    </Box>
   );
-};
-
-export default GameOver;
+}

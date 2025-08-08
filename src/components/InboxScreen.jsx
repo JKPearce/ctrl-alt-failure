@@ -1,6 +1,29 @@
+import useSound from "@/hooks/useSound";
 import { formatGameTime } from "@/lib/helpers/gameHelpers";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
+import SearchIcon from "@mui/icons-material/Search";
+import {
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Grid,
+  InputAdornment,
+  ListItemButton,
+  Paper,
+  Snackbar,
+  Stack,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { FixedSizeList as VirtualList } from "react-window";
 
 const FILTERS = [
   { label: "All", value: "all" },
@@ -9,36 +32,99 @@ const FILTERS = [
   { label: "Complaints", value: "complaint" },
 ];
 
-function getTypeBadge(type, difficulty, small = false) {
-  const base = small
-    ? "badge font-semibold text-[10px] px-1 py-0.5 mr-2"
-    : "badge font-semibold text-xs px-2 py-1 mr-3";
-  if (type === "hardware") {
-    return (
-      <span className={`badge-primary ${base}`}>HW {difficulty}</span>
-    );
-  }
-  if (type === "software") {
-    return <span className={`badge-info ${base}`}>SW {difficulty}</span>;
-  }
-  return null;
-}
-
-const InboxScreen = ({ gameState, assignTicketToAgent, deleteSpam }) => {
-  const [expandedId, setExpandedId] = useState(null);
+export default function InboxScreen({
+  gameState,
+  assignTicketToAgent,
+  deleteSpam,
+}) {
   const [filter, setFilter] = useState("all");
+  const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState(null);
+  const { playAssign, playDelete } = useSound();
+  const [snack, setSnack] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
+  const searchRef = useRef(null);
 
-  const agents = useMemo(() => Object.values(gameState.agents), [gameState.agents]);
+  const agents = useMemo(
+    () => Object.values(gameState.agents),
+    [gameState.agents]
+  );
+  const items = useMemo(
+    () => Object.values(gameState.inbox).filter((i) => i.activeItem),
+    [gameState.inbox]
+  );
 
-  // Items filtered and sorted
-  let inboxItems = Object.values(gameState.inbox).filter((item) => item.activeItem);
-  if (filter !== "all") {
-    inboxItems = inboxItems.filter((item) => item.messageType === filter);
-  }
-  inboxItems = inboxItems.sort((a, b) => b.receivedTime - a.receivedTime);
+  const counts = useMemo(() => {
+    const base = { all: 0, ticket: 0, spam: 0, complaint: 0 };
+    for (const it of items) {
+      base.all += 1;
+      base[it.messageType] += 1;
+    }
+    return base;
+  }, [items]);
 
-  const activeCount = Object.values(gameState.inbox).filter((i) => i.activeItem).length;
-  const inboxSize = gameState.inboxSize;
+  const filtered = useMemo(() => {
+    let rows = items;
+    if (filter !== "all") rows = rows.filter((i) => i.messageType === filter);
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      rows = rows.filter((i) => {
+        const sender = (i.sender ?? "").toString().toLowerCase();
+        const subject = (i.subject ?? "").toString().toLowerCase();
+        const body = (i.body ?? "").toString().toLowerCase();
+        return sender.includes(q) || subject.includes(q) || body.includes(q);
+      });
+    }
+    return rows.sort((a, b) => b.receivedTime - a.receivedTime);
+  }, [items, filter, query]);
+
+  const selected = filtered.find((i) => i.id === selectedId) || null;
+
+  useEffect(() => {
+    // Clear selection if it no longer exists under current filter/query
+    if (selectedId && !filtered.some((r) => r.id === selectedId)) {
+      setSelectedId(null);
+    }
+  }, [filtered, selectedId]);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "/") {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+      if (
+        e.key.toLowerCase() === "b" &&
+        selected &&
+        selected.messageType === "ticket"
+      ) {
+        const best = getBestAgentId(selected);
+        if (best) {
+          playAssign();
+          assignTicketToAgent(selected.id, best);
+          setSnack({
+            open: true,
+            message: "Assigned best agent",
+            severity: "success",
+          });
+        }
+      }
+      if (
+        (e.key === "Delete" || e.key === "Backspace") &&
+        selected &&
+        selected.messageType !== "ticket"
+      ) {
+        playDelete();
+        deleteSpam(selected.id);
+        setSnack({ open: true, message: "Deleted", severity: "warning" });
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected, assignTicketToAgent, deleteSpam, playAssign, playDelete]);
 
   const getBestAgentId = (ticket) => {
     const available = agents.filter((a) => !a.assignedTicketId);
@@ -49,169 +135,405 @@ const InboxScreen = ({ gameState, assignTicketToAgent, deleteSpam }) => {
     return sorted[0]?.id || null;
   };
 
-  return (
-    <div className="h-full flex flex-col p-4">
-      {/* Inbox Header */}
-      <div className="mb-2">
-        <div className="flex items-center justify-between border rounded px-4 py-2 bg-base-100">
-          <span className="font-bold text-lg">
-            Inbox
-            <span className="text-base-content/50 font-normal"> {activeCount} / {inboxSize}</span>
-          </span>
-          <div className="flex gap-2">
-            {FILTERS.map((f) => (
-              <button
-                key={f.value}
-                className={`btn btn-xs btn-ghost ${filter === f.value ? "bg-base-200 font-bold" : ""}`}
-                onClick={() => setFilter(f.value)}
+  const ROW_HEIGHT = 76;
+
+  const renderRow = ({ index, style }) => {
+    const item = filtered[index] || {};
+    const isSelected = selectedId === item.id;
+    const isTicket = item.messageType === "ticket";
+    return (
+      <Box style={style} key={item.id}>
+        <ListItemButton
+          onClick={() => setSelectedId(item.id)}
+          selected={isSelected}
+          sx={{
+            mx: 1,
+            my: 0.5,
+            borderRadius: 1,
+            py: 1,
+            pr: 1,
+            bgcolor: isSelected ? "action.selected" : undefined,
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1.5}
+            alignItems="flex-start"
+            sx={{ width: 1 }}
+          >
+            <Chip
+              size="small"
+              color={
+                isTicket
+                  ? "primary"
+                  : item.messageType === "complaint"
+                  ? "warning"
+                  : "default"
+              }
+              variant={isTicket ? "filled" : "outlined"}
+              label={
+                isTicket
+                  ? "Ticket"
+                  : item.messageType === "spam"
+                  ? "Spam"
+                  : "Complaint"
+              }
+            />
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                sx={{ minWidth: 0 }}
               >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Column headers for readability */}
-      <div className="px-4 py-1 text-[11px] uppercase tracking-wide text-base-content/50 hidden sm:grid grid-cols-[1fr_auto]">
-        <div>From • Subject</div>
-        <div className="text-right">Received</div>
-      </div>
-
-      {/* List */}
-      <div className="flex-1 overflow-y-auto">
-        {inboxItems.length === 0 && (
-          <div className="text-center text-base-content/60 py-8">No messages found.</div>
-        )}
-        <ul>
-          {inboxItems.map((item) => {
-            const isNew = gameState.dayNumber === item.receivedDay;
-            const isExpanded = expandedId === item.id;
-            const isTicket = item.messageType === "ticket";
-            const isSpam = item.messageType === "spam";
-            const isComplaint = item.messageType === "complaint";
-            let typeBadge = null;
-            if (isTicket) {
-              typeBadge = getTypeBadge(item.ticketType, item.difficulty, true);
-            }
-
-            return (
-              <React.Fragment key={item.id}>
-                <li
-                  className={
-                    `group px-4 py-3 cursor-pointer grid grid-cols-[1fr_auto] gap-3 items-center ` +
-                    `${isNew ? "bg-base-300/40" : "bg-base-100"} ` +
-                    `hover:bg-base-200 transition border-b border-base-200 last:border-b-0`
-                  }
-                  onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                <Typography variant="body2" noWrap fontWeight={600}>
+                  {item.sender || "Unknown"}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  —
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  noWrap
+                  sx={{ flex: 1 }}
                 >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 min-w-0">
-                      {/* message type chip */}
-                      <span className={`badge badge-outline badge-sm ${isTicket ? "badge-primary" : isSpam ? "badge-error" : "badge-warning"}`}>
-                        {isTicket ? "Ticket" : isSpam ? "Spam" : "Complaint"}
-                      </span>
-                      {typeBadge}
-                      <span className="font-semibold truncate">{item.sender}</span>
-                      <span className="truncate text-base-content/80">— {item.subject}</span>
-                    </div>
-                    <div className="text-xs text-base-content/60 truncate">
-                      {item.body.length > 90 ? item.body.slice(0, 90) + "..." : item.body}
-                    </div>
-                  </div>
-                  <div className="text-right text-xs text-base-content/60 flex items-center justify-end gap-2">
-                    {isExpanded ? (
-                      <ChevronDown className="w-4 h-4" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
-                    <span>{`Day ${item.receivedDay} ${formatGameTime(item.receivedTime)}`}</span>
-                  </div>
-                </li>
+                  {item.subject || "(no subject)"}
+                </Typography>
+              </Stack>
+              <Typography variant="caption" color="text.secondary" noWrap>
+                {item.body || ""}
+              </Typography>
+            </Box>
+            <Stack
+              direction="row"
+              spacing={0.5}
+              alignItems="center"
+              color="text.secondary"
+            >
+              <Typography variant="caption">
+                Day {item.receivedDay ?? "?"}
+              </Typography>
+              <Typography variant="caption">•</Typography>
+              <Typography variant="caption">
+                {formatGameTime(item.receivedTime ?? 0)}
+              </Typography>
+              <ChevronRightIcon fontSize="small" />
+            </Stack>
+            {isTicket && (
+              <Button
+                size="small"
+                variant="outlined"
+                sx={{ ml: 1, display: { xs: "none", lg: "inline-flex" } }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const best = getBestAgentId(item);
+                  if (!best) return;
+                  playAssign();
+                  assignTicketToAgent(item.id, best);
+                  setSnack({
+                    open: true,
+                    message: "Assigned best agent",
+                    severity: "success",
+                  });
+                }}
+              >
+                Assign
+              </Button>
+            )}
+          </Stack>
+        </ListItemButton>
+      </Box>
+    );
+  };
 
-                {isExpanded && (
-                  <div className="px-12 py-4 bg-base-200 border-b border-base-300">
-                    <div className="mb-2">
-                      <div className="font-bold text-base mb-1">{item.subject}</div>
-                      <div className="text-sm text-base-content/60 mb-2">
-                        From: <span className="font-semibold">{item.sender}</span>
-                      </div>
-                      {isTicket && (
-                        <div className="flex items-center gap-2 mb-2">{getTypeBadge(item.ticketType, item.difficulty)}</div>
-                      )}
-                      <div className="text-sm whitespace-pre-line mb-3">{item.body}</div>
-                    </div>
+  return (
+    <Paper sx={{ p: 1.5, height: 1, minHeight: 420 }}>
+      {/* Outlook-like header */}
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
+        <TextField
+          size="small"
+          placeholder="Search sender, subject, or body… (/ to focus)"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          inputRef={searchRef}
+          sx={{ flex: 1, minWidth: 220 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon fontSize="small" />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <ToggleButtonGroup
+          value={filter}
+          exclusive
+          onChange={(e, v) => v && setFilter(v)}
+          size="small"
+          color="primary"
+        >
+          {FILTERS.map((f) => (
+            <ToggleButton key={f.value} value={f.value} sx={{ gap: 0.75 }}>
+              <Typography variant="body2">{f.label}</Typography>
+              <Chip size="small" variant="outlined" label={counts[f.value]} />
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+        <Chip
+          size="small"
+          variant="outlined"
+          label={`${filtered.length} items`}
+        />
+      </Stack>
 
-                    {isTicket && (
-                      <div className="flex items-center gap-3">
-                        <button
-                          className="btn btn-sm btn-primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const best = getBestAgentId(item);
-                            if (best) assignTicketToAgent(item.id, best);
-                          }}
-                          disabled={agents.filter((a) => !a.assignedTicketId).length === 0}
-                        >
-                          Assign Best
-                        </button>
-                        <span className="text-xs text-base-content/60">or pick manually:</span>
-                      </div>
-                    )}
+      {/* Split pane */}
+      <Box sx={{ display: "flex", gap: 1.5, height: `calc(100% - 44px)` }}>
+        {/* Fixed-width message list */}
+        <Paper
+          variant="outlined"
+          sx={{ width: 360, minWidth: 320, maxWidth: 420, overflow: "hidden" }}
+        >
+          {filtered.length === 0 ? (
+            <Box
+              sx={{
+                height: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "text.secondary",
+                p: 2,
+              }}
+            >
+              No messages.
+            </Box>
+          ) : filtered.length <= 50 ? (
+            <Box sx={{ py: 0.5 }}>
+              {filtered.map((_, index) =>
+                renderRow({ index, style: { height: ROW_HEIGHT } })
+              )}
+            </Box>
+          ) : (
+            <VirtualList
+              height={Math.min(
+                520,
+                Math.max(320, filtered.length * ROW_HEIGHT)
+              )}
+              itemCount={filtered.length}
+              itemSize={ROW_HEIGHT}
+              width={360}
+            >
+              {renderRow}
+            </VirtualList>
+          )}
+        </Paper>
 
-                    {isTicket && (
-                      <div className="mt-3">
-                        <div className="font-semibold text-xs mb-2">Assign to Agent</div>
-                        <div className="flex flex-col gap-2">
-                          {agents
-                            .sort((a, b) => b.skills[item.ticketType] - a.skills[item.ticketType])
-                            .filter((agent) => {
-                              return !agent.assignedTicketId;
-                            })
-                            .map((agent) => {
-                              const agentSkill = agent.skills[item.ticketType];
-                              const isGood = agentSkill >= item.difficulty;
+        {/* Reading pane expands */}
+        <Paper variant="outlined" sx={{ flex: 1, p: 2, overflow: "auto" }}>
+          {!selected ? (
+            <Box
+              sx={{
+                height: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "text.secondary",
+              }}
+            >
+              Select a message to view details
+            </Box>
+          ) : (
+            <Stack spacing={1.5}>
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                color="text.secondary"
+              >
+                <Chip
+                  size="small"
+                  label={
+                    selected.messageType === "ticket"
+                      ? "Ticket"
+                      : selected.messageType === "spam"
+                      ? "Spam"
+                      : "Complaint"
+                  }
+                  variant="outlined"
+                />
+                <Typography variant="caption">
+                  Day {selected.receivedDay}
+                </Typography>
+                <Typography variant="caption">•</Typography>
+                <Typography variant="caption">
+                  {formatGameTime(selected.receivedTime)}
+                </Typography>
+              </Stack>
+              <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
+                {selected.subject}
+              </Typography>
+              <Typography variant="subtitle2" color="text.secondary">
+                From {selected.sender}
+              </Typography>
+              {selected.messageType === "ticket" && (
+                <Typography variant="caption" color="text.secondary">
+                  {selected.ticketType.charAt(0).toUpperCase() +
+                    selected.ticketType.slice(1)}{" "}
+                  • Difficulty {selected.difficulty}
+                </Typography>
+              )}
+              <Divider sx={{ my: 1 }} />
+              <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
+                {selected.body}
+              </Typography>
 
-                              return (
-                                <div key={agent.id} className={`flex items-center gap-4 p-2 rounded ${isGood ? "bg-success/10" : "bg-base-100"}`}>
-                                  <div className="avatar">
-                                    <div className="w-8 rounded-full bg-base-300">
-                                      <img src={agent.profileImage} alt={agent.agentName} />
-                                    </div>
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-semibold truncate">{agent.agentName}</div>
-                                    <div className="text-xs text-base-content/60">
-                                      {item.ticketType.charAt(0).toUpperCase() + item.ticketType.slice(1)} skill: <span className={`font-bold ${isGood ? "text-success" : "text-base-content"}`}>{agentSkill}</span>
-                                      {"  |  "}Ticket difficulty: <span className="font-bold">{item.difficulty}</span>
-                                    </div>
-                                  </div>
-                                  <button className={`btn btn-xs`} onClick={() => assignTicketToAgent(item.id, agent.id)}>
-                                    Assign
-                                  </button>
-                                </div>
-                              );
-                            })}
-                        </div>
-                      </div>
-                    )}
+              {selected.messageType === "ticket" ? (
+                <Box>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    alignItems="center"
+                    sx={{ mb: 1 }}
+                  >
+                    <Button
+                      size="small"
+                      variant="contained"
+                      startIcon={<PersonAddAltIcon />}
+                      onClick={() => {
+                        const best = getBestAgentId(selected);
+                        if (best) {
+                          playAssign();
+                          assignTicketToAgent(selected.id, best);
+                          setSnack({
+                            open: true,
+                            message: "Assigned best agent",
+                            severity: "success",
+                          });
+                        }
+                      }}
+                      disabled={
+                        agents.filter((a) => !a.assignedTicketId).length === 0
+                      }
+                    >
+                      Assign Best
+                    </Button>
+                    <Typography variant="caption" color="text.secondary">
+                      or choose an agent
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={1}>
+                    {agents
+                      .filter((a) => !a.assignedTicketId)
+                      .sort(
+                        (a, b) =>
+                          b.skills[selected.ticketType] -
+                          a.skills[selected.ticketType]
+                      )
+                      .map((agent) => {
+                        const skill = agent.skills[selected.ticketType];
+                        const isGood = skill >= selected.difficulty;
+                        return (
+                          <Paper
+                            key={agent.id}
+                            variant="outlined"
+                            sx={{ p: 1 }}
+                          >
+                            <Stack
+                              direction="row"
+                              spacing={1.5}
+                              alignItems="center"
+                            >
+                              <Avatar
+                                src={agent.profileImage}
+                                alt={agent.agentName}
+                                sx={{ width: 28, height: 28 }}
+                              />
+                              <Box sx={{ minWidth: 0, flex: 1 }}>
+                                <Typography
+                                  variant="body2"
+                                  noWrap
+                                  fontWeight={600}
+                                >
+                                  {agent.agentName}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  {selected.ticketType.charAt(0).toUpperCase() +
+                                    selected.ticketType.slice(1)}{" "}
+                                  skill:{" "}
+                                  <b
+                                    style={{
+                                      color: isGood ? "#4ade80" : undefined,
+                                    }}
+                                  >
+                                    {skill}
+                                  </b>{" "}
+                                  | Ticket difficulty:{" "}
+                                  <b>{selected.difficulty}</b>
+                                </Typography>
+                              </Box>
+                              <Button
+                                size="small"
+                                onClick={() => {
+                                  playAssign();
+                                  assignTicketToAgent(selected.id, agent.id);
+                                  setSnack({
+                                    open: true,
+                                    message: `Assigned ${agent.agentName}`,
+                                    severity: "success",
+                                  });
+                                }}
+                              >
+                                Assign
+                              </Button>
+                            </Stack>
+                          </Paper>
+                        );
+                      })}
+                  </Stack>
+                </Box>
+              ) : (
+                <Box>
+                  <Button
+                    size="small"
+                    color="error"
+                    variant="outlined"
+                    startIcon={<DeleteOutlineIcon />}
+                    onClick={() => {
+                      playDelete();
+                      deleteSpam(selected.id);
+                      setSnack({
+                        open: true,
+                        message: "Deleted",
+                        severity: "warning",
+                      });
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Box>
+              )}
+            </Stack>
+          )}
+        </Paper>
+      </Box>
 
-                    {!isTicket && (
-                      <div className="mt-2">
-                        <button className="btn btn-xs btn-outline btn-error" onClick={() => deleteSpam(item.id)}>
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </React.Fragment>
-            );
-          })}
-        </ul>
-      </div>
-    </div>
+      <Snackbar
+        open={snack.open}
+        autoHideDuration={1800}
+        onClose={() => setSnack({ ...snack, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snack.severity}
+          variant="filled"
+          onClose={() => setSnack({ ...snack, open: false })}
+        >
+          {snack.message}
+        </Alert>
+      </Snackbar>
+    </Paper>
   );
-};
-
-export default InboxScreen;
+}

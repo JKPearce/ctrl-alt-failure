@@ -158,8 +158,11 @@ export const spawnNewTicket = async (
     try {
       const response = await fetch("/api/ticket", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify({ contract }),
       });
+      if (!response.ok) throw new Error("ticket api error");
       ticketData = await response.json();
     } catch (error) {
       ticketData = getFallbackTicket(TICKET_TEMPLATES);
@@ -191,8 +194,11 @@ export const spawnNewSpam = async (contract, chaos, dayNumber, gameMinutes) => {
     try {
       const response = await fetch("/api/spam", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify({ contract }),
       });
+      if (!response.ok) throw new Error("spam api error");
       spamData = await response.json();
     } catch (error) {
       spamData = getFallbackTicket(SPAM_TEMPLATES);

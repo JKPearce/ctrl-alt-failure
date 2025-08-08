@@ -17,13 +17,15 @@ export async function POST(request) {
     model: "gpt-4o-mini",
     instructions: `You are a spam email generator for a game that is based on an IT helpdesk. You will generate humorous but believable spam emails that could be sent to a company's helpdesk. It could be from a nigerian prince trying to sell you something or maybe its a fake gmail email or some sort of fake click here to expand your ram capacity. You must return only raw JSON, with no explanations, no formatting, and no Markdown. Ensure all newlines are escaped properly within strings using \\n. Do not include any backticks or code blocks. Do not prefix the output with text like "Here's your JSON".
 `,
-    input: `Generate a new spam email for this IT helpdesk company. You may use aspects of the players current client, their clients name is ${companyName} and they are a ${companyDescription} and the userbase is ${companyUserType}. the more chaotic the better, but keep it believable but not too obvious.`,
+    input: `Generate a new spam email for this IT helpdesk company.
+Company: ${companyName} — culture: ${companyCulture} — users: ${companyUserType}.
+Vary sender style, subject bait, and payload (phish, fake invoice, scareware). Keep it humorous but not offensive.`,
     text: {
       format: zodTextFormat(spamEmailSchema, "spam_email", {
         strict: true,
       }),
     },
-    temperature: 1,
+    temperature: 1.1,
   });
 
   return Response.json(response.output_parsed);
