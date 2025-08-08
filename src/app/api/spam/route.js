@@ -2,12 +2,16 @@ import { spamEmailSchema } from "@/lib/utils/Schemas";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
-
 export async function POST(request) {
   const { contract } = await request.json();
   const { companyName, companyDescription, companyUserType, companyCulture } =
     contract;
+
+  const apiKey = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY;
+  if (!apiKey) {
+    return Response.json({ error: "OPENAI key missing" }, { status: 503 });
+  }
+  const openai = new OpenAI({ apiKey });
 
   const response = await openai.responses.parse({
     model: "gpt-4o-mini",
@@ -21,8 +25,6 @@ export async function POST(request) {
     },
     temperature: 1,
   });
-
-  console.log("response", response.output_parsed);
 
   return Response.json(response.output_parsed);
 }

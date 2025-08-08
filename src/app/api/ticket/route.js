@@ -2,13 +2,18 @@ import { ticketSchema } from "@/lib/utils/Schemas";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
+async function getOpenAI() {
+  const apiKey = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY;
+  if (!apiKey) return null;
+  return new OpenAI({ apiKey });
+}
 
 async function generateNewAITicketsBulk(amount) {
+  const openai = await getOpenAI();
+  if (!openai) throw new Error("OPENAI key missing");
   const newTickets = [];
 
   for (let index = 0; index < amount; index++) {
-    console.log("Generating ticket: ", index);
     const response = await openai.responses.parse({
       model: "gpt-4o-mini",
       instructions: `You are Ticket-Bot 5000, a cheeky help-desk ticket generator. Return ONLY the JSON array.`,
@@ -21,7 +26,6 @@ async function generateNewAITicketsBulk(amount) {
       temperature: 1.2,
     });
 
-    console.log("ticket generated", response.output_parsed);
     newTickets.push(response.output_parsed);
   }
 
@@ -29,6 +33,8 @@ async function generateNewAITicketsBulk(amount) {
 }
 
 async function generateNewAITicket(contract, ticketType) {
+  const openai = await getOpenAI();
+  if (!openai) throw new Error("OPENAI key missing");
   const { companyName, companyDescription, companyUserType, companyCulture } =
     contract;
 
@@ -54,20 +60,14 @@ Avoid unnecessary rambling or repetition. Stay concise and passive-aggressive.`,
 // This handles GET requests
 export async function GET(request) {
   try {
-    // Call your function and wait for it to complete
-    const tickets = await generateNewAITicketsBulk(1);
+    const openai = await getOpenAI();
+    if (!openai) return Response.json({ error: "OPENAI key missing" }, { status: 503 });
 
-    // Return a proper JSON response
+    const tickets = await generateNewAITicketsBulk(1);
     return Response.json(tickets);
   } catch (error) {
-    // Handle any errors that occur
     console.error("Error generating tickets:", error);
-
-    // Return an error response
-    return Response.json(
-      { error: "Failed to generate tickets" },
-      { status: 500 }
-    );
+    return Response.json({ error: "Failed to generate tickets" }, { status: 500 });
   }
 }
 
@@ -75,8 +75,7 @@ export async function GET(request) {
 export async function POST(request) {
   const { contract } = await request.json();
 
-  //I want to make a "generic IT Ticket" one that can happen in any company
-  //i also want to roll on the spawnTable to get a specific type of ticket related to the company
+  // select specific issue via spawnTable
   const entries = Object.entries(contract.spawnTable);
   const roll = Math.random();
   let cumulativeProbability = 0;
@@ -90,9 +89,13 @@ export async function POST(request) {
     }
   }
 
-  const aiGeneratedTicket = await generateNewAITicket(
-    contract,
-    selectedTicketIssue
-  );
-  return Response.json(aiGeneratedTicket);
+  try {
+    const openai = await getOpenAI();
+    if (!openai) return Response.json({ error: "OPENAI key missing" }, { status: 503 });
+
+    const aiGeneratedTicket = await generateNewAITicket(contract, selectedTicketIssue);
+    return Response.json(aiGeneratedTicket);
+  } catch (e) {
+    return Response.json({ error: "Failed to generate ticket" }, { status: 500 });
+  }
 }

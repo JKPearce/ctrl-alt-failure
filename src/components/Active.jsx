@@ -15,6 +15,7 @@ import React, { useState } from "react";
 import ContractView from "./ContractView";
 import InboxScreen from "./InboxScreen";
 import ScreamFeed from "./ScreamFeed";
+import HUD from "./HUD";
 
 const navItems = [
   { label: "inbox", icon: Inbox },
@@ -58,16 +59,12 @@ const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
           <span className="btn btn-ghost text-xl">CTRL-ALT-FAIL</span>
         </div>
         <div className="flex-1 justify-center flex">
-          <span className="text-lg font-semibold">
-            {gameState.businessName}
-          </span>
+          <span className="text-lg font-semibold">{gameState.businessName}</span>
         </div>
-        <div className="flex-1 justify-end flex gap-4 items-center">
+        <div className="flex-1 justify-end flex gap-3 items-center pr-2">
           <div className="flex items-center gap-2">
             <button
-              className={`btn ${
-                gameState.gameTime.isPaused ? "btn-primary" : "btn-outline"
-              }`}
+              className={`btn ${gameState.gameTime.isPaused ? "btn-primary" : "btn-outline"}`}
               onClick={() => {
                 if (gameState.gameTime.isPaused) {
                   resumeTime();
@@ -75,6 +72,8 @@ const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
                   pauseTime();
                 }
               }}
+              aria-label={gameState.gameTime.isPaused ? "Resume" : "Pause"}
+              title={gameState.gameTime.isPaused ? "Resume" : "Pause"}
             >
               {gameState.gameTime.isPaused ? "▶️" : "⏸️"}
             </button>
@@ -82,25 +81,24 @@ const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
             {[1, 2, 3].map((speed) => (
               <button
                 key={speed}
-                className={`btn ${
-                  gameState.gameTime.speed === speed
-                    ? "btn-active"
-                    : "btn-outline"
-                }`}
+                className={`btn ${gameState.gameTime.speed === speed ? "btn-active" : "btn-outline"}`}
                 onClick={() => setTimeSpeed(speed)}
               >
                 {speed}x
               </button>
             ))}
-            <span>
-              <Clock />
-              Time:{formatGameTime(gameState.gameTime.currentTick)}
+            <span className="flex items-center gap-1 text-sm">
+              <Clock className="w-4 h-4" />
+              {formatGameTime(gameState.gameTime.currentTick)}
             </span>
           </div>
-          <span>Day {gameState.dayNumber}</span>
-          <span>Chaos {gameState.chaos}</span>
+          <span className="text-sm">Day {gameState.dayNumber}</span>
+          <span className="text-sm">Chaos {gameState.chaos}</span>
         </div>
       </div>
+
+      {/* HUD */}
+      <HUD gameState={gameState} />
 
       {/* Main Content */}
       <div className="flex flex-1">
@@ -161,18 +159,12 @@ const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
                 Agents
               </div>
             )}
-            <div
-              className={`flex flex-col gap-4 ${
-                !sidebarOpen ? "items-center" : ""
-              }`}
-            >
+            <div className={`flex flex-col gap-4 ${!sidebarOpen ? "items-center" : ""}`}>
               {agents.map((agent) => (
                 <button
                   key={agent.id}
                   className={`flex items-center gap-2 w-full rounded-lg transition-colors ${
-                    selectedAgentId === agent.id
-                      ? "bg-base-300"
-                      : "hover:bg-base-100"
+                    selectedAgentId === agent.id ? "bg-base-300" : "hover:bg-base-100"
                   } ${!sidebarOpen ? "justify-center p-0" : "p-2"}`}
                   onClick={() => setSelectedAgentId(agent.id)}
                   tabIndex={0}
@@ -193,20 +185,12 @@ const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
                   {sidebarOpen && (
                     <div className="text-xs text-left">
                       <div className="font-semibold">{agent.agentName}</div>
-                      <div className="text-xs text-base-content/60">
-                        {agent.currentAction}
-                      </div>
+                      <div className="text-xs text-base-content/60">{agent.currentAction}</div>
                       {agent.assignedTicketId && (
                         <progress
                           className="progress progress-primary"
-                          value={
-                            gameState.inbox[agent.assignedTicketId]
-                              .resolveProgress
-                          }
-                          max={
-                            gameState.inbox[agent.assignedTicketId]
-                              .timeToResolve
-                          }
+                          value={gameState.inbox[agent.assignedTicketId].resolveProgress}
+                          max={gameState.inbox[agent.assignedTicketId].timeToResolve}
                         />
                       )}
                     </div>
@@ -224,61 +208,37 @@ const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
                 <div className="flex items-center gap-4">
                   <div className="avatar">
                     <div className="w-16 rounded-full bg-base-300">
-                      <img
-                        src={selectedAgent.profileImage}
-                        alt={selectedAgent.agentName}
-                      />
+                      <img src={selectedAgent.profileImage} alt={selectedAgent.agentName} />
                     </div>
                   </div>
                   <div>
-                    <div className="text-xl font-bold">
-                      {selectedAgent.agentName}
-                    </div>
+                    <div className="text-xl font-bold">{selectedAgent.agentName}</div>
                     <div className="text-base-content/60 text-sm">
-                      {selectedAgent.nickName} &bull; Age {selectedAgent.age}{" "}
-                      &bull; {selectedAgent.gender}
+                      {selectedAgent.nickName} • Age {selectedAgent.age} • {selectedAgent.gender}
                     </div>
-                    <div className="text-sm mt-1 italic">
-                      {selectedAgent.personalStatement}
-                    </div>
+                    <div className="text-sm mt-1 italic">{selectedAgent.personalStatement}</div>
                   </div>
                 </div>
                 <div className="flex gap-8 mt-2">
                   <div>
                     <div className="font-semibold text-xs mb-1">Skills</div>
-                    <div className="text-xs">
-                      Hardware: {selectedAgent.skills.hardware}
-                    </div>
-                    <div className="text-xs">
-                      Software: {selectedAgent.skills.software}
-                    </div>
+                    <div className="text-xs">Hardware: {selectedAgent.skills.hardware}</div>
+                    <div className="text-xs">Software: {selectedAgent.skills.software}</div>
                   </div>
                   <div>
-                    <div className="font-semibold text-xs mb-1">
-                      Personality
-                    </div>
-                    <div className="text-xs">
-                      Traits: {selectedAgent.personality.traits.join(", ")}
-                    </div>
-                    <div className="text-xs">
-                      Fav Food: {selectedAgent.personality.favFood}
-                    </div>
+                    <div className="font-semibold text-xs mb-1">Personality</div>
+                    <div className="text-xs">Traits: {selectedAgent.personality.traits.join(", ")}</div>
+                    <div className="text-xs">Fav Food: {selectedAgent.personality.favFood}</div>
                   </div>
                 </div>
                 <div className="mt-4">
                   <div className="font-semibold text-xs mb-1">Chat Log</div>
                   <div className="bg-base-200 rounded p-3 text-xs h-40 overflow-y-auto flex flex-col gap-2">
-                    {/* Placeholder for chat log, replace with real data later */}
                     <div className="chat chat-start">
-                      <div className="chat-bubble">
-                        You assigned {selectedAgent.agentName} to Ticket:
-                        "Broken printer"
-                      </div>
+                      <div className="chat-bubble">You assigned {selectedAgent.agentName} to Ticket: "Broken printer"</div>
                     </div>
                     <div className="chat chat-end">
-                      <div className="chat-bubble">
-                        Printers are just made to make my life harder...
-                      </div>
+                      <div className="chat-bubble">Printers are just made to make my life harder...</div>
                     </div>
                   </div>
                 </div>
@@ -293,15 +253,10 @@ const Active = ({ gameState, pauseTime, resumeTime, setTimeSpeed }) => {
                   />
                 )}
                 {selectedNav === "stats" && (
-                  <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
-                    Stats view coming soon...
-                  </div>
+                  <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">Stats view coming soon...</div>
                 )}
                 {selectedNav === "ctrl-alt-scream" && (
-                  <ScreamFeed
-                    screams={gameState.screams}
-                    agents={gameState.agents}
-                  />
+                  <ScreamFeed screams={gameState.screams} agents={gameState.agents} />
                 )}
                 {selectedNav === "contract" && (
                   <div className="text-center text-lg text-base-content/70 flex-1 flex items-start">
