@@ -325,7 +325,7 @@ function SetupScreen({ startGame }) {
           </Typography>
 
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Stack spacing={0.5}>
@@ -342,7 +342,7 @@ function SetupScreen({ startGame }) {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Stack spacing={0.5}>
@@ -359,7 +359,7 @@ function SetupScreen({ startGame }) {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Stack spacing={0.5}>
@@ -381,7 +381,7 @@ function SetupScreen({ startGame }) {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Stack spacing={0.5}>

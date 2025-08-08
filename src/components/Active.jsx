@@ -13,6 +13,8 @@ import PauseIcon from "@mui/icons-material/Pause";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import {
   AppBar,
+  BottomNavigation,
+  BottomNavigationAction,
   Box,
   Button,
   ButtonGroup,
@@ -264,7 +266,7 @@ export default function Active({
           <Stack
             direction="row"
             spacing={1}
-            sx={{ display: { xs: "none", lg: "flex" } }}
+            sx={{ display: { xs: "none", sm: "flex" } }}
           >
             <Chip
               label={`Inbox ${activeCount}/${inboxSize}`}
@@ -295,7 +297,11 @@ export default function Active({
           </Stack>
           <Box sx={{ flex: 1 }} />
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <ButtonGroup variant="outlined" size="small">
+            <ButtonGroup
+              variant="outlined"
+              size="small"
+              sx={{ display: { xs: "none", md: "inline-flex" } }}
+            >
               {gameState.gameTime.isPaused ? (
                 <Button
                   onClick={() => {
@@ -334,7 +340,10 @@ export default function Active({
               direction="row"
               spacing={1}
               alignItems="center"
-              sx={{ display: { xs: "none", md: "flex" }, minWidth: 220 }}
+              sx={{
+                display: { xs: "none", md: "flex" },
+                minWidth: { md: 220 },
+              }}
             >
               <Stack spacing={0.25} sx={{ width: 80 }}>
                 <Typography variant="caption" color="text.secondary">
@@ -423,12 +432,16 @@ export default function Active({
         </Drawer>
       </Box>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 2 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: { xs: 1, md: 2 } }}>
         <Toolbar />
-        <Box sx={{ maxWidth: 1200, mx: "auto" }}>
+        <Box sx={{ maxWidth: 1200, mx: "auto", pb: { xs: 12, md: 0 } }}>
           {selectedAgent ? (
             <Paper sx={{ p: 2 }}>
-              <Stack direction="row" spacing={2} alignItems="center">
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                alignItems={{ sm: "center" }}
+              >
                 {selectedAgent.profileImage ? (
                   <img
                     src={selectedAgent.profileImage}
@@ -560,7 +573,11 @@ export default function Active({
                     )}
                   </Stack>
                 </Box>
-                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={1}
+                  sx={{ mt: 1 }}
+                >
                   <TextField
                     size="small"
                     fullWidth
@@ -600,6 +617,101 @@ export default function Active({
           )}
         </Box>
       </Box>
+
+      {/* Mobile bottom controls */}
+      <Paper
+        elevation={8}
+        sx={{
+          position: "fixed",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: { xs: "block", md: "none" },
+          borderTop: 1,
+          borderColor: "divider",
+          pb: "env(safe-area-inset-bottom)",
+        }}
+      >
+        <Box sx={{ px: 1, pt: 0.5 }}>
+          <BottomNavigation
+            value={selectedNav}
+            onChange={(e, val) => {
+              setSelectedNav(val);
+              setSelectedAgentId(null);
+            }}
+            showLabels
+          >
+            <BottomNavigationAction
+              label="Inbox"
+              value="inbox"
+              icon={<InboxIcon />}
+            />
+            <BottomNavigationAction
+              label="Contract"
+              value="contract"
+              icon={<HandshakeIcon />}
+            />
+            <BottomNavigationAction
+              label="Stats"
+              value="stats"
+              icon={<BarChartIcon />}
+            />
+            <BottomNavigationAction
+              label="Screams"
+              value="screams"
+              icon={<MegaphoneIcon />}
+            />
+          </BottomNavigation>
+
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ py: 0.5 }}
+          >
+            <Stack direction="row" spacing={1} alignItems="center">
+              {gameState.gameTime.isPaused ? (
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={() => {
+                    playResume();
+                    resumeTime();
+                  }}
+                  startIcon={<PlayArrowIcon />}
+                >
+                  Play
+                </Button>
+              ) : (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    playPause();
+                    pauseTime();
+                  }}
+                  startIcon={<PauseIcon />}
+                >
+                  Pause
+                </Button>
+              )}
+            </Stack>
+            <ButtonGroup variant="outlined" size="small">
+              {[1, 2, 3].map((s) => (
+                <Button
+                  key={s}
+                  variant={
+                    gameState.gameTime.speed === s ? "contained" : "outlined"
+                  }
+                  onClick={() => setTimeSpeed(s)}
+                >
+                  {s}x
+                </Button>
+              ))}
+            </ButtonGroup>
+          </Stack>
+        </Box>
+      </Paper>
     </Box>
   );
 }

@@ -288,11 +288,23 @@ export default function InboxScreen({
       </Stack>
 
       {/* Split pane */}
-      <Box sx={{ display: "flex", gap: 1.5, height: `calc(100% - 44px)` }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 1.5,
+          height: { xs: "auto", md: `calc(100% - 44px)` },
+        }}
+      >
         {/* Fixed-width message list */}
         <Paper
           variant="outlined"
-          sx={{ width: 360, minWidth: 320, maxWidth: 420, overflow: "hidden" }}
+          sx={{
+            width: { xs: 1, md: 360 },
+            minWidth: { md: 320 },
+            maxWidth: { md: 420 },
+            overflow: "hidden",
+          }}
         >
           {filtered.length === 0 ? (
             <Box
@@ -321,7 +333,7 @@ export default function InboxScreen({
               )}
               itemCount={filtered.length}
               itemSize={ROW_HEIGHT}
-              width={360}
+              width={"100%"}
             >
               {renderRow}
             </VirtualList>
@@ -329,7 +341,15 @@ export default function InboxScreen({
         </Paper>
 
         {/* Reading pane expands */}
-        <Paper variant="outlined" sx={{ flex: 1, p: 2, overflow: "auto" }}>
+        <Paper
+          variant="outlined"
+          sx={{
+            flex: 1,
+            p: 2,
+            overflow: "auto",
+            minHeight: { xs: 260, md: "auto" },
+          }}
+        >
           {!selected ? (
             <Box
               sx={{
