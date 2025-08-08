@@ -2,11 +2,15 @@ import { screamSchema } from "@/lib/utils/Schemas";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
-
 export async function POST(request) {
   const { agent, currentTicket, chaos, currentTime, currentDay } =
     await request.json();
+
+  const apiKey = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY;
+  if (!apiKey) {
+    return Response.json({ error: "OPENAI key missing" }, { status: 503 });
+  }
+  const openai = new OpenAI({ apiKey });
 
   const response = await openai.responses.parse({
     model: "gpt-4o-mini",
@@ -35,8 +39,6 @@ The current chaos level is ${chaos}% the current day is ${currentDay} and the cu
     },
     temperature: 1,
   });
-
-  console.log("response", response.output_parsed);
 
   return Response.json(response.output_parsed);
 }
